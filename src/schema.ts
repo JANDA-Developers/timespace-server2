@@ -1,5 +1,6 @@
 import { fileLoader, mergeResolvers, mergeTypes } from "merge-graphql-schemas";
 import path from "path";
+import * as scalars from "./api/Common/scalars/scalars";
 import { makeExecutableSchema } from "graphql-tools";
 import { GraphQLUpload } from "graphql-upload";
 
@@ -18,6 +19,7 @@ const schema = makeExecutableSchema({
     typeDefs: mergedTypes,
     resolvers: {
         ...mergedResolvers,
+        ...scalars,
         Upload: GraphQLUpload
     }
 });

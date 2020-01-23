@@ -1,0 +1,40 @@
+scalar DateTime
+scalar EmailAddress
+scalar Name
+scalar Password
+scalar PhoneNumber
+scalar URL
+scalar Object
+scalar Upload
+
+type Err {
+    msg: String!
+    code: String!
+}
+
+enum MimeType {
+    TEXT_PLAIN
+    TEXT_CSS
+    TEXT_JAVASCRIPT
+
+    IMAGE_GIF
+    IMAGE_PNG
+    IMAGE_JPEG
+    IMAGE_BMP
+    IMAGE_WEBP
+
+    AUDIO_MIDI
+    AUDIO_MPEG
+    AUDIO_WEBM
+    AUDIO_OGG
+    AUDIO_WAV
+    VIDEO_WEBM
+    VIDEO_OGG
+
+    APPLICATION_OCTET_STREAM
+    APPLICATION_PKCS12
+    APPLICATION_VND_MSPOWERPOINT
+    APPLICATION_XHTML_XML
+    APPLICATION_XML
+    APPLICATION_PDF
+}
