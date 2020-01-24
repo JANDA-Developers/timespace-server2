@@ -1,0 +1,31 @@
+type ZoneInfo {
+    _id: ID!
+    # 국가 코드
+    countryCode: String!
+    # 국가 명
+    countryName: String!
+    # 얘가 유니크한 값임.
+    timezone: String!
+    # 분 단위 시간 보정값 => ex) 대한민국의 경우 +540 => 따라서 UTC 시간에 +540분을 하면 우리나라 시간이 나옴
+    offset: Int!
+}
+
+type GroupedZoneInfo {
+    _id: ZoneInfoGroup!
+    timezones: [String!]
+}
+
+type ZoneInfoGroup {
+    countryCode: String!
+    countryName: String!
+    offset: Int!
+}
+
+type Query {
+    countries: [Country!]
+}
+
+type Country {
+    name: String!
+    code: String!
+}

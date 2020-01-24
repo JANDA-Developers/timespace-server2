@@ -1,0 +1,14 @@
+type Mutation {
+    SignIn(param: SignInInput!): SignInResponse!
+}
+
+input SignInInput {
+    email: EmailAddress!
+    password: String!
+}
+
+type SignInResponse {
+    ok: Boolean!
+    error: Err
+    data: Object
+}

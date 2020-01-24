@@ -1,3 +1,13 @@
-type User {
+type User implements BaseModel {
     _id: ID!
+    name: String
+    email: String
+    phoneNumber: PhoneNumber
+    zoneInfo: ZoneInfo
+    createdAt: DateTime!
+    updatedAt: DateTime!
+}
+
+type Query {
+    users: [User!]
 }

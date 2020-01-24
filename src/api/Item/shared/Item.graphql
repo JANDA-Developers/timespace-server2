@@ -1,0 +1,11 @@
+type Item {
+    _id: ID!
+    store: Store
+    user: User
+    group: Group
+    name: String!
+    itemNum: String!
+    images: [URL!]
+    description: String
+    constraintors: [Constraintor!]
+}

@@ -1,0 +1,30 @@
+type Mutation {
+    EmailSignUp(param: EmailSignUpInput!): EmailSignUpResponse!
+}
+
+type EmailSignUpResponse {
+    ok: Boolean!
+    error: Err
+    data: EmailSignUpResult
+}
+
+input EmailSignUpInput {
+    email: EmailAddress!
+    phoneNumber: PhoneNumber!
+    # 기본값 Asia/Seoul
+    timezone: String
+    password: Password!
+    username: String!
+}
+
+type EmailSignUpResult {
+    CodeDeliveryDetails: CodeDeliveryDetails
+    UserConfirmed: Boolean!
+    UserSub: String
+}
+
+type CodeDeliveryDetails {
+    AttributeName: String
+    DeliveryMedium: String
+    Destination: String
+}

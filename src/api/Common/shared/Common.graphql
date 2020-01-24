@@ -38,3 +38,9 @@ enum MimeType {
     APPLICATION_XML
     APPLICATION_PDF
 }
+
+interface BaseModel {
+    _id: ID!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+}

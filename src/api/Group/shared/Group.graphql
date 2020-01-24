@@ -1,0 +1,5 @@
+type Group {
+    _id: ID!
+    name: String!
+    description: String
+}

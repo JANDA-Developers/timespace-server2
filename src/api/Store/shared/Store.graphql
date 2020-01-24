@@ -1,0 +1,12 @@
+type Store {
+    _id: ID!
+    user: User
+    name: String!
+    storeNum: String!
+    type: StoreType!
+    description: String
+}
+
+enum StoreType {
+    TIME_PLACE_PRICE
+}

@@ -1,0 +1,10 @@
+type Sales {
+    _id: ID!
+    store: Store
+    user: User
+    item: Item
+    salesNum: String!
+    name: String!
+    memo: String
+    moduleDatas: Object
+}
