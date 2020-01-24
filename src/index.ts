@@ -1,16 +1,10 @@
 import dotenv from "dotenv";
 
-const env = (process.env.NODE_ENV || "development").trim();
-console.log(`Env: ${env}`);
 dotenv.config({
     path: "../.env"
 });
-// import mongoose from "mongoose";
 import app from "./app";
 import { mongoose } from "@typegoose/typegoose";
-// import fs from "fs";
-
-const isDev: boolean = process.env.NODE_ENV === "development";
 
 const port = parseInt(process.env.PORT || "4000");
 
@@ -23,10 +17,6 @@ mongoose
         useUnifiedTopology: true
     })
     .then(() => {
-        if (isDev) {
-            console.log("Env: Development");
-            // console.info(connection.models);
-        }
         app.listen({ port }, () => {
             console.log(`DB Connection: ${dbUri}`);
             console.log(
