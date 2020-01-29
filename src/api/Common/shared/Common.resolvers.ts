@@ -10,7 +10,11 @@ const resolver: Resolvers = {
     },
     ZoneInfo: {},
     Query: {
-        countries: async (): Promise<any[]> => await ZoneInfoModel.countries()
+        countries: async (): Promise<any[]> => await ZoneInfoModel.countries(),
+        timezone: async (
+            _,
+            { countryCode }: { countryCode: string }
+        ): Promise<any[]> => await ZoneInfoModel.cities(countryCode)
     }
 };
 

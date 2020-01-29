@@ -17,7 +17,8 @@ const resolvers: Resolvers = {
                     email,
                     password,
                     phoneNumber,
-                    timezone
+                    countryCode,
+                    city
                 } = param;
 
                 const cognito = new CognitoIdentityServiceProvider();
@@ -33,11 +34,11 @@ const resolvers: Resolvers = {
                             },
                             {
                                 Name: "phone_number",
-                                Value: (timezone || "+82") + phoneNumber
+                                Value: (countryCode || "+82") + phoneNumber
                             },
                             {
                                 Name: "zoneinfo",
-                                Value: "Asia/Seoul"
+                                Value: city
                             }
                         ]
                     })

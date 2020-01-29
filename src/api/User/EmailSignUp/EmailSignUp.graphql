@@ -11,8 +11,9 @@ type EmailSignUpResponse {
 input EmailSignUpInput {
     email: EmailAddress!
     phoneNumber: PhoneNumber!
-    # 기본값 Asia/Seoul
-    timezone: String
+    # 국가 코드 2자리짜리
+    countryCode: String!
+    city: String!
     password: Password!
     username: String!
 }

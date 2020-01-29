@@ -39,10 +39,38 @@ export class ZoneInfo {
                 $group: {
                     _id: { code: "$countryCode", name: "$countryName" }
                 }
+            },
+            {
+                $sort: {
+                    "_id.name": 1
+                }
             }
         ];
         const data: {
             _id: { code: string; name: string };
+        }[] = await ZoneInfoModel.aggregate(pipeline);
+        return data.map(v => v._id);
+    };
+
+    static cities = async (countryCode: string): Promise<string[]> => {
+        if (!countryCode) {
+            return [];
+        }
+
+        const pipeline: Stage[] = [
+            {
+                $match: {
+                    countryCode
+                }
+            },
+            {
+                $project: {
+                    _id: "$timezone"
+                }
+            }
+        ];
+        const data: {
+            _id: string;
         }[] = await ZoneInfoModel.aggregate(pipeline);
         return data.map(v => v._id);
     };

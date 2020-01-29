@@ -23,6 +23,7 @@ type ZoneInfoGroup {
 
 type Query {
     countries: [Country!]
+    timezone(countryCode: String!): [String!]
 }
 
 type Country {
