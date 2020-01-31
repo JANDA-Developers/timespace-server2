@@ -3,10 +3,10 @@ import helmet from "helmet";
 import logger from "morgan";
 import schema from "./schema";
 import { ApolloServer } from "apollo-server-express";
-import express, { Express } from "express";
+import express, { Express, NextFunction, Response } from "express";
 import axios from "axios";
-// import fs from "fs";
-import { stream } from "./logger";
+import { decodeKey } from "./utils/decodeIdToken";
+import { fmtLog } from "./logger";
 
 class App {
     public server: ApolloServer;
@@ -41,10 +41,7 @@ class App {
                             "Content-Type": "application/json",
                             Accept: "application/json",
                             Connection: "keep-alive",
-                            "X-JWT": req.headers["x-jwt"],
-                            "HP-Key": req.headers["hp-key"],
-                            "HM-Key": req.headers["hm-key"],
-                            "JDH-T": req.headers["jdh-t"]
+                            "X-JWT": req.headers["x-jwt"]
                         }
                     }
                 );
@@ -65,18 +62,38 @@ class App {
         this.app.use(cors());
         this.app.use(helmet());
         this.useLogger();
+        this.app.use(this.jwt);
     };
 
     private useLogger = (): void => {
         this.app.use(
             logger(
-                `{"DATE": ":date", "IP": ":remote-addr", "METHOD": ":method", "URL": ":url", "STATUS": ":status"}`,
-                {
-                    stream
-                    // stream: fs.createWriteStream("app.log", { flags: "w" })
-                }
+                `{"DATE": ":date", "IP": ":remote-addr", "METHOD": ":method", "URL": ":url", "STATUS": ":status"}`
             )
         );
+    };
+
+    private jwt = async (
+        req: any,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> => {
+        const token = req.get("X-JWT");
+
+        if (token) {
+            const user = await decodeKey(token);
+
+            req.user = user;
+
+            fmtLog("info", {
+                who: "jwt-middleware",
+                data: user
+            });
+            // confirm!
+        } else {
+            req.userInfo = undefined;
+        }
+        next();
     };
 }
 

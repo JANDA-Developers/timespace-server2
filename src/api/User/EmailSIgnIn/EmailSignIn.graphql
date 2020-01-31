@@ -1,0 +1,37 @@
+type Mutation {
+    EmailSignIn(param: EmailSignInInput!): EmailSignInResponse!
+}
+
+type EmailSignInResponse {
+    ok: Boolean!
+    error: Err
+    data: EmailSignInResult
+}
+
+input EmailSignInInput {
+    email: EmailAddress!
+    password: String!
+}
+
+type EmailSignInResult {
+    sub: String
+    name: String
+    given_name: String
+    family_name: String
+    middle_name: String
+    nickname: String
+    preferred_username: String
+    profile: String
+    picture: String
+    website: String
+    email: String
+    email_verified: String
+    gender: String
+    birthdate: String
+    zoneinfo: String
+    locale: String
+    phone_number: String
+    phone_number_verified: String
+    address: String
+    updated_at: String
+}

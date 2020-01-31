@@ -25,9 +25,13 @@ const resolvers: Resolvers = {
                 const result = await cognito
                     .signUp({
                         ClientId: process.env.COGNITO_CLIENT_ID || "",
-                        Username: username,
+                        Username: email,
                         Password: password,
                         UserAttributes: [
+                            {
+                                Name: "name",
+                                Value: username
+                            },
                             {
                                 Name: "email",
                                 Value: email

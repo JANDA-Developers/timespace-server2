@@ -1,7 +1,7 @@
 import { createLogger, format } from "winston";
-// import winstonDaily from "winston-daily-rotate-file";
 import AWS from "aws-sdk";
 import WinstonCloudWatch from "winston-cloudwatch";
+import { LogFormat } from "./types/formats";
 
 const { combine, timestamp, printf } = format;
 
@@ -43,6 +43,26 @@ const mLogger = createLogger({
 const stream = {
     write: (message: string): void => {
         mLogger.info(message);
+    }
+};
+
+export const fmtLog = (
+    level: "info" | "err" | "warn" | "debug",
+    format: LogFormat
+): void => {
+    const data = JSON.stringify(format);
+    switch (level) {
+        case "info":
+            mLogger.info(data);
+            break;
+        case "warn":
+            mLogger.info(data);
+            break;
+        case "err":
+            mLogger.error(data);
+            break;
+        default:
+            mLogger.debug(data);
     }
 };
 
