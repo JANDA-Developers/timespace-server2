@@ -13,6 +13,7 @@ export const defaultResolver = resolverFunction => async (
 ) => {
     const startTime = new Date();
     const logInfoArr = [];
+    const { headers, body, ip, user } = context.req;
     let result: any;
     try {
         result = await resolverFunction(
@@ -31,9 +32,21 @@ export const defaultResolver = resolverFunction => async (
     }
     fmtLog(result.error ? "err" : "info", {
         when: startTime.toISOString(),
+        who: {
+            ip,
+            "user-agent": headers["user-agent"],
+            user: {
+                _id: user.sub,
+                email: user.email,
+                // eslint-disable-next-line @typescript-eslint/camelcase
+                phone_number: user.phone_number,
+                name: user.name
+            }
+        },
         where: info.fieldName,
         data: {
             resTime: `${new Date().getTime() - startTime.getTime()} ms`,
+            body,
             input: args,
             insideLog: logInfoArr,
             output: result

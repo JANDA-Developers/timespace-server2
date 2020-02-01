@@ -5,5 +5,9 @@ type Query {
 type GetMyProfileResponse {
     ok: Boolean!
     error: Err
-    data: User
+    data: GetMyProfileResult
+}
+
+type GetMyProfileResult {
+    user: User!
 }

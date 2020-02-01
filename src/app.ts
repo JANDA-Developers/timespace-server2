@@ -17,9 +17,12 @@ class App {
         this.app = express();
         this.server = new ApolloServer({
             schema,
-            context: (req): any => {
+            context: (ctx): any => {
+                console.log(ctx.req.originalUrl);
+                console.log(ctx.req.ip);
+
                 return {
-                    req: req.req
+                    req: ctx.req
                 };
             },
             playground
@@ -81,15 +84,7 @@ class App {
 
         if (token) {
             const user = await decodeKey(token);
-
             req.user = user;
-
-            console.log(
-                JSON.stringify({
-                    who: "jwt-middleware",
-                    data: user
-                })
-            );
             // confirm!
         } else {
             req.userInfo = undefined;

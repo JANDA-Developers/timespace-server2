@@ -1,11 +1,13 @@
-type User implements BaseModel {
+type User {
+    # user.sub
     _id: ID!
-    name: String
-    email: String
-    phoneNumber: PhoneNumber
-    zoneInfo: ZoneInfo
-    createdAt: DateTime!
-    updatedAt: DateTime!
+    name: String!
+    email: String!
+    email_verified: Boolean!
+    phone_number_verified: Boolean!
+    phone_number: String!
+    zoneinfo: String!
+    tokenExpiry: Int!
 }
 
 type Query {
