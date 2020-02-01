@@ -1,4 +1,6 @@
 export type LogFormat = {
-    who: any;
-    data: any;
+    who?: any;
+    when?: any;
+    where?: any;
+    data?: any;
 };

@@ -6,7 +6,6 @@ import { ApolloServer } from "apollo-server-express";
 import express, { Express, NextFunction, Response } from "express";
 import axios from "axios";
 import { decodeKey } from "./utils/decodeIdToken";
-import { fmtLog } from "./logger";
 
 class App {
     public server: ApolloServer;
@@ -68,7 +67,7 @@ class App {
     private useLogger = (): void => {
         this.app.use(
             logger(
-                `{"DATE": ":date", "IP": ":remote-addr", "METHOD": ":method", "URL": ":url", "STATUS": ":status"}`
+                `[:date[iso]] :remote-addr :url(:method :status) :user-agent`
             )
         );
     };
@@ -85,10 +84,12 @@ class App {
 
             req.user = user;
 
-            fmtLog("info", {
-                who: "jwt-middleware",
-                data: user
-            });
+            console.log(
+                JSON.stringify({
+                    who: "jwt-middleware",
+                    data: user
+                })
+            );
             // confirm!
         } else {
             req.userInfo = undefined;

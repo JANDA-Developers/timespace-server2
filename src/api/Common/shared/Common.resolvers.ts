@@ -1,5 +1,5 @@
 import { Resolvers } from "../../../types/resolvers";
-import { ZoneInfoModel } from "../../../models/ZoneInfo";
+import { ZoneinfoModel } from "../../../models/Zoneinfo";
 
 const resolver: Resolvers = {
     BaseModel: {
@@ -8,14 +8,14 @@ const resolver: Resolvers = {
             return "test";
         }
     },
-    ZoneInfo: {},
+    Zoneinfo: {},
     Query: {
         countries: async (_, { countryName }): Promise<any[]> =>
-            await ZoneInfoModel.countries(),
+            await ZoneinfoModel.countries(),
         timezone: async (
             _,
             { countryCode }: { countryCode: string }
-        ): Promise<any[]> => await ZoneInfoModel.cities(countryCode)
+        ): Promise<any[]> => await ZoneinfoModel.cities(countryCode)
     }
 };
 

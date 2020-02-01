@@ -9,14 +9,22 @@ import { getCollectionName, ModelName } from "./__collectionNames";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.ERR)))
 export class ErrCls extends BaseSchema {
+    static makeErr(code: string, msg: string): Error {
+        return new Error(JSON.stringify({ code, msg }));
+    }
+
     @prop({ required: true })
-    message: string;
+    msg: string;
 
     @prop({ required: true })
     code: string;
 
     toString(this: DocumentType<ErrCls>): string {
-        return `[${this.code}] ${this.message}`;
+        return `[${this.code}] ${this.msg}`;
+    }
+
+    toJsonString(this: DocumentType<ErrCls>): string {
+        return JSON.stringify({ msg: this.msg, code: this.code });
     }
 }
 

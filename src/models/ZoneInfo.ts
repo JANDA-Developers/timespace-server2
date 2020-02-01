@@ -6,7 +6,7 @@ import { getCollectionName, ModelName } from "./__collectionNames";
 import { Stage } from "../types/pipeline";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.ZONE_INFO)))
-export class ZoneInfo {
+export class Zoneinfo {
     static getGroupedTimezone = async (countryName?: string): Promise<any> => {
         const pipeline: Stage[] = [];
         if (countryName) {
@@ -28,7 +28,7 @@ export class ZoneInfo {
                 }
             }
         });
-        const data = await ZoneInfoModel.aggregate(pipeline);
+        const data = await ZoneinfoModel.aggregate(pipeline);
         return data;
     };
 
@@ -48,7 +48,7 @@ export class ZoneInfo {
         ];
         const data: {
             _id: { code: string; name: string };
-        }[] = await ZoneInfoModel.aggregate(pipeline);
+        }[] = await ZoneinfoModel.aggregate(pipeline);
         return data.map(v => v._id);
     };
 
@@ -71,7 +71,7 @@ export class ZoneInfo {
         ];
         const data: {
             _id: string;
-        }[] = await ZoneInfoModel.aggregate(pipeline);
+        }[] = await ZoneinfoModel.aggregate(pipeline);
         return data.map(v => v._id);
     };
 
@@ -91,4 +91,4 @@ export class ZoneInfo {
     offsetMinute: number;
 }
 
-export const ZoneInfoModel = getModelForClass(ZoneInfo);
+export const ZoneinfoModel = getModelForClass(Zoneinfo);

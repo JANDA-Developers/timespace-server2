@@ -1,4 +1,4 @@
-type ZoneInfo {
+type Zoneinfo {
     _id: ID!
     # 국가 코드
     countryCode: String!
@@ -10,12 +10,12 @@ type ZoneInfo {
     offset: Int!
 }
 
-type GroupedZoneInfo {
-    _id: ZoneInfoGroup!
+type GroupedZoneinfo {
+    _id: ZoneinfoGroup!
     timezones: [String!]
 }
 
-type ZoneInfoGroup {
+type ZoneinfoGroup {
     countryCode: String!
     countryName: String!
     offset: Int!

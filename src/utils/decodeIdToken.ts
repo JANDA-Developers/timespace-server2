@@ -21,7 +21,7 @@ const getJsonWebKeys = async (): Promise<JWKFormat[]> => {
 
 const decodeTokenHeader = (token: string) => {
     const [headerEncoded] = token.split(".");
-    const buff = new Buffer(headerEncoded, "base64");
+    const buff = Buffer.from(headerEncoded, "base64");
     const text = buff.toString("ascii");
     return JSON.parse(text);
 };
@@ -43,6 +43,10 @@ export const decodeKey = async (token: string) => {
         return;
     }
     const pem = jwkToPem(jwk);
-    const t = jwt.verify(token, pem);
-    return t;
+    try {
+        const t = jwt.verify(token, pem);
+        return t;
+    } catch (error) {
+        return null;
+    }
 };
