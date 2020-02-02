@@ -24,6 +24,7 @@ export const defaultResolver = resolverFunction => async (
             info
         );
     } catch (error) {
+        // console.log(error);
         result = {
             ok: false,
             error: JSON.parse(error.message),

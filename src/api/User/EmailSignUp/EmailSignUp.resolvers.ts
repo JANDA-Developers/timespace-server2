@@ -6,6 +6,7 @@ import {
 import { CognitoIdentityServiceProvider } from "aws-sdk";
 import { defaultResolver } from "../../../utils/resolverFuncWrapper";
 import { UserModel } from "../../../models/User";
+import { ObjectId } from "mongodb";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -51,6 +52,7 @@ const resolvers: Resolvers = {
                         })
                         .promise();
                     await UserModel.create({
+                        _id: new ObjectId(),
                         sub: result.UserSub,
                         loginInfos: []
                     });

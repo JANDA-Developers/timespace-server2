@@ -8,6 +8,7 @@ import { ErrCls } from "../../../models/Err";
 import { defaultResolver } from "../../../utils/resolverFuncWrapper";
 import { UserModel, LoggedInInfo } from "../../../models/User";
 import { decodeKey } from "../../../utils/decodeIdToken";
+import { ObjectId } from "mongodb";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -51,7 +52,7 @@ const resolvers: Resolvers = {
                     );
                     // User Refresh Token, Access Token 두가지를 DB에 저장...
                     let existingUser = await UserModel.findOne({
-                        _id: cognitoUser.sub
+                        sub: cognitoUser.sub
                     });
                     if (!existingUser) {
                         // TODO DB에 User가 존재하지 않는다면
@@ -62,10 +63,11 @@ const resolvers: Resolvers = {
                             refreshToken: authResult.RefreshToken || "",
                             expiryDate: authResult.ExpiresIn || 3600,
                             ip: req.ip,
-                            os: req["user-agent"]
+                            os: req.headers["user-agent"]
                         };
                         existingUser = await UserModel.create({
-                            _id: cognitoUser.sub,
+                            _id: new ObjectId(),
+                            sub: cognitoUser.sub,
                             loginInfos: [tokenInfos]
                         });
                     }
@@ -79,6 +81,10 @@ const resolvers: Resolvers = {
                         }
                     };
                 } catch (error) {
+                    console.log({
+                        tag: "여기인가?",
+                        error
+                    });
                     return {
                         ok: false,
                         error: JSON.parse(error.message),

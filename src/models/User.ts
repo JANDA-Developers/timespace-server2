@@ -2,12 +2,12 @@ import {
     getModelForClass,
     modelOptions,
     prop,
-    index,
     DocumentType
 } from "@typegoose/typegoose";
 import { getCollectionName, ModelName } from "./__collectionNames";
 import { User } from "../types/graph";
 import { ErrCls } from "./Err";
+import { ObjectId } from "mongodb";
 
 export type LoggedInInfo = {
     refreshToken: string;
@@ -20,28 +20,25 @@ export type LoggedInInfo = {
 
 @modelOptions({
     schemaOptions: {
-        _id: false,
+        _id: true,
         collection: getCollectionName(ModelName.USER),
         timestamps: true
     }
 })
-@index(
-    {
-        sub: 1
-    },
-    { unique: true }
-)
 export class UserCls {
     static findBySub = async (sub: string): Promise<DocumentType<UserCls>> => {
         const user = await UserModel.findOne({
-            _id: sub
+            sub
         });
         if (!user) {
             throw ErrCls.makeErr("201", "존재하지 않는 UserId");
         }
         return user;
     };
-    @prop({ index: true })
+    @prop()
+    _id: ObjectId;
+
+    @prop()
     sub: string;
 
     @prop()
