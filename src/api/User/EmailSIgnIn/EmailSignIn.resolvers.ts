@@ -6,6 +6,8 @@ import {
 import { CognitoIdentityServiceProvider } from "aws-sdk";
 import { ErrCls } from "../../../models/Err";
 import { defaultResolver } from "../../../utils/resolverFuncWrapper";
+import { UserModel, LoggedInInfo } from "../../../models/User";
+import { decodeKey } from "../../../utils/decodeIdToken";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -13,13 +15,14 @@ const resolvers: Resolvers = {
             async (
                 insideLog: Array<any>,
                 __: any,
-                { param }: EmailSignInMutationArgs
+                { param }: EmailSignInMutationArgs,
+                { req }
             ): Promise<EmailSignInResponse> => {
                 // Amazon Cognito creates a session which includes the id, access, and refresh tokens of an authenticated user.
                 try {
                     const { email, password } = param;
                     const cognito = new CognitoIdentityServiceProvider();
-                    const result = await cognito
+                    const { AuthenticationResult: authResult } = await cognito
                         .adminInitiateAuth({
                             UserPoolId: process.env.COGNITO_POOL_ID || "",
                             ClientId: process.env.COGNITO_CLIENT_ID || "",
@@ -30,20 +33,49 @@ const resolvers: Resolvers = {
                             }
                         })
                         .promise();
-                    if (!result.AuthenticationResult) {
+                    if (!authResult || !authResult.IdToken) {
                         throw ErrCls.makeErr("102", "로그인 실패");
                     }
-                    insideLog.push("되나 안되나?");
-                    insideLog.push("잘 되는건가?");
+                    /*
+                     * ======================================================================================================================
+                     *
+                     * 이하 User 로그인 성공
+                     *
+                     * ======================================================================================================================
+                     */
+
+                    insideLog.push(authResult);
+                    // TODO: Token Decode 해서 sub 가져옴
+                    const cognitoUser: any = await decodeKey(
+                        authResult.IdToken
+                    );
                     // User Refresh Token, Access Token 두가지를 DB에 저장...
+                    let existingUser = await UserModel.findOne({
+                        _id: cognitoUser.sub
+                    });
+                    if (!existingUser) {
+                        // TODO DB에 User가 존재하지 않는다면
+                        // => DB에 해당 User를 저장함
+                        const tokenInfos: LoggedInInfo = {
+                            accessToken: authResult.AccessToken || "",
+                            idToken: authResult.IdToken || "",
+                            refreshToken: authResult.RefreshToken || "",
+                            expiryDate: authResult.ExpiresIn || 3600,
+                            ip: req.ip,
+                            os: req["user-agent"]
+                        };
+                        existingUser = await UserModel.create({
+                            _id: cognitoUser.sub,
+                            loginInfos: [tokenInfos]
+                        });
+                    }
+
                     return {
                         ok: true,
                         error: null,
                         data: {
-                            token: result.AuthenticationResult.IdToken || "",
-                            expiresIn:
-                                (result.AuthenticationResult.ExpiresIn || 0) *
-                                1000
+                            token: authResult.IdToken || "",
+                            expiresIn: (authResult.ExpiresIn || 0) * 1000
                         }
                     };
                 } catch (error) {

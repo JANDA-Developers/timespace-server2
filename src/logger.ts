@@ -17,23 +17,13 @@ const mLogger = createLogger({
         customFormat
     ),
     transports: [
-        // new transports.Console(),
-
-        // new winstonDaily({
-        //     level: "info",
-        //     datePattern: "YYYYMMDDHH",
-        //     dirname: process.env.LOG_DIR || "./logs",
-        //     filename: `%DATE%.log`,
-        //     maxSize: undefined,
-        //     maxFiles: 48,
-        //     frequency: "1h",
-        //     utc: true
-        // }),
         new WinstonCloudWatch({
             logGroupName: process.env.LOG_GROUP_NAME || "JD_BOOKING",
             logStreamName: (): string => {
-                return `${new Date().toISOString().substr(0, 10)} [${process.env
-                    .LOG_STREAM_NAME || "Nothing"}]`;
+                const cur = new Date().toISOString().split("T");
+                return `[${process.env.LOG_STREAM_NAME || "Nothing"}] ${
+                    cur[0]
+                } ${cur[1].substr(0, 2)} ~`;
             },
             cloudWatchLogs: new AWS.CloudWatchLogs()
         })

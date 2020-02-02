@@ -85,9 +85,8 @@ class App {
         if (token) {
             const user = await decodeKey(token);
             req.user = user;
-            // confirm!
         } else {
-            req.userInfo = undefined;
+            req.user = undefined;
         }
         next();
     };

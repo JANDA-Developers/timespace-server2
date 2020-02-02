@@ -4,7 +4,6 @@ import {
     defaultResolver
 } from "../../../utils/resolverFuncWrapper";
 import { GetMyProfileResponse } from "../../../types/graph";
-import { migrateCognitoUser } from "../../../models/User";
 
 const resolvers: Resolvers = {
     Query: {
@@ -23,7 +22,7 @@ const resolvers: Resolvers = {
                             ok: true,
                             error: null,
                             data: {
-                                user: migrateCognitoUser(user)
+                                user: user as any
                             }
                         };
                     } catch (error) {

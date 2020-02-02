@@ -47,6 +47,12 @@ export const decodeKey = async (token: string) => {
         const t = jwt.verify(token, pem);
         return t;
     } catch (error) {
+        console.log({
+            name: error.name,
+            message: error.message,
+            expiredAt: error.expiredAt,
+            token
+        });
         return null;
     }
 };

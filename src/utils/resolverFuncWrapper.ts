@@ -13,7 +13,7 @@ export const defaultResolver = resolverFunction => async (
 ) => {
     const startTime = new Date();
     const logInfoArr = [];
-    const { headers, body, ip, user } = context.req;
+    const { headers, body, ip, user, ips } = context.req;
     let result: any;
     try {
         result = await resolverFunction(
@@ -34,14 +34,19 @@ export const defaultResolver = resolverFunction => async (
         when: startTime.toISOString(),
         who: {
             ip,
+            ips,
+            "X-JWT": headers["X-JWT"] || headers["x-jwt"],
             "user-agent": headers["user-agent"],
-            user: {
-                _id: user.sub,
-                email: user.email,
-                // eslint-disable-next-line @typescript-eslint/camelcase
-                phone_number: user.phone_number,
-                name: user.name
-            }
+            user:
+                (user && {
+                    _id: user.sub,
+                    email: user.email,
+                    // eslint-disable-next-line @typescript-eslint/camelcase
+                    phone_number: user.phone_number,
+                    name: user.name,
+                    exp: user.exp
+                }) ||
+                null
         },
         where: info.fieldName,
         data: {
