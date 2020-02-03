@@ -19,9 +19,6 @@ export const refreshToken = async (
                 }
             })
             .promise();
-        console.log({
-            result
-        });
         const authResult = result.AuthenticationResult;
         if (!authResult) {
             throw result.$response.error;

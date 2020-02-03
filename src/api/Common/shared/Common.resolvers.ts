@@ -4,13 +4,11 @@ import { CountryInfoModel } from "../../../models/CountryInfo";
 const resolver: Resolvers = {
     BaseModel: {
         __resolveType: (value: any): string => {
-            console.log(value);
             return "test";
         }
     },
     BaseResponse: {
         __resolveType: (value): string => {
-            console.log({ value });
             return "BaseResponse";
         }
     },

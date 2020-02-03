@@ -1,0 +1,8 @@
+type Query {
+    HealthCheck: HealthCheckResponse!
+}
+
+type HealthCheckResponse implements BaseResponse {
+    ok: Boolean!
+    error: Err
+}

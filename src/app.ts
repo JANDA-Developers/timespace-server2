@@ -18,8 +18,8 @@ class App {
         this.server = new ApolloServer({
             schema,
             context: (ctx): any => {
-                console.log(ctx.req.originalUrl);
-                console.log(ctx.req.ip);
+                // console.log(ctx.req.originalUrl);
+                // console.log(ctx.req.ip);
                 return {
                     req: ctx.req
                 };
@@ -31,24 +31,22 @@ class App {
         this.app.get("/", async (req, res) => {
             try {
                 req.body = {
-                    query: "query { HealthCheck { ok, error }}"
+                    query: "query { HealthCheck { ok, error { code, msg } }}"
                 };
-                const result = await axios.post(
-                    `http://${process.env.SERVER_URL}:${process.env.PORT}${path}`,
-                    req.body,
-                    {
-                        headers: {
-                            "Accept-Encoding": "gzip, deflate, br",
-                            "Content-Type": "application/json",
-                            Accept: "application/json",
-                            Connection: "keep-alive",
-                            "X-JWT": req.headers["x-jwt"]
-                        }
+                const uri = `http://${process.env.SERVER_URL}:${process.env.PORT}${path}`;
+                console.log({ uri });
+                const result = await axios.post(uri, req.body, {
+                    headers: {
+                        "Accept-Encoding": "gzip, deflate, br",
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                        Connection: "keep-alive"
                     }
-                );
+                });
+                console.log(result.data);
                 res.json(result.data);
             } catch (error) {
-                console.info(error);
+                console.log(error.data);
                 res.json({
                     ok: false,
                     error: error.message,
@@ -80,12 +78,11 @@ class App {
         next: NextFunction
     ): Promise<void> => {
         const token = req.get("X-JWT");
-
         if (token) {
             const { ok, error, data } = await decodeKey(token);
             req.user = data;
             if (!ok) {
-                req.headers["x-jwt"] = error?.code;
+                req.headers["x-jwt"] = error?.code || "";
             }
         } else {
             req.user = undefined;
