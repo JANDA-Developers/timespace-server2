@@ -1,6 +1,8 @@
 import jwt from "jsonwebtoken";
 import jwkToPem from "jwk-to-pem";
 import axios from "axios";
+import { BaseResponse } from "../types/graph";
+import { ApolloError } from "apollo-server";
 
 interface JWKFormat {
     alg: string;
@@ -35,24 +37,38 @@ const getJsonWebKeyWithKID = async (kid: any, jsonWebKeys: JWKFormat[]) => {
     return null;
 };
 
-export const decodeKey = async (token: string) => {
+export const decodeKey = async (
+    token: string
+): Promise<BaseResponse & { data: any }> => {
     const jsonWebKeys = await getJsonWebKeys();
     const header = decodeTokenHeader(token);
-    const jwk = await getJsonWebKeyWithKID(header.kid, jsonWebKeys);
-    if (!jwk) {
-        return;
-    }
-    const pem = jwkToPem(jwk);
     try {
-        const t = jwt.verify(token, pem);
-        return t;
+        const jwk = await getJsonWebKeyWithKID(header.kid, jsonWebKeys);
+        if (!jwk) {
+            throw new ApolloError("Undefined JWK", "UNDEFINED_JWK");
+        }
+        const pem = jwkToPem(jwk);
+        const user = jwt.verify(token, pem);
+        return {
+            ok: true,
+            error: null,
+            data: user
+        };
     } catch (error) {
         console.log({
             name: error.name,
+            code: error.code,
             message: error.message,
             expiredAt: error.expiredAt,
             token
         });
-        return null;
+        return {
+            ok: false,
+            error: {
+                ...error,
+                code: error.code || error.name
+            },
+            data: null
+        };
     }
 };

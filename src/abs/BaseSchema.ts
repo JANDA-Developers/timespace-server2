@@ -7,9 +7,6 @@ export class BaseSchema {
     _id: ObjectId;
 
     @prop()
-    timezone: string;
-
-    @prop()
     createdAt: Date;
 
     @prop()

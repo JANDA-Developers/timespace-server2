@@ -5,11 +5,11 @@ import {
     DocumentType
 } from "@typegoose/typegoose";
 import { getCollectionName, ModelName } from "./__collectionNames";
-import { User } from "../types/graph";
 import { ObjectId } from "mongodb";
 import { ApolloError } from "apollo-server";
+import { BaseSchema, createSchemaOptions } from "../abs/BaseSchema";
+
 export type LoggedInInfo = {
-    refreshToken: string;
     idToken: string;
     accessToken: string;
     expiryDate: number;
@@ -17,14 +17,8 @@ export type LoggedInInfo = {
     os: string;
 };
 
-@modelOptions({
-    schemaOptions: {
-        _id: true,
-        collection: getCollectionName(ModelName.USER),
-        timestamps: true
-    }
-})
-export class UserCls {
+@modelOptions(createSchemaOptions(getCollectionName(ModelName.USER)))
+export class UserCls extends BaseSchema {
     static findBySub = async (sub: string): Promise<DocumentType<UserCls>> => {
         const user = await UserModel.findOne({
             sub
@@ -45,15 +39,17 @@ export class UserCls {
     sub: string;
 
     @prop()
+    refreshToken: string;
+
+    @prop()
+    refreshTokenLastUpdate: Date;
+
+    // Zoneinfo from graph.d.ts
+    @prop()
+    zoneinfo: any;
+
+    @prop()
     loginInfos: LoggedInInfo[];
 }
-
-export const migrateCognitoUser = (user: any): User => {
-    return {
-        _id: user.sub,
-        tokenExpiry: user.exp,
-        ...user
-    };
-};
 
 export const UserModel = getModelForClass(UserCls);

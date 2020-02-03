@@ -20,7 +20,6 @@ class App {
             context: (ctx): any => {
                 console.log(ctx.req.originalUrl);
                 console.log(ctx.req.ip);
-
                 return {
                     req: ctx.req
                 };
@@ -83,8 +82,11 @@ class App {
         const token = req.get("X-JWT");
 
         if (token) {
-            const user = await decodeKey(token);
-            req.user = user;
+            const { ok, error, data } = await decodeKey(token);
+            req.user = data;
+            if (!ok) {
+                req.headers["x-jwt"] = error?.code;
+            }
         } else {
             req.user = undefined;
         }

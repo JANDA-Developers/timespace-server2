@@ -42,6 +42,16 @@ const resolvers: Resolvers = {
                     }
 
                     const cognito = new CognitoIdentityServiceProvider();
+                    const tz = countryInfo.timezones.find(
+                        tz => tz.name === timezone
+                    );
+                    const zoneinfo = {
+                        name: countryInfo.countryName,
+                        tz: tz?.name,
+                        code: countryInfo.countryCode,
+                        offset: tz?.offset,
+                        callingCode: countryInfo.callingCode
+                    };
                     const result = await cognito
                         .signUp({
                             ClientId: process.env.COGNITO_CLIENT_ID || "",
@@ -63,14 +73,7 @@ const resolvers: Resolvers = {
                                 {
                                     Name: "zoneinfo",
                                     // name, offset 으로 구성된 아이임 ㅎㅎ
-                                    Value: JSON.stringify({
-                                        name: countryInfo.countryName,
-                                        code: countryInfo.countryCode,
-                                        offset: countryInfo.timezones.find(
-                                            tz => tz.name === timezone
-                                        )?.offset,
-                                        callingCode: countryInfo.callingCode
-                                    })
+                                    Value: JSON.stringify(zoneinfo)
                                 }
                             ]
                         })
@@ -78,6 +81,7 @@ const resolvers: Resolvers = {
                     await UserModel.create({
                         _id: new ObjectId(),
                         sub: result.UserSub,
+                        zoneinfo,
                         loginInfos: []
                     });
                     return {

@@ -13,6 +13,7 @@ type User {
 type Zoneinfo {
     name: String!
     code: String!
+    tz: String!
     offset: Int!
     callingCode: String!
 }
