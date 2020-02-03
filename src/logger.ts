@@ -23,7 +23,7 @@ const mLogger = createLogger({
                 const cur = new Date().toISOString().split("T");
                 return `[${process.env.LOG_STREAM_NAME || "Nothing"}] ${
                     cur[0]
-                } ${cur[1].substr(0, 2)} ~`;
+                } ${cur[1].substr(0, 2)}h00m`;
             },
             cloudWatchLogs: new AWS.CloudWatchLogs()
         })
@@ -53,6 +53,7 @@ export const fmtLog = (
             break;
         default:
             mLogger.debug(data);
+            break;
     }
 };
 
