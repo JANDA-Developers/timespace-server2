@@ -26,9 +26,10 @@ const resolvers: Resolvers = {
                             }
                         };
                     } catch (error) {
+                        console.log(error);
                         return {
                             ok: false,
-                            error: JSON.parse(error.message),
+                            error,
                             data: null
                         };
                     }

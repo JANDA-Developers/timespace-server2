@@ -2,7 +2,7 @@ type Mutation {
     EmailSignUp(param: EmailSignUpInput!): EmailSignUpResponse!
 }
 
-type EmailSignUpResponse {
+type EmailSignUpResponse implements BaseResponse {
     ok: Boolean!
     error: Err
     data: EmailSignUpResult
@@ -11,11 +11,9 @@ type EmailSignUpResponse {
 input EmailSignUpInput {
     email: EmailAddress!
     phoneNumber: PhoneNumber!
-    # 국가 코드 2자리짜리
-    countryCode: String!
-    city: String!
     password: Password!
     username: String!
+    timezone: String!
 }
 
 type EmailSignUpResult {

@@ -6,10 +6,13 @@ type User {
     email_verified: Boolean!
     phone_number_verified: Boolean!
     phone_number: String!
-    zoneinfo: String!
+    zoneinfo: Zoneinfo!
     tokenExpiry: Int!
 }
 
-type Query {
-    users: [User!]
+type Zoneinfo {
+    name: String!
+    code: String!
+    offset: Int!
+    callingCode: String!
 }

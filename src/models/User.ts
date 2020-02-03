@@ -6,9 +6,8 @@ import {
 } from "@typegoose/typegoose";
 import { getCollectionName, ModelName } from "./__collectionNames";
 import { User } from "../types/graph";
-import { ErrCls } from "./Err";
 import { ObjectId } from "mongodb";
-
+import { ApolloError } from "apollo-server";
 export type LoggedInInfo = {
     refreshToken: string;
     idToken: string;
@@ -31,7 +30,11 @@ export class UserCls {
             sub
         });
         if (!user) {
-            throw ErrCls.makeErr("201", "존재하지 않는 UserId");
+            throw new ApolloError(
+                "INVALID_USER_SUB",
+                "존재하지 않는 UserSub입니다",
+                { userSub: sub }
+            );
         }
         return user;
     };

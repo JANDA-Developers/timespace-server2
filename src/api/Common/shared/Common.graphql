@@ -7,11 +7,6 @@ scalar URL
 scalar Object
 scalar Upload
 
-type Err {
-    msg: String!
-    code: String!
-}
-
 enum MimeType {
     TEXT_PLAIN
     TEXT_CSS
@@ -43,4 +38,15 @@ interface BaseModel {
     _id: ID!
     createdAt: DateTime!
     updatedAt: DateTime!
+}
+
+# 기본 리턴값... 에러처리 골때릴듯한데...
+interface BaseResponse {
+    ok: Boolean!
+    error: Err
+}
+
+type Err {
+    code: String
+    msg: String
 }

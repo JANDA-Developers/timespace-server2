@@ -1,6 +1,6 @@
 import { UserModel } from "../models/User";
 import { CognitoIdentityServiceProvider } from "aws-sdk";
-import { ErrCls } from "../models/Err";
+import { ApolloError } from "apollo-server";
 
 export const refreshToken = async (
     userSub: string,
@@ -11,7 +11,7 @@ export const refreshToken = async (
 
         const tokens = user.loginInfos.find(v => v.idToken === idToken);
         if (!tokens) {
-            throw ErrCls.makeErr("103", "로그인이 필요합니다");
+            throw new ApolloError("로그인이 필요합니다", "103");
         }
         const cognito = new CognitoIdentityServiceProvider();
         const result = await cognito

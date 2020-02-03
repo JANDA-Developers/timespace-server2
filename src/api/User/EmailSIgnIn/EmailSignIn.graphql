@@ -2,7 +2,7 @@ type Mutation {
     EmailSignIn(param: EmailSignInInput!): EmailSignInResponse!
 }
 
-type EmailSignInResponse {
+type EmailSignInResponse implements BaseResponse {
     ok: Boolean!
     error: Err
     data: EmailSignInResult

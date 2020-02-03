@@ -2,7 +2,7 @@ type Query {
     GetMyProfile: GetMyProfileResponse!
 }
 
-type GetMyProfileResponse {
+type GetMyProfileResponse implements BaseResponse {
     ok: Boolean!
     error: Err
     data: GetMyProfileResult

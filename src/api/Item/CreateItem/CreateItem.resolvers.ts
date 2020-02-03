@@ -17,10 +17,7 @@ const resolvers: Resolvers = {
             } catch (error) {
                 return {
                     ok: false,
-                    error: {
-                        code: "100",
-                        msg: error.message
-                    },
+                    error,
                     data: null
                 };
             }

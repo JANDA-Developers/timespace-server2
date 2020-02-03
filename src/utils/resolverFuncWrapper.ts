@@ -1,5 +1,5 @@
 import { fmtLog } from "../logger";
-import { ErrCls } from "../models/Err";
+import { ApolloError } from "apollo-server";
 
 /**
  * 리솔버 로거... 로그 찍어주는 아이 ㅎㅎ
@@ -27,7 +27,7 @@ export const defaultResolver = resolverFunction => async (
         // console.log(error);
         result = {
             ok: false,
-            error: JSON.parse(error.message),
+            error,
             data: null
         };
     }
@@ -69,7 +69,9 @@ export const privateResolver = resolverFunction => async (
     info: any
 ) => {
     if (!context.req.user) {
-        throw ErrCls.makeErr("101", "Unauthorized");
+        throw new ApolloError("Unauthorized", "UNAUTHORIZED_USER", {
+            jwt: context.req.headers.jwt
+        });
     }
     return await resolverFunction(insideLog, parent, args, context, info);
 };
