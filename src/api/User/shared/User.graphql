@@ -1,6 +1,7 @@
 type User {
     # user.sub
     _id: ID!
+    sub: String!
     name: String!
     email: String!
     email_verified: Boolean!

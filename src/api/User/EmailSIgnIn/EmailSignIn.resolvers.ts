@@ -83,7 +83,6 @@ const resolvers: Resolvers = {
                 } else {
                     existingUser.refreshToken = authResult.RefreshToken || "";
                     existingUser.refreshTokenLastUpdate = new Date();
-                    existingUser.loginInfos.push(tokenInfos);
                 }
                 await existingUser.save();
 
