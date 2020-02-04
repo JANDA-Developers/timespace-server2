@@ -1,30 +1,25 @@
 import { fmtLog } from "../logger";
 import { ApolloError } from "apollo-server";
 import { getIP, getLocalDate } from "./utils";
+import { ResolverFunction } from "../types/resolvers";
 
 /**
  * 리솔버 로거... 로그 찍어주는 아이 ㅎㅎ
  * @param resolverFunction
  */
-export const defaultResolver = resolverFunction => async (
+export const defaultResolver = (resolverFunction: ResolverFunction) => async (
     parent: any,
     args: any,
     context: any,
     info: any
 ) => {
     const startTime = new Date();
-    const logInfoArr = [];
+    const stack = [];
     const { headers, body, user } = context.req;
     const ips = getIP(context.req);
     let result: any;
     try {
-        result = await resolverFunction(
-            logInfoArr,
-            parent,
-            args,
-            context,
-            info
-        );
+        result = await resolverFunction({ parent, args, context, info }, stack);
     } catch (error) {
         // console.log(error);
         result = {
@@ -65,24 +60,21 @@ export const defaultResolver = resolverFunction => async (
             resTime: `${new Date().getTime() - startTime.getTime()} ms`,
             body,
             input: args,
-            insideLog: logInfoArr,
+            insideLog: stack,
             output: result
         }
     });
     return result;
 };
 
-export const privateResolver = resolverFunction => async (
-    insideLog: any[],
-    parent: any,
-    args: any,
-    context: any,
-    info: any
+export const privateResolver = (resolverFunction: ResolverFunction) => async (
+    { parent, args, context, info },
+    insideLog: any[]
 ) => {
     if (!context.req.user) {
         throw new ApolloError("Unauthorized", "UNAUTHORIZED_USER", {
             jwt: context.req.headers.jwt
         });
     }
-    return await resolverFunction(insideLog, parent, args, context, info);
+    return await resolverFunction({ parent, args, context, info }, insideLog);
 };

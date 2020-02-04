@@ -5,3 +5,8 @@ export interface Resolvers {
         [key: string]: Resolver;
     };
 }
+
+export type ResolverFunction = (
+    { parent: any, args: any, context: any, info: any },
+    stack: any[]
+) => any;

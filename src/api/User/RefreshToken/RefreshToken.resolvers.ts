@@ -9,24 +9,22 @@ const resolvers: Resolvers = {
     Mutation: {
         RefreshToken: defaultResolver(
             async (
-                stack: any[],
-                parent,
-                args,
-                { req }
+                { parent, args, context: { req }, info },
+                stack: any[]
             ): Promise<RefreshTokenResponse> => {
                 const token: string | undefined = req.get("X-JWT");
                 const { user: cognitoUser } = req;
                 if (!token) {
                     throw new ApolloError(
-                        "UNDEFINED_TOKEN",
                         "토큰값이 존재하지 않습니다.",
+                        "UNDEFINED_TOKEN",
                         { token }
                     );
                 }
                 if (token === "TokenExpiredError") {
                     throw new ApolloError(
-                        "TOKEN_EXPIRED_ERROR",
-                        "만료된 토큰입니다. 다시 로그인 해주세요"
+                        "만료된 토큰입니다. 다시 로그인 해주세요",
+                        "TOKEN_EXPIRED_ERROR"
                     );
                 }
                 const user = await UserModel.findBySub(cognitoUser.sub);

@@ -1,8 +1,5 @@
 import { Resolvers } from "../../../types/resolvers";
-import {
-    EmailSignUpMutationArgs,
-    EmailSignUpResponse
-} from "../../../types/graph";
+import { EmailSignUpResponse } from "../../../types/graph";
 import { CognitoIdentityServiceProvider } from "aws-sdk";
 import { defaultResolver } from "../../../utils/resolverFuncWrapper";
 import { UserModel } from "../../../models/User";
@@ -14,9 +11,8 @@ const resolvers: Resolvers = {
     Mutation: {
         EmailSignUp: defaultResolver(
             async (
-                logArr: any[],
-                _,
-                { param }: EmailSignUpMutationArgs
+                { parent, args: { param } },
+                logArr: any[]
             ): Promise<EmailSignUpResponse> => {
                 try {
                     const {

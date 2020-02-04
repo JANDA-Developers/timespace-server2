@@ -15,10 +15,12 @@ const resolvers: Resolvers = {
     Mutation: {
         EmailSignIn: defaultResolver(
             async (
-                insideLog: Array<any>,
-                __: any,
-                { param }: EmailSignInMutationArgs,
-                { req }
+                {
+                    parent: any,
+                    args: { param },
+                    context: { req }
+                }: { parent: any; args: EmailSignInMutationArgs; context: any },
+                insideLog: Array<any>
             ): Promise<EmailSignInResponse> => {
                 // Amazon Cognito creates a session which includes the id, access, and refresh tokens of an authenticated user.
                 const { email, password } = param;
