@@ -20,6 +20,7 @@ class App {
             context: (ctx): any => {
                 // console.log(ctx.req.originalUrl);
                 // console.log(ctx.req.ip);
+                console.log(ctx.req.headers["x-forwarded-for"]);
                 return {
                     req: ctx.req
                 };
