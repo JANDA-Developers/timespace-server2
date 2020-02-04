@@ -74,6 +74,13 @@ export const privateResolver = (resolverFunction: ResolverFunction) => async (
     insideLog: any[]
 ) => {
     if (!context.req.user) {
+        const token: string | undefined = context.req.get("X-JWT");
+        if (token === "TokenExpiredError") {
+            throw new ApolloError(
+                "만료된 토큰입니다. 다시 로그인 해주세요",
+                "TOKEN_EXPIRED_ERROR"
+            );
+        }
         throw new ApolloError("Unauthorized", "UNAUTHORIZED_USER", {
             jwt: context.req.headers.jwt
         });

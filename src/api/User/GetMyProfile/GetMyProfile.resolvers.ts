@@ -9,10 +9,7 @@ const resolvers: Resolvers = {
     Query: {
         GetMyProfile: defaultResolver(
             privateResolver(
-                async (
-                    { parent, args, context: { req } },
-                    insideLog: any[]
-                ): Promise<GetMyProfileResponse> => {
+                async ({ context: { req } }): Promise<GetMyProfileResponse> => {
                     try {
                         const { user } = req;
                         // insideLog.push(user);
