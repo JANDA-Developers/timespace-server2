@@ -13,7 +13,7 @@ type CountryInfo {
 type Query {
     # 국가 검색용 API => 결과값에 timezone 포함되어 있음.
     countries(countryName: String): [Country!]
-    currentCountry: Object
+    currentCountry: Zoneinfo!
 }
 
 type Country {
