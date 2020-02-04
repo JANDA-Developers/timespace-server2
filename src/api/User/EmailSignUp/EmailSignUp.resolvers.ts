@@ -104,7 +104,10 @@ const resolvers: Resolvers = {
                 } catch (error) {
                     return {
                         ok: false,
-                        error,
+                        error: {
+                            msg: error.message,
+                            code: error.code || error.extensions.code
+                        },
                         data: null
                     };
                 }
