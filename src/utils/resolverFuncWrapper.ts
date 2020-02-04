@@ -21,10 +21,12 @@ export const defaultResolver = (resolverFunction: ResolverFunction) => async (
     try {
         result = await resolverFunction({ parent, args, context, info }, stack);
     } catch (error) {
-        // console.log(error);
         result = {
             ok: false,
-            error,
+            error: {
+                msg: error.message,
+                code: error.code || error.extensions.code
+            },
             data: null
         };
     }
