@@ -6,6 +6,7 @@ import { ApolloServer } from "apollo-server-express";
 import express, { Express, NextFunction, Response } from "express";
 import axios from "axios";
 import { decodeKey } from "./utils/decodeIdToken";
+import { getIP } from "./utils/utils";
 
 class App {
     public server: ApolloServer;
@@ -18,6 +19,10 @@ class App {
         this.server = new ApolloServer({
             schema,
             context: (ctx): any => {
+                console.log({
+                    forwarded: getIP(ctx.req),
+                    ip: ctx.req.ip
+                });
                 return {
                     req: ctx.req
                 };

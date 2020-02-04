@@ -14,7 +14,7 @@ export const defaultResolver = resolverFunction => async (
 ) => {
     const startTime = new Date();
     const logInfoArr = [];
-    const { headers, body, user, ips } = context.req;
+    const { headers, body, user } = context.req;
     const ip = getIP(context.req);
     let result: any;
     try {
@@ -36,8 +36,8 @@ export const defaultResolver = resolverFunction => async (
     fmtLog(result.error ? "err" : "info", {
         when: startTime.toISOString(),
         who: {
+            req: context.req,
             ip,
-            ips,
             "X-JWT": headers["X-JWT"] || headers["x-jwt"],
             "user-agent": headers["user-agent"],
             user:
