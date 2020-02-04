@@ -15,7 +15,7 @@ export const defaultResolver = resolverFunction => async (
     const startTime = new Date();
     const logInfoArr = [];
     const { headers, body, user } = context.req;
-    const ip = getIP(context.req);
+    const ips = getIP(context.req);
     let result: any;
     try {
         result = await resolverFunction(
@@ -36,7 +36,10 @@ export const defaultResolver = resolverFunction => async (
     fmtLog(result.error ? "err" : "info", {
         when: startTime.toISOString(),
         who: {
-            ip,
+            ip: {
+                clientIP: ips[0],
+                proxys: ips.slice(1)
+            },
             "X-JWT": headers["X-JWT"] || headers["x-jwt"],
             "user-agent": headers["user-agent"],
             user:

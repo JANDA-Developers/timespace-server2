@@ -23,7 +23,7 @@ const resolver: Resolvers = {
             return result || [];
         },
         currentCountry: async (_, __, { req }): Promise<any> => {
-            const geolocation = await getGeoInfoByIP(getIP(req));
+            const geolocation = await getGeoInfoByIP(getIP(req)[0]);
             return geolocation;
         }
     }

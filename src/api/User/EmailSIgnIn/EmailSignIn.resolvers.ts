@@ -66,7 +66,7 @@ const resolvers: Resolvers = {
                     accessToken: authResult.AccessToken || "",
                     idToken: authResult.IdToken || "",
                     expiryDate: authResult.ExpiresIn || 3600,
-                    ip: getIP(req),
+                    ip: getIP(req)[0],
                     os: req.headers["user-agent"]
                 };
                 if (!existingUser) {
