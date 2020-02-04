@@ -38,7 +38,8 @@ export const defaultResolver = resolverFunction => async (
             utc: startTime.toISOString(),
             localTime: getLocalDate(
                 startTime,
-                (user && user.zoneinfo.offset) || undefined
+                (user && parseInt(JSON.parse(user.zoneinfo).offset)) ||
+                    undefined
             ).toISOString()
         },
         who: {
