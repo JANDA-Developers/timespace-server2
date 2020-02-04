@@ -36,7 +36,6 @@ export const defaultResolver = resolverFunction => async (
     fmtLog(result.error ? "err" : "info", {
         when: startTime.toISOString(),
         who: {
-            req: context.req,
             ip,
             "X-JWT": headers["X-JWT"] || headers["x-jwt"],
             "user-agent": headers["user-agent"],
