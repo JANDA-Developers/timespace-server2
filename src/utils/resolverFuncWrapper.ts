@@ -1,5 +1,6 @@
 import { fmtLog } from "../logger";
 import { ApolloError } from "apollo-server";
+import { getIP } from "./utils";
 
 /**
  * 리솔버 로거... 로그 찍어주는 아이 ㅎㅎ
@@ -13,7 +14,8 @@ export const defaultResolver = resolverFunction => async (
 ) => {
     const startTime = new Date();
     const logInfoArr = [];
-    const { headers, body, ip, user, ips } = context.req;
+    const { headers, body, user, ips } = context.req;
+    const ip = getIP(context.req);
     let result: any;
     try {
         result = await resolverFunction(

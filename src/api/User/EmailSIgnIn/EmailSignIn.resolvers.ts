@@ -9,6 +9,7 @@ import { UserModel, LoggedInInfo } from "../../../models/User";
 import { decodeKey } from "../../../utils/decodeIdToken";
 import { ObjectId } from "mongodb";
 import { ApolloError } from "apollo-server";
+import { getIP } from "../../../utils/utils";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -65,7 +66,7 @@ const resolvers: Resolvers = {
                     accessToken: authResult.AccessToken || "",
                     idToken: authResult.IdToken || "",
                     expiryDate: authResult.ExpiresIn || 3600,
-                    ip: req.ip,
+                    ip: getIP(req),
                     os: req.headers["user-agent"]
                 };
                 if (!existingUser) {

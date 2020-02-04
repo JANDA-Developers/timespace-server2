@@ -1,6 +1,7 @@
 import { Resolvers } from "../../../types/resolvers";
 import { CountryInfoModel } from "../../../models/CountryInfo";
 import { getGeoInfoByIP } from "../../../utils/geoLocationAPI";
+import { getIP } from "../../../utils/utils";
 
 const resolver: Resolvers = {
     BaseModel: {
@@ -22,7 +23,7 @@ const resolver: Resolvers = {
             return result || [];
         },
         currentCountry: async (_, __, { req }): Promise<any> => {
-            const geolocation = await getGeoInfoByIP(req.get("ip"));
+            const geolocation = await getGeoInfoByIP(getIP(req));
             return geolocation;
         }
     }
