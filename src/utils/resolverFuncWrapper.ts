@@ -1,6 +1,6 @@
 import { fmtLog } from "../logger";
 import { ApolloError } from "apollo-server";
-import { getIP } from "./utils";
+import { getIP, getLocalDate } from "./utils";
 
 /**
  * 리솔버 로거... 로그 찍어주는 아이 ㅎㅎ
@@ -34,7 +34,13 @@ export const defaultResolver = resolverFunction => async (
         };
     }
     fmtLog(result.error ? "err" : "info", {
-        when: startTime.toISOString(),
+        when: {
+            utc: startTime.toISOString(),
+            localTime: getLocalDate(
+                startTime,
+                (user && user.zoneinfo.offset) || undefined
+            ).toISOString()
+        },
         who: {
             ip: {
                 clientIP: ips[0],
