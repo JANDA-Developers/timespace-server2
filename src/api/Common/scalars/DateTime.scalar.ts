@@ -1,25 +1,28 @@
 import { GraphQLScalarType } from "graphql";
 import { ASTNode, Kind } from "graphql/language";
 
-function serialize(value: string): Date | null {
+function serialize(value: string | number): Date | null {
+    console.log({
+        dateValue: value
+    });
     const date = new Date(value);
     return date;
 }
 
-function parseValue(value: string | Date): string | null {
+function parseValue(value: number | Date): string | null {
     const date = new Date(value);
-    date.setUTCHours(0, 0, 0, 0);
     if (isNaN(date.getTime())) {
         throw new Error("Invalid Date Value");
     }
     return date.toISOString();
 }
 
-function parseLiteral(ast: ASTNode): string | null {
+function parseLiteral(ast: ASTNode): Date | null {
     switch (ast.kind) {
         case Kind.STRING:
+            return new Date(ast.value);
         case Kind.INT:
-            return parseValue(ast.value);
+            return new Date(parseInt(ast.value));
         default:
             return null;
     }

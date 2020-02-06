@@ -50,3 +50,70 @@ type Err {
     code: String
     msg: String
 }
+
+enum Day {
+    SUN
+    MON
+    TUE
+    WED
+    THU
+    FRI
+    SAT
+}
+# 선택 가능 범위
+type SelectablePeriod {
+    # 최대 선택 범위
+    max: Int!
+    # 최소 손택 범위
+    min: Int!
+    # 선택 단위
+    unit: Int!
+}
+
+enum GenderOption {
+    MALE
+    FEMALE
+    ANY
+}
+
+enum Gender {
+    MALE
+    FEMALE
+}
+
+type Query {
+    includeDays(days: Int!): [Day!]
+    periodTest(param: PeriodInput!): Period!
+}
+
+type Period {
+    # 00:00 을 기준으로 분(Minute) 단위로 설정됨
+    start: Int!
+
+    # 00:00 을 기준으로 분(Minute) 단위로 설정됨
+    end: Int!
+
+    # start, end 사이의 시간
+    time: Int!
+
+    # 포함하는 요일"들"
+    days: [Day!]
+
+    # 해당 날짜가 포함되는지 확인
+    isIn(date: DateTime!): Boolean!
+
+    # 겹치는 기간 나옴
+    intersactions(period: PeriodInput!): [Period!]
+
+    # 서로 겹치지 않는 기간 출력
+    differences(perid: PeriodInput!): [Period!]
+
+    # 여러개의 Period로 쪼개기
+    split: [Period!]
+}
+
+input PeriodInput {
+    start: Int!
+    time: Int!
+    days: [Day!]
+}

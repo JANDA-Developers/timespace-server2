@@ -32,7 +32,6 @@ class App {
                     query: "query { HealthCheck { ok, error { code, msg } }}"
                 };
                 const uri = `http://${process.env.SERVER_URL}:${process.env.PORT}${path}`;
-                console.log({ uri });
                 const result = await axios.post(uri, req.body, {
                     headers: {
                         "Accept-Encoding": "gzip, deflate, br",
@@ -41,10 +40,8 @@ class App {
                         Connection: "keep-alive"
                     }
                 });
-                console.log(result.data);
                 res.json(result.data);
             } catch (error) {
-                console.log(error.data);
                 res.json({
                     ok: false,
                     error: error.message,

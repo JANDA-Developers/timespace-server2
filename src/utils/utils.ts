@@ -1,4 +1,4 @@
-import { ONE_MINUTE, ONE_HOUR } from "./dateFuncs";
+import { ONE_MINUTE, ONE_HOUR, ONE_DAY } from "./dateFuncs";
 
 export const getIP = (req: any): string[] => {
     const ips: string[] = (
@@ -18,4 +18,8 @@ export const getLocalDate = (date: Date, offsetHour?: number) => {
                 ? offsetHour * ONE_HOUR
                 : -date.getTimezoneOffset() * ONE_MINUTE)
     );
+};
+
+export const dateToMinutes = (date: Date) => {
+    return (date.getTime() % ONE_DAY) / ONE_MINUTE;
 };
