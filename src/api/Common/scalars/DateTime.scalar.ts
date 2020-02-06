@@ -2,9 +2,6 @@ import { GraphQLScalarType } from "graphql";
 import { ASTNode, Kind } from "graphql/language";
 
 function serialize(value: string | number): Date | null {
-    console.log({
-        dateValue: value
-    });
     const date = new Date(value);
     return date;
 }

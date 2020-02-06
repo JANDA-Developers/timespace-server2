@@ -23,3 +23,20 @@ export const getLocalDate = (date: Date, offsetHour?: number) => {
 export const dateToMinutes = (date: Date) => {
     return (date.getTime() % ONE_DAY) / ONE_MINUTE;
 };
+
+export const daysToNumber = (days: any[]) => {
+    return days.reduce((d1, d2) => d1 + d2);
+};
+
+export const daysNumToArr = (day: number, criteria = 64): number[] => {
+    if (criteria === 0) {
+        return [];
+    }
+    if (day >= criteria) {
+        const v = daysNumToArr(day - criteria, criteria >> 1);
+        v.push(criteria);
+        return v;
+    } else {
+        return daysNumToArr(day, criteria >> 1);
+    }
+};

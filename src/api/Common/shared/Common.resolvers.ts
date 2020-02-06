@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { CountryInfoModel } from "../../../models/CountryInfo";
 import { getGeoInfoByIP } from "../../../utils/geoLocationAPI";
-import { getIP } from "../../../utils/utils";
+import { getIP, daysNumToArr } from "../../../utils/utils";
 import { Zoneinfo, PeriodInput } from "../../../types/graph";
 import { defaultResolver } from "../../../utils/resolverFuncWrapper";
 import { PeriodCls } from "../../../utils/Period";
+
 const resolver = {
     BaseModel: {
         __resolveType: (value: any): string => {
@@ -38,18 +39,24 @@ const resolver = {
         FEMALE: 3
     },
     Period: {
-        // start: (): number => {},
-        // end: () => {},
-        // time: () => {},
-        days: (period: PeriodCls) => daysNumToArr(period.days),
-        isIn: (period: PeriodCls, { date }) => period.isIn(date)
-        // intersaction: () => {},
+        days: (obj: PeriodCls) => daysNumToArr(obj.days),
+        isIn: (obj: PeriodCls, { date }) => {
+            obj.validate();
+            return obj.isIn(date);
+        },
+        intersactions: (
+            obj: PeriodCls,
+            { period }: { period: PeriodCls }
+        ): PeriodCls | null => {
+            obj.validate();
+            const p = new PeriodCls(period);
+            return obj.intersactions(p);
+        }
         // differences: () => {},
         // disperse: () => {}
     },
     Query: {
         periodTest: (_, { param }: { param: PeriodInput }) => {
-            console.info(param);
             return new PeriodCls({
                 ...param,
                 days: (param.days as any[]).reduce(
@@ -83,19 +90,6 @@ const resolver = {
         includeDays: (_, { days }) => {
             return daysNumToArr(days);
         }
-    }
-};
-
-export const daysNumToArr = (day: number, criteria = 64): number[] => {
-    if (criteria === 0) {
-        return [];
-    }
-    if (day >= criteria) {
-        const v = daysNumToArr(day - criteria, criteria >> 1);
-        v.push(criteria);
-        return v;
-    } else {
-        return daysNumToArr(day, criteria >> 1);
     }
 };
 

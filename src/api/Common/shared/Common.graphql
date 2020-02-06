@@ -103,12 +103,12 @@ type Period {
     isIn(date: DateTime!): Boolean!
 
     # 겹치는 기간 나옴
-    intersactions(period: PeriodInput!): [Period!]
+    intersactions(period: PeriodInput!): Period
 
-    # 서로 겹치지 않는 기간 출력
+    # [개발중] 서로 겹치지 않는 기간 출력
     differences(perid: PeriodInput!): [Period!]
 
-    # 여러개의 Period로 쪼개기
+    # [개발중] 여러개의 Period로 쪼개기
     split: [Period!]
 }
 
