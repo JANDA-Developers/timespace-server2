@@ -2,26 +2,6 @@ import _ from "lodash";
 import { Types } from "mongoose";
 import { getDayOfYear } from "../../utils/dateFuncs";
 
-export const houseAccessKeyGen = (): string => {
-    return (
-        s4() +
-        s4() +
-        "-" +
-        s4() +
-        "-" +
-        s4() +
-        "-" +
-        s4() +
-        "-" +
-        s4() +
-        s4() +
-        s4()
-    );
-};
-export const appilcationKeyGen = (): string => {
-    return s4() + s4() + "-" + s4() + "-" + s4() + s4() + s4() + s4();
-};
-
 /**
  * YYYYMMDD-"HouseCode(6)"-"RandomCode(8)" => Legarcy
  * "HouseCode(6)"-"YM(3)Time(3)RandomCode32(4).toUpperCase()"
@@ -31,7 +11,7 @@ export const bookingNumGen = (houseNum: string | Types.ObjectId): string => {
     const date = new Date();
     const id =
         typeof houseNum !== "string"
-            ? houseNumGen(houseNum.toHexString())
+            ? genCode(houseNum.toHexString())
             : houseNum;
     return `${id}-${getDayOfYear(date)}${date
         .getHours()
@@ -43,7 +23,7 @@ export const bookingNumGen = (houseNum: string | Types.ObjectId): string => {
         .substr(0, 2)}`;
 };
 
-export const houseNumGen = (houseNum: string): string =>
+export const genCode = (houseNum: string): string =>
     makeCodeByHexString({
         id: houseNum,
         units: [1, 2, 3, 5, 7],

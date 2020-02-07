@@ -1,5 +1,8 @@
 import { ONE_MINUTE, ONE_HOUR, ONE_DAY } from "./dateFuncs";
 import { ClientSession } from "mongoose";
+import { MongoError } from "mongodb";
+import { mongoose } from "@typegoose/typegoose";
+import { ApolloError } from "apollo-server";
 
 export const getIP = (req: any): string[] => {
     const ips: string[] = (
@@ -47,14 +50,24 @@ export const errorReturn = async (error: any, dbSession?: ClientSession) => {
         await dbSession.abortTransaction();
         dbSession.endSession();
     }
-    console.log({
-        error0: error
-    });
+    let code: string = "UNDEFINED";
+    let msg: string = "UNDEFINED";
+    if (error instanceof MongoError) {
+        code = error.name;
+    } else if (error instanceof mongoose.Error) {
+        code = error.name;
+    } else if (error instanceof ApolloError) {
+        code = error.extensions.code;
+    } else {
+        code = error.code || error.name;
+    }
+    msg = error.message;
+
     return {
         ok: false,
         error: {
-            code: error.code || error.extensions.code,
-            msg: error.message
+            code,
+            msg
         },
         data: null
     };

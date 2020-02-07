@@ -25,8 +25,8 @@ export class UserCls extends BaseSchema {
         });
         if (!user) {
             throw new ApolloError(
-                "INVALID_USER_SUB",
                 "존재하지 않는 UserSub입니다",
+                "INVALID_USER_SUB",
                 { userSub: sub }
             );
         }

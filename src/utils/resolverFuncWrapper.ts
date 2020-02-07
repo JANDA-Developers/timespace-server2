@@ -18,18 +18,8 @@ export const defaultResolver = (resolverFunction: ResolverFunction) => async (
     const { headers, body, user } = context.req;
     const ips = getIP(context.req);
     let result: any;
-    try {
-        result = await resolverFunction({ parent, args, context, info }, stack);
-    } catch (error) {
-        result = {
-            ok: false,
-            error: {
-                msg: error.message,
-                code: error.code || error.extensions.code
-            },
-            data: null
-        };
-    }
+    result = await resolverFunction({ parent, args, context, info }, stack);
+
     fmtLog(result.error ? "err" : "info", {
         when: {
             utc: startTime.toISOString(),

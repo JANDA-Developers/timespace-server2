@@ -1,0 +1,11 @@
+type Mutation {
+    DeleteStore(param: DeleteStoreInput!): DeleteStoreResponse!
+}
+type DeleteStoreResponse {
+    ok: Boolean!
+    error: Err
+    data: Store
+}
+input DeleteStoreInput {
+    storeCode: String!
+}

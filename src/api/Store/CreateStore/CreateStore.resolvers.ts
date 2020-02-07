@@ -31,6 +31,7 @@ const resolvers: Resolvers = {
                         const _id = new ObjectId();
                         const store = new StoreModel({
                             _id,
+                            user: new ObjectId(cognitoUser["custom:_id"]),
                             name,
                             type,
                             description

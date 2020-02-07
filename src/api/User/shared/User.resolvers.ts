@@ -2,7 +2,8 @@ import { Resolvers } from "../../../types/resolvers";
 
 const resolvers: Resolvers = {
     User: {
-        _id: cognitoUser => cognitoUser && cognitoUser["custom:_id"],
+        _id: cognitoUser =>
+            (cognitoUser && cognitoUser["custom:_id"]) || cognitoUser._id,
         tokenExpiry: user => user.exp,
         zoneinfo: user => JSON.parse(user.zoneinfo)
     }
