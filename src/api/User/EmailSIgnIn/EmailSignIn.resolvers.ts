@@ -16,7 +16,6 @@ const resolvers: Resolvers = {
         EmailSignIn: defaultResolver(
             async (
                 {
-                    parent: any,
                     args: { param },
                     context: { req }
                 }: { parent: any; args: EmailSignInMutationArgs; context: any },
