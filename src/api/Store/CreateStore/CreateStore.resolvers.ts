@@ -22,6 +22,7 @@ const resolvers: Resolvers = {
                     session.startTransaction();
                     try {
                         const { cognitoUser } = req;
+                        console.log(cognitoUser);
                         const {
                             name,
                             type,
@@ -30,14 +31,14 @@ const resolvers: Resolvers = {
                         const _id = new ObjectId();
                         const store = new StoreModel({
                             _id,
-                            user: new ObjectId(cognitoUser["custom:_id"]),
+                            user: new ObjectId(cognitoUser._id),
                             name,
                             type,
                             description
                         });
                         await store.save({ session });
                         await UserModel.findByIdAndUpdate(
-                            cognitoUser["custom:_id"],
+                            cognitoUser._id,
                             {
                                 $push: {
                                     stores: _id

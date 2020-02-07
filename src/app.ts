@@ -86,12 +86,18 @@ class App {
         const token = req.get("X-JWT");
         if (token) {
             const { ok, error, data } = await decodeKey(token);
-            if (!data) {
-                data._id = data["custom:_id"];
-            }
-            req.cognitoUser = data;
             if (!ok) {
                 req.headers["x-jwt"] = error?.code || "";
+            }
+            if (data) {
+                console.log(
+                    "==================================================================================="
+                );
+                console.log({
+                    data
+                });
+                data._id = data["custom:_id"];
+                req.cognitoUser = data;
             }
         } else {
             req.cognitoUser = undefined;

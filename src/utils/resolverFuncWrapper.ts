@@ -1,7 +1,8 @@
 import { fmtLog } from "../logger";
 import { ApolloError } from "apollo-server";
-import { getIP, getLocalDate } from "./utils";
+import { getIP, getLocalDate, errorReturn } from "./utils";
 import { ResolverFunction } from "../types/resolvers";
+import { BaseResponse } from "../types/graph";
 
 /**
  * 리솔버 로거... 로그 찍어주는 아이 ㅎㅎ
@@ -62,18 +63,25 @@ export const defaultResolver = (resolverFunction: ResolverFunction) => async (
 export const privateResolver = (resolverFunction: ResolverFunction) => async (
     { parent, args, context, info },
     insideLog: any[]
-) => {
-    if (!context.req.cognitoUser) {
-        const token: string | undefined = context.req.get("X-JWT");
-        if (token === "TokenExpiredError") {
-            throw new ApolloError(
-                "만료된 토큰입니다. 다시 로그인 해주세요",
-                "TOKEN_EXPIRED_ERROR"
-            );
+): Promise<BaseResponse & { data: any | null }> => {
+    try {
+        if (!context.req.cognitoUser) {
+            const token: string | undefined = context.req.get("X-JWT");
+            if (token === "TokenExpiredError") {
+                throw new ApolloError(
+                    "만료된 토큰입니다. 다시 로그인 해주세요",
+                    "TOKEN_EXPIRED_ERROR"
+                );
+            }
+            throw new ApolloError("Unauthorized", "UNAUTHORIZED_USER", {
+                jwt: context.req.headers.jwt
+            });
         }
-        throw new ApolloError("Unauthorized", "UNAUTHORIZED_USER", {
-            jwt: context.req.headers.jwt
-        });
+        return await resolverFunction(
+            { parent, args, context, info },
+            insideLog
+        );
+    } catch (error) {
+        return await errorReturn(error);
     }
-    return await resolverFunction({ parent, args, context, info }, insideLog);
 };
