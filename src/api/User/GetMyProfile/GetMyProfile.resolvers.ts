@@ -11,13 +11,13 @@ const resolvers: Resolvers = {
             privateResolver(
                 async ({ context: { req } }): Promise<GetMyProfileResponse> => {
                     try {
-                        const { user } = req;
+                        const { cognitoUser } = req;
                         // insideLog.push(user);
                         return {
                             ok: true,
                             error: null,
                             data: {
-                                user: user as any
+                                user: cognitoUser as any
                             }
                         };
                     } catch (error) {

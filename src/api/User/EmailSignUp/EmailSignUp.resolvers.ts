@@ -10,10 +10,7 @@ import { ApolloError } from "apollo-server";
 const resolvers: Resolvers = {
     Mutation: {
         EmailSignUp: defaultResolver(
-            async (
-                { parent, args: { param } },
-                logArr: any[]
-            ): Promise<EmailSignUpResponse> => {
+            async ({ args: { param } }): Promise<EmailSignUpResponse> => {
                 try {
                     const {
                         username,
@@ -48,6 +45,7 @@ const resolvers: Resolvers = {
                         offset: tz?.offset,
                         callingCode: countryInfo.callingCode
                     };
+                    const _id = new ObjectId();
                     const result = await cognito
                         .signUp({
                             ClientId: process.env.COGNITO_CLIENT_ID || "",
@@ -70,12 +68,16 @@ const resolvers: Resolvers = {
                                     Name: "zoneinfo",
                                     // name, offset 으로 구성된 아이임 ㅎㅎ
                                     Value: JSON.stringify(zoneinfo)
+                                },
+                                {
+                                    Name: "custom:_id",
+                                    Value: _id.toHexString()
                                 }
                             ]
                         })
                         .promise();
                     await UserModel.create({
-                        _id: new ObjectId(),
+                        _id,
                         sub: result.UserSub,
                         zoneinfo,
                         loginInfos: []

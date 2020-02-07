@@ -1,4 +1,5 @@
 import { ONE_MINUTE, ONE_HOUR, ONE_DAY } from "./dateFuncs";
+import { ClientSession } from "mongoose";
 
 export const getIP = (req: any): string[] => {
     const ips: string[] = (
@@ -39,4 +40,22 @@ export const daysNumToArr = (day: number, criteria = 64): number[] => {
     } else {
         return daysNumToArr(day, criteria >> 1);
     }
+};
+
+export const errorReturn = async (error: any, dbSession?: ClientSession) => {
+    if (dbSession) {
+        await dbSession.abortTransaction();
+        dbSession.endSession();
+    }
+    console.log({
+        error0: error
+    });
+    return {
+        ok: false,
+        error: {
+            code: error.code || error.extensions.code,
+            msg: error.message
+        },
+        data: null
+    };
 };

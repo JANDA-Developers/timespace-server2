@@ -60,6 +60,17 @@ class App {
     };
 
     private useLogger = (): void => {
+        logger.token("remote-addr", req => {
+            var ffHeaderValue = req.headers["x-forwarded-for"];
+            if (typeof ffHeaderValue === "string") {
+                return ffHeaderValue;
+            }
+            return (
+                (ffHeaderValue && ffHeaderValue[0]) ||
+                req.connection.remoteAddress ||
+                ""
+            );
+        });
         this.app.use(
             logger(
                 `[:date[iso]] :remote-addr :url(:method :status) :user-agent`
@@ -75,12 +86,12 @@ class App {
         const token = req.get("X-JWT");
         if (token) {
             const { ok, error, data } = await decodeKey(token);
-            req.user = data;
+            req.cognitoUser = data;
             if (!ok) {
                 req.headers["x-jwt"] = error?.code || "";
             }
         } else {
-            req.user = undefined;
+            req.cognitoUser = undefined;
         }
         next();
     };

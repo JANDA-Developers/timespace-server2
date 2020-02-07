@@ -6,16 +6,19 @@ import { ObjectId } from "mongodb";
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.STORE)))
 export class StoreCls extends BaseSchema {
     @prop()
-    userSub: string;
+    user: ObjectId;
 
     @prop()
     name: string;
 
     @prop()
+    type: "CONFERENCEROOM_BOOKING" | "TICKETS";
+
+    @prop()
     storeCode: string;
 
     @prop()
-    itemIds: ObjectId[];
+    items: ObjectId[];
 }
 
 export const StoreModel = getModelForClass(StoreCls);

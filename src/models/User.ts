@@ -50,6 +50,9 @@ export class UserCls extends BaseSchema {
 
     @prop()
     loginInfos: LoggedInInfo[];
+
+    @prop({ default: [] })
+    stores: ObjectId[];
 }
 
 export const UserModel = getModelForClass(UserCls);

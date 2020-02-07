@@ -55,13 +55,6 @@ export const decodeKey = async (
             data: user
         };
     } catch (error) {
-        // console.log({
-        //     name: error.name,
-        //     code: error.code,
-        //     message: error.message,
-        //     expiredAt: error.expiredAt,
-        //     token
-        // });
         return {
             ok: false,
             error: {

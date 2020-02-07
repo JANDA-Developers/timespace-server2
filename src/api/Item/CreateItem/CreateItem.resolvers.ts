@@ -3,6 +3,7 @@ import {
     CreateItemMutationArgs,
     CreateItemResponse
 } from "../../../types/graph";
+import { ApolloError } from "apollo-server";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -12,12 +13,15 @@ const resolvers: Resolvers = {
         ): Promise<CreateItemResponse> => {
             try {
                 console.log(param);
-                throw new Error("뀨");
+                throw new ApolloError("개발중", "UNDERDEVELOPMENT");
                 // const {} = param;
             } catch (error) {
                 return {
                     ok: false,
-                    error,
+                    error: {
+                        code: error.code || error.extensions.code,
+                        msg: error.message
+                    },
                     data: null
                 };
             }

@@ -62,7 +62,7 @@ export const defaultResolver = (resolverFunction: ResolverFunction) => async (
             resTime: `${new Date().getTime() - startTime.getTime()} ms`,
             body,
             input: args,
-            insideLog: stack,
+            logStack: stack,
             output: result
         }
     });
@@ -73,7 +73,7 @@ export const privateResolver = (resolverFunction: ResolverFunction) => async (
     { parent, args, context, info },
     insideLog: any[]
 ) => {
-    if (!context.req.user) {
+    if (!context.req.cognitoUser) {
         const token: string | undefined = context.req.get("X-JWT");
         if (token === "TokenExpiredError") {
             throw new ApolloError(

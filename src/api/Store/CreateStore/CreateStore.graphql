@@ -1,0 +1,14 @@
+type Mutation {
+    CreateStore(param: CreateStoreInput!): CreateStoreResponse!
+}
+type CreateStoreResponse {
+    ok: Boolean!
+    error: Err
+    data: Store
+}
+
+input CreateStoreInput {
+    name: String!
+    type: StoreType!
+    description: String
+}
