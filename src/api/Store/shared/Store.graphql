@@ -8,6 +8,6 @@ type Store {
 }
 
 enum StoreType {
-    CONFERENCEROOM_BOOKING
-    TICKETS
+    LEASE
+    TICKET
 }

@@ -46,7 +46,13 @@ export class StoreCls extends BaseSchema {
     name: string;
 
     @prop()
-    type: "CONFERENCEROOM_BOOKING" | "TICKETS";
+    manager: {
+        name: string;
+        phone_number: string;
+    };
+
+    @prop()
+    type: "LEASE" | "TICKET";
 
     @prop({
         default(this: DocumentType<StoreCls>) {
