@@ -2,7 +2,7 @@ type Store {
     _id: ID!
     user: User
     name: String!
-    storeNum: String!
+    code: String!
     type: StoreType!
     description: String
 }

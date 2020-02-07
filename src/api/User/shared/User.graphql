@@ -9,6 +9,7 @@ type User {
     phone_number: String!
     zoneinfo: Zoneinfo!
     tokenExpiry: Int!
+    stores: [Store!]
 }
 
 type Zoneinfo {

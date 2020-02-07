@@ -55,6 +55,9 @@ export class StoreCls extends BaseSchema {
     })
     code: string;
 
+    @prop()
+    description: string;
+
     @prop({ default: [] })
     items: ObjectId[];
 }

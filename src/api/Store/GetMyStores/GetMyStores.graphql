@@ -1,0 +1,8 @@
+type Query {
+    GetMyStores: GetMyStoresResponse!
+}
+type GetMyStoresResponse {
+    ok: Boolean!
+    error: Err
+    data: [Store!]
+}

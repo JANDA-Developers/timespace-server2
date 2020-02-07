@@ -22,7 +22,6 @@ const resolvers: Resolvers = {
                     session.startTransaction();
                     try {
                         const { cognitoUser } = req;
-                        console.log(cognitoUser);
                         const {
                             name,
                             type,

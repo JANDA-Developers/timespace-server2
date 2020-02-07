@@ -1,0 +1,17 @@
+type Mutation {
+    UpdateStore(param: UpdateStoreInput!): UpdateStoreResponse!
+}
+type UpdateStoreResponse {
+    ok: Boolean!
+    error: Err
+    data: Store
+}
+input UpdateStoreInput {
+    storeCode: String!
+    updateParam: StoreUpdateParamInput!
+}
+
+input StoreUpdateParamInput {
+    name: String!
+    description: String!
+}
