@@ -1,9 +1,15 @@
 import { BaseSchema, createSchemaOptions } from "../abs/BaseSchema";
-import { prop, getModelForClass, modelOptions } from "@typegoose/typegoose";
+import {
+    prop,
+    getModelForClass,
+    modelOptions,
+    DocumentType
+} from "@typegoose/typegoose";
 import { getCollectionName, ModelName } from "./__collectionNames";
 import { ObjectId } from "mongodb";
 import { PeriodCls } from "../utils/Period";
-import { GenderOption, SelectablePeriod } from "../types/graph";
+import { GenderOption, PeriodOption } from "../types/graph";
+import { genCode, s4 } from "./utils/genId";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.ITEM)))
 export class ItemCls extends BaseSchema {
@@ -13,7 +19,11 @@ export class ItemCls extends BaseSchema {
     @prop()
     storeId: ObjectId;
 
-    @prop()
+    @prop({
+        default(this: DocumentType<ItemCls>) {
+            return `${genCode(this.storeId)}-${s4(32).toUpperCase()}`;
+        }
+    })
     itemCode: string;
 
     @prop()
@@ -25,8 +35,11 @@ export class ItemCls extends BaseSchema {
     @prop({ default: () => true })
     needToConfirm: boolean;
 
-    @prop({ default: (): GenderOption => "ANY" })
-    genderOption: GenderOption;
+    @prop({ default: () => false })
+    usingPeriodOption: boolean;
+
+    @prop({ default: () => false })
+    usingCapacityOption: boolean;
 
     /*
      * =============================================================================================================================
@@ -35,12 +48,14 @@ export class ItemCls extends BaseSchema {
      *
      * =============================================================================================================================
      */
-    @prop({ default: () => [] })
-    enabledPeriod: Array<PeriodCls>;
 
-    @prop({ default: () => [] })
-    disabledPeriod: Array<PeriodCls>;
-
+    /*
+     * =============================================================================================================================
+     *
+     * usingCapacityOption 종속 파라미터들
+     *
+     * =============================================================================================================================
+     */
     @prop({
         default: () => 1,
         validate: [
@@ -48,6 +63,12 @@ export class ItemCls extends BaseSchema {
                 validator: (v: number) => v >= 0,
                 message: "peopleCount는 음수가 될 수 없습니다."
             }
+        ],
+        required: [
+            function(this: DocumentType<ItemCls>) {
+                return this.usingCapacityOption;
+            },
+            "PeopleCapacity가 설정되지 않았습니다. "
         ]
     })
     peopleCapacity: number;
@@ -55,21 +76,71 @@ export class ItemCls extends BaseSchema {
     @prop({
         validate: [
             {
-                validator: (v: SelectablePeriod) => v.max > 0,
+                validator(this: DocumentType<ItemCls>, value) {
+                    return this.usingCapacityOption ? value : true;
+                },
+                message: "GenderOption이 설정되지 않았습니다. "
+            }
+        ],
+        default(this: DocumentType<ItemCls>) {
+            return this.usingCapacityOption ? "ANY" : undefined;
+        }
+    })
+    genderOption: GenderOption;
+
+    /*
+     * =============================================================================================================================
+     *
+     * usingPeriodOption 종속 파라미터들
+     *
+     * =============================================================================================================================
+     */
+    @prop({
+        default: () => [],
+        required: [
+            function(this: DocumentType<ItemCls>) {
+                return this.usingPeriodOption;
+            },
+            "SelectablePeriod가 설정되지 않았습니다."
+        ]
+    })
+    enabledPeriod: Array<PeriodCls>;
+
+    @prop({
+        default: () => [],
+        required: [
+            function(this: DocumentType<ItemCls>) {
+                return this.usingPeriodOption;
+            },
+            "DisablePeriod가 설정되지 않았습니다."
+        ]
+    })
+    disabledPeriod: Array<PeriodCls>;
+
+    @prop({
+        validate: [
+            {
+                validator: (v: PeriodOption) => v.max > 0,
                 message:
                     "selectablePeriod.max 값은 0또는 음수가 될 수 없습니다."
             },
             {
-                validator: (v: SelectablePeriod) => v.min >= 0,
+                validator: (v: PeriodOption) => v.min >= 0,
                 message: "selectablePeriod.min 값은 음수가 될 수 없습니다."
             },
             {
-                validator: (v: SelectablePeriod) => v.unit >= 0,
+                validator: (v: PeriodOption) => v.unit >= 0,
                 message: "selectablePeriod.unit 값은 음수가 될 수 없습니다."
             }
+        ],
+        required: [
+            function(this: DocumentType<ItemCls>) {
+                return this.usingPeriodOption;
+            },
+            "SelectablePeriod가 설정되지 않았습니다."
         ]
     })
-    selectablePeriod: SelectablePeriod;
+    selectablePeriod: PeriodOption;
 }
 
 export const ItemModel = getModelForClass(ItemCls);

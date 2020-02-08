@@ -13,5 +13,13 @@ input CreateItemInput {
     name: String
     images: [URL]
     descriptions: String
-    # constraintors: [Constraintor]
+    optionalParams: ItemOptionalFieldInput
+}
+
+input ItemOptionalFieldInput {
+    peopleCapacity: Int
+    genderOption: GenderOption
+    enabledPeriod: [PeriodInput!]
+    disabledPeriod: [PeriodInput!]
+    selectablePeriod: PeriodOptionInput
 }

@@ -24,7 +24,6 @@ const resolvers: Resolvers = {
                         const { cognitoUser } = req;
                         const { storeCode } = param as DeleteStoreInput;
                         const store = await StoreModel.findByCode(storeCode);
-                        console.log(store);
 
                         await StoreModel.deleteOne(
                             {

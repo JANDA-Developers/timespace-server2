@@ -1,9 +1,17 @@
 import { ObjectId } from "mongodb";
 import { SchemaOptions } from "mongoose";
-import { prop } from "@typegoose/typegoose";
+import { prop, index } from "@typegoose/typegoose";
 
+@index(
+    {
+        expireAt: 1
+    },
+    {
+        expireAfterSeconds: 0
+    }
+)
 export class BaseSchema {
-    @prop()
+    @prop({ default: () => new ObjectId() })
     _id: ObjectId;
 
     @prop()
@@ -11,6 +19,9 @@ export class BaseSchema {
 
     @prop()
     updatedAt: Date;
+
+    @prop()
+    expireAt: Date;
 }
 
 export const createSchemaOptions = (

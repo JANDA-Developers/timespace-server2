@@ -1,6 +1,7 @@
 import _ from "lodash";
 import { Types } from "mongoose";
 import { getDayOfYear } from "../../utils/dateFuncs";
+import { ObjectId } from "mongodb";
 
 /**
  * YYYYMMDD-"HouseCode(6)"-"RandomCode(8)" => Legarcy
@@ -23,9 +24,9 @@ export const bookingNumGen = (houseNum: string | Types.ObjectId): string => {
         .substr(0, 2)}`;
 };
 
-export const genCode = (houseNum: string): string =>
+export const genCode = (id: string | ObjectId): string =>
     makeCodeByHexString({
-        id: houseNum,
+        id,
         units: [1, 2, 3, 5, 7],
         digits: 6
     });
@@ -60,7 +61,7 @@ export const makeCodeByHexString = ({
     units,
     digits
 }: {
-    id: string;
+    id: string | ObjectId;
     units: number[];
     digits?: number;
 }): string => {

@@ -66,6 +66,14 @@ export class StoreCls extends BaseSchema {
 
     @prop({ default: [] })
     items: ObjectId[];
+
+    @prop({ default: true })
+    usingPeriodOption: boolean;
+
+    @prop({
+        default: true
+    })
+    usingCapacityOption: boolean;
 }
 
 export const StoreModel = getModelForClass(StoreCls);

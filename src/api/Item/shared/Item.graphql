@@ -1,11 +1,19 @@
-type Item {
+# 티켓 아이템에 관한 스키마.
+type Item implements BaseModel {
     _id: ID!
     store: Store
-    user: User
-    group: Group
     name: String!
-    itemNum: String!
+    itemCode: String!
     images: [URL!]
     description: String
-    constraintors: [Constraintor!]
+    needToConfirm: Boolean!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    expireAt: DateTime
+
+    peopleCapacity: Int
+    genderOption: GenderOption
+    enabledPeriod: [Period!]
+    disabledPeriod: [Period!]
+    selectablePeriod: PeriodOption
 }

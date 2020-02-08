@@ -1,13 +1,18 @@
-type Store {
+type Store implements BaseModel {
     _id: ID!
     user: User
     name: String!
     code: String!
     type: StoreType!
     description: String
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    expireAt: DateTime
 }
 
 enum StoreType {
+    # 임대업. ex) 스터디룸, 컨퍼런스룸, etc...
     LEASE
+    # 티켓 판매. ex) 롤러장, etc... 티켓이라고 부를수 있는 것들.
     TICKET
 }

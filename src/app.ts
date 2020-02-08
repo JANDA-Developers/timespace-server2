@@ -90,12 +90,6 @@ class App {
                 req.headers["x-jwt"] = error?.code || "";
             }
             if (data) {
-                console.log(
-                    "==================================================================================="
-                );
-                console.log({
-                    data
-                });
                 data._id = data["custom:_id"];
                 req.cognitoUser = data;
             }

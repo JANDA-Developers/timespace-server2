@@ -1,0 +1,11 @@
+enum GenderOption {
+    MALE
+    FEMALE
+    ANY
+    SEPARATELY
+}
+
+enum Gender {
+    MALE
+    FEMALE
+}
