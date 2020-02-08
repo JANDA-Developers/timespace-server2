@@ -9,7 +9,6 @@ type CreateItemResponse implements BaseResponse {
 
 input CreateItemInput {
     storeId: ID!
-    group: ID
     name: String
     images: [URL]
     descriptions: String

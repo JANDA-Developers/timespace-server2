@@ -1,0 +1,24 @@
+type Mutation {
+    UpdateItem(param: UpdateItemInput!): UpdateItemResponse!
+}
+type UpdateItemResponse {
+    ok: Boolean!
+    error: Err
+    data: Item
+}
+input UpdateItemInput {
+    itemCode: String!
+    updateItemParamInput: UpdateItemParamInput!
+}
+
+input UpdateItemParamInput {
+    name: String
+    description: String
+    needToConfirm: Boolean
+
+    peopleCapacity: Int
+    genderOption: GenderOption
+    enabledPeriod: [PeriodInput!]
+    disabledPeriod: [PeriodInput!]
+    selectablePeriod: PeriodOptionInput
+}

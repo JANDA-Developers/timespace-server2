@@ -23,7 +23,7 @@ export class ItemCls extends BaseSchema {
         if (!item) {
             throw new ApolloError(
                 "존재하지 않는 StoreCode입니다",
-                "UNEXIST_STORECODE"
+                "UNEXIST_ITEMCODE"
             );
         }
         return item;

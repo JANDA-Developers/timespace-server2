@@ -24,7 +24,6 @@ const resolvers: Resolvers = {
                     try {
                         const {
                             descriptions,
-                            group,
                             images,
                             name,
                             storeId,
@@ -44,7 +43,6 @@ const resolvers: Resolvers = {
                         const item = new ItemModel({
                             _id: itemId,
                             name,
-                            group,
                             images,
                             storeId: new ObjectId(storeId),
                             descriptions,
