@@ -3,6 +3,7 @@ import { DocumentType } from "@typegoose/typegoose";
 import { StoreCls } from "../../../models/Store";
 import { ApolloError } from "apollo-server";
 import { ObjectId } from "mongodb";
+import { ItemModel } from "../../../models/Item";
 
 const resolvers: Resolvers = {
     Store: {
@@ -15,6 +16,14 @@ const resolvers: Resolvers = {
                 );
             }
             return cognitoUser;
+        },
+        items: async (store: DocumentType<StoreCls>) => {
+            return await ItemModel.find({
+                _id: {
+                    $in: store.items
+                    // .map(itemId => new ObjectId(itemId))
+                }
+            });
         }
     }
 };

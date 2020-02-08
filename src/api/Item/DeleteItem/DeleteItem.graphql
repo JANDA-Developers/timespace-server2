@@ -1,0 +1,11 @@
+type Mutation {
+    DeleteItem(param: DeleteItemInput!): DeleteItemResponse!
+}
+type DeleteItemResponse {
+    ok: Boolean!
+    error: Err
+    data: Item
+}
+input DeleteItemInput {
+    itemCode: String!
+}

@@ -3,7 +3,7 @@ type Item implements BaseModel {
     _id: ID!
     store: Store
     name: String!
-    itemCode: String!
+    code: String!
     images: [URL!]
     description: String
     needToConfirm: Boolean!

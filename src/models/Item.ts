@@ -10,9 +10,25 @@ import { ObjectId } from "mongodb";
 import { PeriodCls } from "../utils/Period";
 import { GenderOption, PeriodOption } from "../types/graph";
 import { genCode, s4 } from "./utils/genId";
+import { ApolloError } from "apollo-server";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.ITEM)))
 export class ItemCls extends BaseSchema {
+    static findByCode = async (
+        itemCode: string
+    ): Promise<DocumentType<ItemCls>> => {
+        const item = await ItemModel.findOne({
+            code: itemCode
+        });
+        if (!item) {
+            throw new ApolloError(
+                "존재하지 않는 StoreCode입니다",
+                "UNEXIST_STORECODE"
+            );
+        }
+        return item;
+    };
+
     @prop()
     name: string;
 
@@ -24,7 +40,7 @@ export class ItemCls extends BaseSchema {
             return `${genCode(this.storeId)}-${s4(32).toUpperCase()}`;
         }
     })
-    itemCode: string;
+    code: string;
 
     @prop()
     images: string[];

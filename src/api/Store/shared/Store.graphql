@@ -8,6 +8,7 @@ type Store implements BaseModel {
     createdAt: DateTime!
     updatedAt: DateTime!
     expireAt: DateTime
+    items: [Item!]
 }
 
 enum StoreType {
