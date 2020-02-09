@@ -19,6 +19,5 @@ input UpdateItemParamInput {
     peopleCapacity: Int
     genderOption: GenderOption
     enabledPeriod: [PeriodInput!]
-    disabledPeriod: [PeriodInput!]
-    selectablePeriod: PeriodOptionInput
+    periodOption: PeriodOptionInput
 }

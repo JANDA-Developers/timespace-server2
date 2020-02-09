@@ -8,7 +8,7 @@ import {
 import { getCollectionName, ModelName } from "./__collectionNames";
 import { ObjectId } from "mongodb";
 import { PeriodCls } from "../utils/Period";
-import { GenderOption, PeriodOption } from "../types/graph";
+import { GenderOption, PeriodOption, Period } from "../types/graph";
 import { genCode, s4 } from "./utils/genId";
 import { ApolloError } from "apollo-server";
 
@@ -77,7 +77,7 @@ export class ItemCls extends BaseSchema {
         validate: [
             {
                 validator: (v: number) => v >= 0,
-                message: "peopleCount는 음수가 될 수 없습니다."
+                message: "PeopleCount는 음수가 될 수 없습니다."
             }
         ],
         required: [
@@ -112,51 +112,59 @@ export class ItemCls extends BaseSchema {
      * =============================================================================================================================
      */
     @prop({
+        validate: [
+            {
+                validator(
+                    this: DocumentType<ItemCls>,
+                    enabledPeriod: Array<PeriodCls>
+                ): boolean {
+                    return (
+                        enabledPeriod.filter(
+                            period => period.time < this.periodOption.min
+                        ).length === 0
+                    );
+                },
+                message:
+                    "enabledPeriod.time 값이 periodOption.min보다 작습니다."
+            }
+        ],
         default: () => [],
         required: [
             function(this: DocumentType<ItemCls>) {
                 return this.usingPeriodOption;
             },
-            "SelectablePeriod가 설정되지 않았습니다."
-        ]
+            "EnabledPeriod가 설정되지 않았습니다."
+        ],
+        set: (periodList: Array<Period>) =>
+            periodList.map(p => new PeriodCls(p)),
+        get: (periodList: Array<Period>) =>
+            periodList.map(p => new PeriodCls(p))
     })
     enabledPeriod: Array<PeriodCls>;
-
-    @prop({
-        default: () => [],
-        required: [
-            function(this: DocumentType<ItemCls>) {
-                return this.usingPeriodOption;
-            },
-            "DisablePeriod가 설정되지 않았습니다."
-        ]
-    })
-    disabledPeriod: Array<PeriodCls>;
 
     @prop({
         validate: [
             {
                 validator: (v: PeriodOption) => v.max > 0,
-                message:
-                    "selectablePeriod.max 값은 0또는 음수가 될 수 없습니다."
+                message: "PeriodOption.max 값은 0또는 음수가 될 수 없습니다."
             },
             {
                 validator: (v: PeriodOption) => v.min >= 0,
-                message: "selectablePeriod.min 값은 음수가 될 수 없습니다."
+                message: "PeriodOption.min 값은 음수가 될 수 없습니다."
             },
             {
                 validator: (v: PeriodOption) => v.unit >= 0,
-                message: "selectablePeriod.unit 값은 음수가 될 수 없습니다."
+                message: "PeriodOption.unit 값은 음수가 될 수 없습니다."
             }
         ],
         required: [
             function(this: DocumentType<ItemCls>) {
                 return this.usingPeriodOption;
             },
-            "SelectablePeriod가 설정되지 않았습니다."
+            "PeriodOption가 설정되지 않았습니다."
         ]
     })
-    selectablePeriod: PeriodOption;
+    periodOption: PeriodOption;
 }
 
 export const ItemModel = getModelForClass(ItemCls);

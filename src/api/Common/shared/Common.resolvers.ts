@@ -18,6 +18,12 @@ const resolver = {
         }
     },
     CountryInfo: {},
+    // GenderOption: {
+    //     ANY: "ANY",
+    //     SEPARATELY: "SEPARATELY",
+    //     MALE: "MALE",
+    //     FEMALE: "FEMALE"
+    // },
     Day: {
         // TODO: 여기서 연구해야 할것은... 뭐가있냐 다한것 같은데? 좀더 생각해보자
         SUN: 0b0000001,
@@ -29,15 +35,15 @@ const resolver = {
         SAT: 0b1000000
     },
     // TODO: 여기서 더 연구해야 할것은... GenderOptions을 Gender로 % 연산 했을때 나머지가 0이면 포함관계, 0이 아니면 포함되지 않음.. 렛츠고
-    GenderOption: {
-        MALE: 2,
-        FEMALE: 3,
-        ANY: 6
-    },
-    Gender: {
-        MALE: 2,
-        FEMALE: 3
-    },
+    // GenderOption: {
+    //     MALE: 2,
+    //     FEMALE: 3,
+    //     ANY: 6,
+    // },
+    // Gender: {
+    //     MALE: 2,
+    //     FEMALE: 3
+    // },
     Period: {
         days: (obj: PeriodCls) => daysNumToArr(obj.days),
         isIn: (obj: PeriodCls, { date }) => {

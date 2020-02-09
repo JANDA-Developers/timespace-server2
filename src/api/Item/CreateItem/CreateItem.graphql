@@ -11,7 +11,7 @@ input CreateItemInput {
     storeId: ID!
     name: String
     images: [URL]
-    descriptions: String
+    description: String
     optionalParams: ItemOptionalFieldInput
 }
 
@@ -20,5 +20,5 @@ input ItemOptionalFieldInput {
     genderOption: GenderOption
     enabledPeriod: [PeriodInput!]
     disabledPeriod: [PeriodInput!]
-    selectablePeriod: PeriodOptionInput
+    periodOption: PeriodOptionInput
 }

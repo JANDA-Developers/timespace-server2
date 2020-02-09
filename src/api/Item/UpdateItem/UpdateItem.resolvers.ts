@@ -24,10 +24,9 @@ const resolvers: Resolvers = {
                             updateItemParamInput
                         } = param as UpdateItemInput;
                         const item = await ItemModel.findByCode(itemCode);
-
                         for (const fieldName in updateItemParamInput) {
                             const element = updateItemParamInput[fieldName];
-                            if (element) {
+                            if (element !== null) {
                                 item[fieldName] = element;
                             }
                         }

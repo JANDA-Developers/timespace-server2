@@ -23,7 +23,7 @@ const resolvers: Resolvers = {
                     session.startTransaction();
                     try {
                         const {
-                            descriptions,
+                            description,
                             images,
                             name,
                             storeId,
@@ -45,7 +45,7 @@ const resolvers: Resolvers = {
                             name,
                             images,
                             storeId: new ObjectId(storeId),
-                            descriptions,
+                            description,
                             usingPeriodOption: store.usingPeriodOption || false,
                             usingCapacityOption:
                                 store.usingCapacityOption || false

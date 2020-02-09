@@ -6,7 +6,7 @@ export enum ModelName {
     ITEM = "ItemList",
     SALES = "SalesList",
     ZONE_INFO = "CountryInfoList",
-    CONSTRAINTOR = "ConstraintorList"
+    NOTIFICATION = "Notifications"
 }
 
 export const getCollectionName = (modelName: ModelName): string =>
