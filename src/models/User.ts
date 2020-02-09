@@ -8,6 +8,7 @@ import { getCollectionName, ModelName } from "./__collectionNames";
 import { ObjectId } from "mongodb";
 import { ApolloError } from "apollo-server";
 import { BaseSchema, createSchemaOptions } from "../abs/BaseSchema";
+import { Zoneinfo, UserRole } from "../types/graph";
 
 export type LoggedInInfo = {
     idToken: string;
@@ -35,6 +36,9 @@ export class UserCls extends BaseSchema {
     @prop()
     _id: ObjectId;
 
+    @prop({ default: [] })
+    roles: UserRole[];
+
     @prop()
     sub: string;
 
@@ -46,13 +50,24 @@ export class UserCls extends BaseSchema {
 
     // Zoneinfo from graph.d.ts
     @prop()
-    zoneinfo: any;
+    zoneinfo: Zoneinfo;
 
     @prop()
     loginInfos: LoggedInInfo[];
 
-    @prop({ default: [] })
+    @prop({
+        default: [],
+        get: (ids: any[]) => ids.map(id => new ObjectId(id)),
+        set: (ids: any[]) => ids.map(id => new ObjectId(id))
+    })
     stores: ObjectId[];
+
+    @prop({
+        default: [],
+        get: (ids: any[]) => ids.map(id => new ObjectId(id)),
+        set: (ids: any[]) => ids.map(id => new ObjectId(id))
+    })
+    disabledStores: ObjectId[];
 }
 
 export const UserModel = getModelForClass(UserCls);

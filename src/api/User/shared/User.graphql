@@ -1,6 +1,7 @@
 type User {
     # user.sub
     _id: ID!
+    roles: [UserRole!]
     sub: String!
     name: String!
     email: String!
@@ -10,6 +11,7 @@ type User {
     zoneinfo: Zoneinfo!
     tokenExpiry: Int!
     stores: [Store!]
+    disabledStores: [Store]
 }
 
 type Zoneinfo {
@@ -18,4 +20,10 @@ type Zoneinfo {
     tz: String!
     offset: Int!
     callingCode: String!
+}
+
+enum UserRole {
+    BUYER
+    SELLER
+    ADMIN
 }

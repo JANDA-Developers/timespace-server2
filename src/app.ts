@@ -91,6 +91,7 @@ class App {
             }
             if (data) {
                 data._id = data["custom:_id"];
+                data.zoneinfo = JSON.parse(data.zoneinfo);
                 req.cognitoUser = data;
             }
         } else {

@@ -1,11 +1,12 @@
 import { Resolvers } from "../../../types/resolvers";
-import { EmailSignUpResponse } from "../../../types/graph";
+import { EmailSignUpResponse, EmailSignUpInput } from "../../../types/graph";
 import { CognitoIdentityServiceProvider } from "aws-sdk";
 import { defaultResolver } from "../../../utils/resolverFuncWrapper";
 import { UserModel } from "../../../models/User";
 import { ObjectId } from "mongodb";
 import { CountryInfoModel } from "../../../models/CountryInfo";
 import { ApolloError } from "apollo-server";
+import { AttributeType } from "aws-sdk/clients/cognitoidentityserviceprovider";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -17,8 +18,9 @@ const resolvers: Resolvers = {
                         email,
                         password,
                         phoneNumber,
-                        timezone
-                    } = param;
+                        timezone,
+                        roles
+                    } = param as EmailSignUpInput;
 
                     const countryInfo = await CountryInfoModel.findOne({
                         "timezones.name": timezone
@@ -46,34 +48,49 @@ const resolvers: Resolvers = {
                         callingCode: countryInfo.callingCode
                     };
                     const _id = new ObjectId();
+
+                    const userAttributes: AttributeType[] = [
+                        {
+                            Name: "name",
+                            Value: username
+                        },
+                        {
+                            Name: "email",
+                            Value: email
+                        },
+                        {
+                            Name: "phone_number",
+                            Value: phoneNumber
+                        },
+                        {
+                            Name: "zoneinfo",
+                            // name, offset 으로 구성된 아이임 ㅎㅎ
+                            Value: JSON.stringify(zoneinfo)
+                        },
+                        {
+                            Name: "custom:_id",
+                            Value: _id.toHexString()
+                        }
+                    ];
+                    roles.forEach((role): void => {
+                        if (role === "BUYER") {
+                            userAttributes.push({
+                                Name: "custom:isBuyer",
+                                Value: "1"
+                            });
+                        } else if (role === "SELLER") {
+                            userAttributes.push({
+                                Name: "custom:isSeller",
+                                Value: "1"
+                            });
+                        }
+                    });
                     const result = await cognito
                         .signUp({
                             ClientId: process.env.COGNITO_CLIENT_ID || "",
                             Username: email,
                             Password: password,
-                            UserAttributes: [
-                                {
-                                    Name: "name",
-                                    Value: username
-                                },
-                                {
-                                    Name: "email",
-                                    Value: email
-                                },
-                                {
-                                    Name: "phone_number",
-                                    Value: phoneNumber
-                                },
-                                {
-                                    Name: "zoneinfo",
-                                    // name, offset 으로 구성된 아이임 ㅎㅎ
-                                    Value: JSON.stringify(zoneinfo)
-                                },
-                                {
-                                    Name: "custom:_id",
-                                    Value: _id.toHexString()
-                                }
-                            ]
+                            UserAttributes: userAttributes
                         })
                         .promise();
                     await UserModel.create({
