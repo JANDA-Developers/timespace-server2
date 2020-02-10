@@ -22,7 +22,7 @@ export class StoreCls extends BaseSchema {
         if (!store) {
             throw new ApolloError(
                 "존재하지 않는 StoreCode입니다",
-                "UNEXIST_STORECODE"
+                "UNEXIST_STORE"
             );
         }
         return store;
@@ -69,6 +69,9 @@ export class StoreCls extends BaseSchema {
         }
     })
     code: string;
+
+    @prop()
+    image: string;
 
     @prop()
     description: string;

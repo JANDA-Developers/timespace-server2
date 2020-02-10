@@ -4,7 +4,7 @@ import { getCollectionName, ModelName } from "./__collectionNames";
 import { ObjectId } from "mongodb";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.SALES)))
-export class SalesCls extends BaseSchema {
+export class ItemCls extends BaseSchema {
     @prop()
     name: string;
 
@@ -20,4 +20,4 @@ export class SalesCls extends BaseSchema {
     buyer: ObjectId;
 }
 
-export const SalesModel = getModelForClass(SalesCls);
+export const ItemModel = getModelForClass(ItemCls);

@@ -1,9 +1,9 @@
-type Sales {
+type Item {
     _id: ID!
     store: Store
     user: User
     product: Product
-    salesNum: String!
+    code: String!
     name: String!
     memo: String
     moduleDatas: Object

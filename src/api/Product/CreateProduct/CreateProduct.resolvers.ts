@@ -41,7 +41,6 @@ const resolvers: Resolvers = {
                                 "UNEXIST_STORE"
                             );
                         }
-                        store.products.push(productId);
 
                         const product = new ProductModel({
                             _id: productId,
@@ -62,6 +61,7 @@ const resolvers: Resolvers = {
                             }
                         }
                         await product.save({ session });
+                        store.products.push(productId);
                         await store.save({
                             session
                         });

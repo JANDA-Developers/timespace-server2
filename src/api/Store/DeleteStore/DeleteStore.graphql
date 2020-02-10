@@ -7,5 +7,5 @@ type DeleteStoreResponse {
     data: Store
 }
 input DeleteStoreInput {
-    storeCode: String!
+    storeId: ID!
 }
