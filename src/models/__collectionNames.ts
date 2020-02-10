@@ -1,4 +1,4 @@
-const prefix = "dev_";
+const prefix = "";
 export enum ModelName {
     USER = "UserList",
     STORE = "StoreList",
