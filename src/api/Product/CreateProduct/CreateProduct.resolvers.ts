@@ -42,11 +42,13 @@ const resolvers: Resolvers = {
                             );
                         }
 
+                        const stid = new ObjectId(storeId);
+
                         const product = new ProductModel({
                             _id: productId,
                             name,
                             images,
-                            storeId: new ObjectId(storeId),
+                            storeId: stid,
                             description,
                             usingPeriodOption: store.usingPeriodOption || false,
                             usingCapacityOption:
@@ -61,10 +63,20 @@ const resolvers: Resolvers = {
                             }
                         }
                         await product.save({ session });
-                        store.products.push(productId);
-                        await store.save({
-                            session
-                        });
+
+                        await StoreModel.updateOne(
+                            {
+                                _id: stid
+                            },
+                            {
+                                $push: {
+                                    products: productId
+                                }
+                            },
+                            {
+                                session
+                            }
+                        );
                         await session.commitTransaction();
                         session.endSession();
                         return {

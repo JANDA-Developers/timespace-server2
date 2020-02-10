@@ -79,7 +79,11 @@ export class StoreCls extends BaseSchema {
     @prop({
         default: [],
         get: (ids: any[]) => ids.map(id => new ObjectId(id)),
-        set: (ids: any[]) => ids.map(id => new ObjectId(id))
+        set: (ids: any[]) => {
+            return ids.map(id =>
+                typeof id === "string" ? new ObjectId(id) : id
+            );
+        }
     })
     products: ObjectId[];
 
