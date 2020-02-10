@@ -31,6 +31,7 @@ export const defaultResolver = (resolverFunction: ResolverFunction) => async (
             ).toISOString()
         },
         who: {
+            headers: headers,
             ip: {
                 clientIP: ips[0],
                 proxys: ips.slice(1)

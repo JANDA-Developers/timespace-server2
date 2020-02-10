@@ -11,7 +11,7 @@ type User {
     zoneinfo: Zoneinfo!
     tokenExpiry: Int!
     stores: [Store!]
-    disabledStores: [Store]
+    disabledStores: [Store!]
 }
 
 type Zoneinfo {

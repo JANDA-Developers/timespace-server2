@@ -9,6 +9,8 @@ import { errorReturn } from "../../../utils/utils";
 import { mongoose } from "@typegoose/typegoose";
 import { UserModel } from "../../../models/User";
 import { ObjectId } from "mongodb";
+import { CountryInfoModel } from "../../../models/CountryInfo";
+import { ApolloError } from "apollo-server";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -26,8 +28,34 @@ const resolvers: Resolvers = {
                             name,
                             type,
                             manager,
-                            description
+                            description,
+                            timezone
                         } = param as CreateStoreInput;
+                        let zoneinfo = cognitoUser.zoneinfo;
+                        if (timezone) {
+                            const countryInfo = await CountryInfoModel.findOne({
+                                "timezones.name": timezone
+                            });
+                            if (!countryInfo) {
+                                throw new ApolloError(
+                                    "Timezone 설정이 잘못되었습니다.",
+                                    "UNDEFINED_COUNTRYINFO",
+                                    {
+                                        timezone
+                                    }
+                                );
+                            }
+                            const tz = countryInfo.timezones.find(
+                                tz => tz.name === timezone
+                            );
+                            zoneinfo = {
+                                name: countryInfo.countryName,
+                                tz: tz?.name,
+                                code: countryInfo.countryCode,
+                                offset: tz?.offset,
+                                callingCode: countryInfo.callingCode
+                            };
+                        }
                         const userId = new ObjectId(cognitoUser._id);
                         const _id = new ObjectId();
                         const store = new StoreModel({
@@ -35,7 +63,7 @@ const resolvers: Resolvers = {
                             user: userId,
                             name,
                             type,
-                            zoneinfo: cognitoUser.zoneinfo,
+                            zoneinfo,
                             description,
                             manager: {
                                 name:
