@@ -78,7 +78,7 @@ export class StoreCls extends BaseSchema {
         get: (ids: any[]) => ids.map(id => new ObjectId(id)),
         set: (ids: any[]) => ids.map(id => new ObjectId(id))
     })
-    items: ObjectId[];
+    products: ObjectId[];
 
     @prop({ default: true })
     usingPeriodOption: boolean;

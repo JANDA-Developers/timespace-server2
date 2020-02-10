@@ -1,24 +1,27 @@
 import { mongoose } from "@typegoose/typegoose";
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
-import { CreateItemResponse, CreateItemInput } from "../../../types/graph";
+import {
+    CreateProductResponse,
+    CreateProductInput
+} from "../../../types/graph";
 import {
     defaultResolver,
     privateResolver
 } from "../../../utils/resolverFuncWrapper";
-import { ItemModel } from "../../../models/Item";
+import { ProductModel } from "../../../models/Product";
 import { ObjectId } from "mongodb";
 import { StoreModel } from "../../../models/Store";
 import { ApolloError } from "apollo-server";
 
 const resolvers: Resolvers = {
     Mutation: {
-        CreateItem: defaultResolver(
+        CreateProduct: defaultResolver(
             privateResolver(
                 async (
                     { args: { param }, context: { req } },
                     stack
-                ): Promise<CreateItemResponse> => {
+                ): Promise<CreateProductResponse> => {
                     const session = await mongoose.startSession();
                     session.startTransaction();
                     try {
@@ -28,9 +31,9 @@ const resolvers: Resolvers = {
                             name,
                             storeId,
                             optionalParams
-                        } = param as CreateItemInput;
+                        } = param as CreateProductInput;
 
-                        const itemId = new ObjectId();
+                        const productId = new ObjectId();
                         const store = await StoreModel.findById(storeId);
                         if (!store) {
                             throw new ApolloError(
@@ -38,10 +41,10 @@ const resolvers: Resolvers = {
                                 "UNEXIST_STORE"
                             );
                         }
-                        store.items.push(itemId);
+                        store.products.push(productId);
 
-                        const item = new ItemModel({
-                            _id: itemId,
+                        const product = new ProductModel({
+                            _id: productId,
                             name,
                             images,
                             storeId: new ObjectId(storeId),
@@ -54,11 +57,11 @@ const resolvers: Resolvers = {
                             for (const fieldName in optionalParams) {
                                 const param = optionalParams[fieldName];
                                 if (param) {
-                                    item[fieldName] = param;
+                                    product[fieldName] = param;
                                 }
                             }
                         }
-                        await item.save({ session });
+                        await product.save({ session });
                         await store.save({
                             session
                         });
@@ -67,7 +70,7 @@ const resolvers: Resolvers = {
                         return {
                             ok: true,
                             error: null,
-                            data: item as any
+                            data: product as any
                         };
                     } catch (error) {
                         return await errorReturn(error, session);

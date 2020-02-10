@@ -1,5 +1,5 @@
 # 티켓 아이템에 관한 스키마.
-type Item implements BaseModel {
+type Product implements BaseModel {
     _id: ID!
     store: Store
     name: String!

@@ -3,7 +3,7 @@ import { DocumentType } from "@typegoose/typegoose";
 import { StoreCls } from "../../../models/Store";
 import { ApolloError } from "apollo-server";
 import { ObjectId } from "mongodb";
-import { ItemModel } from "../../../models/Item";
+import { ProductModel } from "../../../models/Product";
 
 const resolvers: Resolvers = {
     Store: {
@@ -17,11 +17,11 @@ const resolvers: Resolvers = {
             }
             return cognitoUser;
         },
-        items: async (store: DocumentType<StoreCls>) => {
-            return await ItemModel.find({
+        products: async (store: DocumentType<StoreCls>) => {
+            return await ProductModel.find({
                 _id: {
-                    $in: store.items
-                    // .map(itemId => new ObjectId(itemId))
+                    $in: store.products
+                    // .map(productId => new ObjectId(productId))
                 }
             });
         }

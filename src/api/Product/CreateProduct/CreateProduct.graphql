@@ -1,21 +1,21 @@
 type Mutation {
-    CreateItem(param: CreateItemInput!): CreateItemResponse!
+    CreateProduct(param: CreateProductInput!): CreateProductResponse!
 }
-type CreateItemResponse implements BaseResponse {
+type CreateProductResponse implements BaseResponse {
     ok: Boolean!
     error: Err
-    data: Item
+    data: Product
 }
 
-input CreateItemInput {
+input CreateProductInput {
     storeId: ID!
     name: String
     images: [URL]
     description: String
-    optionalParams: ItemOptionalFieldInput
+    optionalParams: ProductOptionalFieldInput
 }
 
-input ItemOptionalFieldInput {
+input ProductOptionalFieldInput {
     peopleCapacity: Int
     genderOption: GenderOption
     enabledPeriod: [PeriodInput!]

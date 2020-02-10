@@ -1,15 +1,15 @@
 import { BaseSchema } from "../../abs/BaseSchema";
 import { prop } from "@typegoose/typegoose";
 
-enum ItemValidatorType {
+enum ProductValidatorType {
     TIME_CAPACITY_BASE,
     TIME_BASE
 }
 
-export class ItemValidator extends BaseSchema {
+export class ProductValidator extends BaseSchema {
     @prop()
     name: string;
 
     @prop()
-    type: ItemValidatorType;
+    type: ProductValidatorType;
 }

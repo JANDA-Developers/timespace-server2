@@ -12,21 +12,21 @@ import { GenderOption, PeriodOption, Period } from "../types/graph";
 import { genCode, s4 } from "./utils/genId";
 import { ApolloError } from "apollo-server";
 
-@modelOptions(createSchemaOptions(getCollectionName(ModelName.ITEM)))
-export class ItemCls extends BaseSchema {
+@modelOptions(createSchemaOptions(getCollectionName(ModelName.PRODUCT)))
+export class ProductCls extends BaseSchema {
     static findByCode = async (
-        itemCode: string
-    ): Promise<DocumentType<ItemCls>> => {
-        const item = await ItemModel.findOne({
-            code: itemCode
+        productCode: string
+    ): Promise<DocumentType<ProductCls>> => {
+        const product = await ProductModel.findOne({
+            code: productCode
         });
-        if (!item) {
+        if (!product) {
             throw new ApolloError(
                 "존재하지 않는 StoreCode입니다",
                 "UNEXIST_ITEMCODE"
             );
         }
-        return item;
+        return product;
     };
 
     @prop()
@@ -36,7 +36,7 @@ export class ItemCls extends BaseSchema {
     storeId: ObjectId;
 
     @prop({
-        default(this: DocumentType<ItemCls>) {
+        default(this: DocumentType<ProductCls>) {
             return `${genCode(this.storeId)}-${s4(32).toUpperCase()}`;
         }
     })
@@ -81,7 +81,7 @@ export class ItemCls extends BaseSchema {
             }
         ],
         required: [
-            function(this: DocumentType<ItemCls>) {
+            function(this: DocumentType<ProductCls>) {
                 return this.usingCapacityOption;
             },
             "PeopleCapacity가 설정되지 않았습니다. "
@@ -92,13 +92,13 @@ export class ItemCls extends BaseSchema {
     @prop({
         validate: [
             {
-                validator(this: DocumentType<ItemCls>, value) {
+                validator(this: DocumentType<ProductCls>, value) {
                     return this.usingCapacityOption ? value : true;
                 },
                 message: "GenderOption이 설정되지 않았습니다. "
             }
         ],
-        default(this: DocumentType<ItemCls>) {
+        default(this: DocumentType<ProductCls>) {
             return this.usingCapacityOption ? "ANY" : undefined;
         }
     })
@@ -115,7 +115,7 @@ export class ItemCls extends BaseSchema {
         validate: [
             {
                 validator(
-                    this: DocumentType<ItemCls>,
+                    this: DocumentType<ProductCls>,
                     enabledPeriod: Array<PeriodCls>
                 ): boolean {
                     return (
@@ -130,7 +130,7 @@ export class ItemCls extends BaseSchema {
         ],
         default: () => [],
         required: [
-            function(this: DocumentType<ItemCls>) {
+            function(this: DocumentType<ProductCls>) {
                 return this.usingPeriodOption;
             },
             "EnabledPeriod가 설정되지 않았습니다."
@@ -158,7 +158,7 @@ export class ItemCls extends BaseSchema {
             }
         ],
         required: [
-            function(this: DocumentType<ItemCls>) {
+            function(this: DocumentType<ProductCls>) {
                 return this.usingPeriodOption;
             },
             "PeriodOption가 설정되지 않았습니다."
@@ -167,4 +167,4 @@ export class ItemCls extends BaseSchema {
     periodOption: PeriodOption;
 }
 
-export const ItemModel = getModelForClass(ItemCls);
+export const ProductModel = getModelForClass(ProductCls);

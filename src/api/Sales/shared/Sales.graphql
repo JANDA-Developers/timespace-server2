@@ -2,7 +2,7 @@ type Sales {
     _id: ID!
     store: Store
     user: User
-    item: Item
+    product: Product
     salesNum: String!
     name: String!
     memo: String

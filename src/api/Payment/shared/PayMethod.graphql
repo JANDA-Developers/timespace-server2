@@ -1,0 +1,21 @@
+type PayMethod {
+    type: PayMethodType!
+    cardInfo: CardInfo
+}
+
+type CardInfo {
+    no: String!
+    billKey: String!
+    isEnabled: Boolean!
+    createdAt: DateTime!
+    updatedAt: DateTime
+}
+
+enum PayMethodType {
+    # 카드결제
+    CARD
+    # 계좌이체
+    BANK_TRANSFER
+    # 가상계좌 입금
+    VBANK
+}

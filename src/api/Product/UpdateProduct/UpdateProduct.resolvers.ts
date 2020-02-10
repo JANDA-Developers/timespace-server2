@@ -1,36 +1,41 @@
 import { mongoose } from "@typegoose/typegoose";
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
-import { UpdateItemResponse, UpdateItemInput } from "../../../types/graph";
+import {
+    UpdateProductResponse,
+    UpdateProductInput
+} from "../../../types/graph";
 import {
     defaultResolver,
     privateResolver
 } from "../../../utils/resolverFuncWrapper";
-import { ItemModel } from "../../../models/Item";
+import { ProductModel } from "../../../models/Product";
 
 const resolvers: Resolvers = {
     Mutation: {
-        UpdateItem: defaultResolver(
+        UpdateProduct: defaultResolver(
             privateResolver(
                 async ({
                     args: { param },
                     context: { req }
-                }): Promise<UpdateItemResponse> => {
+                }): Promise<UpdateProductResponse> => {
                     const session = await mongoose.startSession();
                     session.startTransaction();
                     try {
                         const {
-                            itemCode,
-                            updateItemParamInput
-                        } = param as UpdateItemInput;
-                        const item = await ItemModel.findByCode(itemCode);
-                        for (const fieldName in updateItemParamInput) {
-                            const element = updateItemParamInput[fieldName];
+                            productCode,
+                            updateProductParamInput
+                        } = param as UpdateProductInput;
+                        const product = await ProductModel.findByCode(
+                            productCode
+                        );
+                        for (const fieldName in updateProductParamInput) {
+                            const element = updateProductParamInput[fieldName];
                             if (element !== null) {
-                                item[fieldName] = element;
+                                product[fieldName] = element;
                             }
                         }
-                        await item.save({
+                        await product.save({
                             session
                         });
                         await session.commitTransaction();
@@ -38,7 +43,7 @@ const resolvers: Resolvers = {
                         return {
                             ok: true,
                             error: null,
-                            data: item as any
+                            data: product as any
                         };
                     } catch (error) {
                         return await errorReturn(error, session);

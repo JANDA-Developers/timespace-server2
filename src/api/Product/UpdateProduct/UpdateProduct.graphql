@@ -1,0 +1,23 @@
+type Mutation {
+    UpdateProduct(param: UpdateProductInput!): UpdateProductResponse!
+}
+type UpdateProductResponse {
+    ok: Boolean!
+    error: Err
+    data: Product
+}
+input UpdateProductInput {
+    productCode: String!
+    updateProductParamInput: UpdateProductParamInput!
+}
+
+input UpdateProductParamInput {
+    name: String
+    description: String
+    needToConfirm: Boolean
+
+    peopleCapacity: Int
+    genderOption: GenderOption
+    enabledPeriod: [PeriodInput!]
+    periodOption: PeriodOptionInput
+}

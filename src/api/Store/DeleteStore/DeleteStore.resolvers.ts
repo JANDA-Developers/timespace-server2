@@ -9,7 +9,7 @@ import {
 import { StoreModel } from "../../../models/Store";
 import { UserModel } from "../../../models/User";
 import { ObjectId } from "mongodb";
-import { ItemModel } from "../../../models/Item";
+import { ProductModel } from "../../../models/Product";
 import { ONE_DAY } from "../../../utils/dateFuncs";
 
 const resolvers: Resolvers = {
@@ -42,10 +42,10 @@ const resolvers: Resolvers = {
                                 session
                             }
                         );
-                        await ItemModel.updateMany(
+                        await ProductModel.updateMany(
                             {
                                 _id: {
-                                    $in: store.items
+                                    $in: store.products
                                 }
                             },
                             {
@@ -72,7 +72,7 @@ const resolvers: Resolvers = {
                             { _id: new ObjectId(cognitoUser._id) },
                             {
                                 $push: {
-                                    disabledStore: store._id
+                                    disabledStores: store._id
                                 }
                             },
                             {

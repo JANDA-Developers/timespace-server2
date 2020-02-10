@@ -9,7 +9,7 @@ type Store implements BaseModel {
     createdAt: DateTime!
     updatedAt: DateTime!
     expiresAt: DateTime
-    items: [Item!]
+    products: [Product!]
 }
 
 enum StoreType {

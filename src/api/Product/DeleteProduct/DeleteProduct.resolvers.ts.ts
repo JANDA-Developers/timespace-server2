@@ -2,27 +2,34 @@ import { ApolloError } from "apollo-server";
 import { mongoose } from "@typegoose/typegoose";
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
-import { DeleteItemResponse, DeleteItemInput } from "../../../types/graph";
+import {
+    DeleteProductResponse,
+    DeleteProductInput
+} from "../../../types/graph";
 import {
     defaultResolver,
     privateResolver
 } from "../../../utils/resolverFuncWrapper";
-import { ItemModel } from "../../../models/Item";
+import { ProductModel } from "../../../models/Product";
 import { StoreModel } from "../../../models/Store";
 import { ObjectId } from "mongodb";
 
 const resolvers: Resolvers = {
     Mutation: {
-        DeleteItem: defaultResolver(
+        DeleteProduct: defaultResolver(
             privateResolver(
-                async ({ args: { param } }): Promise<DeleteItemResponse> => {
+                async ({ args: { param } }): Promise<DeleteProductResponse> => {
                     const session = await mongoose.startSession();
                     session.startTransaction();
                     try {
-                        const { itemCode } = param as DeleteItemInput;
-                        const item = await ItemModel.findByCode(itemCode);
-                        const itemId = new ObjectId(item._id);
-                        const store = await StoreModel.findById(item.storeId);
+                        const { productCode } = param as DeleteProductInput;
+                        const product = await ProductModel.findByCode(
+                            productCode
+                        );
+                        const productId = new ObjectId(product._id);
+                        const store = await StoreModel.findById(
+                            product.storeId
+                        );
                         if (!store) {
                             throw new ApolloError(
                                 "존재하지 않는 Store",
@@ -30,13 +37,13 @@ const resolvers: Resolvers = {
                             );
                         }
 
-                        store.items = store.items.filter(
-                            itm => !itemId.equals(itm)
+                        store.products = store.products.filter(
+                            itm => !productId.equals(itm)
                         );
 
-                        await ItemModel.deleteOne(
+                        await ProductModel.deleteOne(
                             {
-                                _id: itemId
+                                _id: productId
                             },
                             {
                                 session
@@ -50,7 +57,7 @@ const resolvers: Resolvers = {
                         return {
                             ok: true,
                             error: null,
-                            data: item as any
+                            data: product as any
                         };
                     } catch (error) {
                         return await errorReturn(error, session);
