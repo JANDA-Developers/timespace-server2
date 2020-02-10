@@ -66,11 +66,15 @@ export const privateResolver = (resolverFunction: ResolverFunction) => async (
 ): Promise<BaseResponse & { data: any | null }> => {
     try {
         if (!context.req.cognitoUser) {
-            const token: string | undefined = context.req.get("X-JWT");
+            const token: string | undefined =
+                context.req.get("X-JWT") || context.req.get("x-jwt");
             if (token === "TokenExpiredError") {
                 throw new ApolloError(
                     "만료된 토큰입니다. 다시 로그인 해주세요",
-                    "TOKEN_EXPIRED_ERROR"
+                    "TOKEN_EXPIRED_ERROR",
+                    {
+                        headers: context.req.headers
+                    }
                 );
             }
             throw new ApolloError("Unauthorized", "UNAUTHORIZED_USER", {

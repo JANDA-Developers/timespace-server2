@@ -83,7 +83,7 @@ class App {
         res: Response,
         next: NextFunction
     ): Promise<void> => {
-        const token = req.get("X-JWT");
+        const token = req.get("X-JWT") || req.get("x-jwt");
         if (token) {
             const { ok, error, data } = await decodeKey(token);
             if (!ok) {
