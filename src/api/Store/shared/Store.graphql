@@ -6,6 +6,8 @@ type Store implements BaseModel {
     type: StoreType!
     zoneinfo: Zoneinfo!
     description: String
+    location: Location
+    manager: Manager
     createdAt: DateTime!
     updatedAt: DateTime!
     expiresAt: DateTime

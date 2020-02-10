@@ -56,3 +56,17 @@ type Query {
     includeDays(days: Int!): [Day!]
     periodTest(param: PeriodInput!): Period!
 }
+
+type Location {
+    address: String!
+    addressDetail: String
+    lat: Float!
+    lng: Float!
+}
+
+input LocationInput {
+    address: String!
+    addressDetail: String
+    lat: Float!
+    lng: Float!
+}

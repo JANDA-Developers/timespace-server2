@@ -9,7 +9,7 @@ import { getCollectionName, ModelName } from "./__collectionNames";
 import { ObjectId } from "mongodb";
 import { ApolloError } from "apollo-server";
 import { genCode } from "./utils/genId";
-import { Zoneinfo, StoreType, Manager } from "../types/graph";
+import { Zoneinfo, StoreType, Manager, Location } from "../types/graph";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.STORE)))
 export class StoreCls extends BaseSchema {
@@ -90,6 +90,9 @@ export class StoreCls extends BaseSchema {
 
     @prop()
     manager: Manager;
+
+    @prop()
+    location: Location;
 }
 
 export const StoreModel = getModelForClass(StoreCls);
