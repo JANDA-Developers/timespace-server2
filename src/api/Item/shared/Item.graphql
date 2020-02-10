@@ -9,7 +9,7 @@ type Item implements BaseModel {
     needToConfirm: Boolean!
     createdAt: DateTime!
     updatedAt: DateTime!
-    expireAt: DateTime
+    expiresAt: DateTime
 
     peopleCapacity: Int
     genderOption: GenderOption

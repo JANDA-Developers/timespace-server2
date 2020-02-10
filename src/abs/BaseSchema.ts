@@ -4,14 +4,18 @@ import { prop, index } from "@typegoose/typegoose";
 
 @index(
     {
-        expireAt: 1
+        expiresAt: 1
     },
     {
         expireAfterSeconds: 0
     }
 )
 export class BaseSchema {
-    @prop({ default: () => new ObjectId() })
+    @prop({
+        default: () => new ObjectId(),
+        get: id => new ObjectId(id),
+        set: id => new ObjectId(id)
+    })
     _id: ObjectId;
 
     @prop()
@@ -21,7 +25,7 @@ export class BaseSchema {
     updatedAt: Date;
 
     @prop()
-    expireAt: Date;
+    expiresAt: Date;
 }
 
 export const createSchemaOptions = (

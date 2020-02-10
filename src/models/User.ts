@@ -9,6 +9,7 @@ import { ObjectId } from "mongodb";
 import { ApolloError } from "apollo-server";
 import { BaseSchema, createSchemaOptions } from "../abs/BaseSchema";
 import { Zoneinfo, UserRole } from "../types/graph";
+import { CognitoIdentityServiceProvider } from "aws-sdk";
 
 export type LoggedInInfo = {
     idToken: string;
@@ -33,6 +34,28 @@ export class UserCls extends BaseSchema {
         }
         return user;
     };
+
+    async getAttributesFronCognito(this: DocumentType<UserCls>): Promise<void> {
+        const cognito = new CognitoIdentityServiceProvider();
+        const cognitoUser = await cognito
+            .adminGetUser({
+                UserPoolId: process.env.COGNITO_POOL_ID || "",
+                Username: this.sub
+            })
+            .promise();
+        const attributes = cognitoUser.UserAttributes;
+        if (attributes) {
+            attributes.forEach(attr => {
+                const { Name, Value } = attr;
+                if (Name === "zoneinfo") {
+                    this.zoneinfo = JSON.parse(Value || "");
+                } else {
+                    this[Name] = Value;
+                }
+            });
+        }
+    }
+
     @prop()
     _id: ObjectId;
 

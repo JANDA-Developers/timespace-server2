@@ -9,6 +9,7 @@ import { getCollectionName, ModelName } from "./__collectionNames";
 import { ObjectId } from "mongodb";
 import { ApolloError } from "apollo-server";
 import { genCode } from "./utils/genId";
+import { Zoneinfo, StoreType, Manager } from "../types/graph";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.STORE)))
 export class StoreCls extends BaseSchema {
@@ -32,9 +33,23 @@ export class StoreCls extends BaseSchema {
         validate: {
             validator: user => user,
             message: "Store.user 정보가 존재하지 않습니다."
-        }
+        },
+        get: id => new ObjectId(id),
+        set: id => new ObjectId(id)
     })
     user: ObjectId;
+
+    @prop({
+        required: true,
+        set: (zoneinfo: any) => {
+            if (typeof zoneinfo === "string") {
+                return JSON.parse(zoneinfo);
+            }
+            return zoneinfo;
+        },
+        get: (zoneinfo: any) => zoneinfo
+    })
+    zoneinfo: Zoneinfo;
 
     @prop({
         required: true,
@@ -46,13 +61,7 @@ export class StoreCls extends BaseSchema {
     name: string;
 
     @prop()
-    manager: {
-        name: string;
-        phone_number: string;
-    };
-
-    @prop()
-    type: "LEASE" | "TICKET";
+    type: StoreType;
 
     @prop({
         default(this: DocumentType<StoreCls>) {
@@ -64,7 +73,11 @@ export class StoreCls extends BaseSchema {
     @prop()
     description: string;
 
-    @prop({ default: [] })
+    @prop({
+        default: [],
+        get: (ids: any[]) => ids.map(id => new ObjectId(id)),
+        set: (ids: any[]) => ids.map(id => new ObjectId(id))
+    })
     items: ObjectId[];
 
     @prop({ default: true })
@@ -74,6 +87,9 @@ export class StoreCls extends BaseSchema {
         default: true
     })
     usingCapacityOption: boolean;
+
+    @prop()
+    manager: Manager;
 }
 
 export const StoreModel = getModelForClass(StoreCls);

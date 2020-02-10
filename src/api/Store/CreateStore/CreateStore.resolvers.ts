@@ -25,19 +25,31 @@ const resolvers: Resolvers = {
                         const {
                             name,
                             type,
+                            manager,
                             description
                         } = param as CreateStoreInput;
+                        const userId = new ObjectId(cognitoUser._id);
                         const _id = new ObjectId();
                         const store = new StoreModel({
                             _id,
-                            user: new ObjectId(cognitoUser._id),
+                            user: userId,
                             name,
                             type,
-                            description
+                            zoneinfo: cognitoUser.zoneinfo,
+                            description,
+                            manager: {
+                                name:
+                                    (manager && manager.name) ||
+                                    cognitoUser.name,
+                                phoneNumber:
+                                    (manager && manager.phoneNumber) ||
+                                    cognitoUser.phone_number,
+                                isVerifiedPhoneNumber: false
+                            }
                         });
                         await store.save({ session });
-                        await UserModel.findByIdAndUpdate(
-                            cognitoUser._id,
+                        await UserModel.updateOne(
+                            { _id: userId },
                             {
                                 $push: {
                                     stores: _id

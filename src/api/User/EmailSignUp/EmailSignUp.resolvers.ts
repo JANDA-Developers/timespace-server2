@@ -28,8 +28,8 @@ const resolvers: Resolvers = {
 
                     if (!countryInfo) {
                         throw new ApolloError(
-                            "UNDEFINED_COUNTRYINFO",
                             "Timezone 설정이 잘못되었습니다.",
+                            "UNDEFINED_COUNTRYINFO",
                             {
                                 timezone
                             }
@@ -85,6 +85,12 @@ const resolvers: Resolvers = {
                             });
                         }
                     });
+                    if (roles.length === 0) {
+                        throw new ApolloError(
+                            "User.Roles값이 비어있습니다.",
+                            "EMPTY_USER_ROLES"
+                        );
+                    }
                     const result = await cognito
                         .signUp({
                             ClientId: process.env.COGNITO_CLIENT_ID || "",

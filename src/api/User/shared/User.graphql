@@ -27,3 +27,14 @@ enum UserRole {
     SELLER
     ADMIN
 }
+
+type Manager {
+    name: String!
+    phoneNumber: String!
+    isVerifiedPhoneNumber: Boolean!
+}
+
+input ManagerInput {
+    name: String!
+    phoneNumber: String!
+}

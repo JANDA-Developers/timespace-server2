@@ -36,7 +36,7 @@ enum MimeType {
 
 interface BaseModel {
     _id: ID!
-    expireAt: DateTime
+    expiresAt: DateTime
     createdAt: DateTime!
     updatedAt: DateTime
 }

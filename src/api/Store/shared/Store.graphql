@@ -4,10 +4,11 @@ type Store implements BaseModel {
     name: String!
     code: String!
     type: StoreType!
+    zoneinfo: Zoneinfo!
     description: String
     createdAt: DateTime!
     updatedAt: DateTime!
-    expireAt: DateTime
+    expiresAt: DateTime
     items: [Item!]
 }
 
