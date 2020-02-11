@@ -1,0 +1,12 @@
+type Query {
+    # 외부에서 Store를 조회할떄 사용함
+    GetStoreByCode(param: GetStoreByCodeInput!): GetStoreByCodeResponse!
+}
+type GetStoreByCodeResponse {
+    ok: Boolean!
+    error: Err
+    data: Store
+}
+input GetStoreByCodeInput {
+    storeCode: String!
+}

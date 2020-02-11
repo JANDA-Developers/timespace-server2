@@ -13,6 +13,7 @@ import { ProductModel } from "../../../models/Product";
 import { ObjectId } from "mongodb";
 import { StoreModel } from "../../../models/Store";
 import { ApolloError } from "apollo-server";
+import { ERROR_CODES } from "../../../types/values";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -40,7 +41,7 @@ const resolvers: Resolvers = {
                         if (!store) {
                             throw new ApolloError(
                                 "존재하지 않는 Store",
-                                "UNEXIST_STORE"
+                                ERROR_CODES.UNEXIST_STORE
                             );
                         }
 

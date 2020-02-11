@@ -12,6 +12,7 @@ import { ObjectId } from "mongodb";
 import { ProductModel } from "../../../models/Product";
 import { ONE_DAY } from "../../../utils/dateFuncs";
 import { ApolloError } from "apollo-server";
+import { ERROR_CODES } from "../../../types/values";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -30,7 +31,7 @@ const resolvers: Resolvers = {
                         if (!store) {
                             throw new ApolloError(
                                 "존재하지 않는 StoreId",
-                                "UNEXIST_STORE"
+                                ERROR_CODES.UNEXIST_STORE
                             );
                         }
                         const expiresAt = new Date(

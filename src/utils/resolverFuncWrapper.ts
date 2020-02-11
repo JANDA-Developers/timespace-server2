@@ -78,7 +78,7 @@ export const privateResolver = (resolverFunction: ResolverFunction) => async (
                     }
                 );
             }
-            throw new ApolloError("Unauthorized", "UNAUTHORIZED_USER", {
+            throw new ApolloError("Unauthorized", "UNAUTHORIZED", {
                 jwt: context.req.headers.jwt
             });
         }

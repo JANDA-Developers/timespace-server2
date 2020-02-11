@@ -9,6 +9,7 @@ import {
 import { StoreModel } from "../../../models/Store";
 import { UserModel } from "../../../models/User";
 import { ApolloError } from "apollo-server";
+import { ERROR_CODES } from "../../../types/values";
 
 const resolvers: Resolvers = {
     Query: {
@@ -24,7 +25,7 @@ const resolvers: Resolvers = {
                         if (!user) {
                             throw new ApolloError(
                                 "존재하지 않는 UserId",
-                                "UNEXIST_USER"
+                                ERROR_CODES.UNEXIST_USER
                             );
                         }
 

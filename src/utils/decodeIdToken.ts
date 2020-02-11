@@ -3,6 +3,7 @@ import jwkToPem from "jwk-to-pem";
 import axios from "axios";
 import { BaseResponse } from "../types/graph";
 import { ApolloError } from "apollo-server";
+import { ERROR_CODES } from "../types/values";
 
 interface JWKFormat {
     alg: string;
@@ -45,7 +46,7 @@ export const decodeKey = async (
     try {
         const jwk = await getJsonWebKeyWithKID(header.kid, jsonWebKeys);
         if (!jwk) {
-            throw new ApolloError("Undefined JWK", "UNDEFINED_JWK");
+            throw new ApolloError("Undefined JWK", ERROR_CODES.UNDEFINED_JWK);
         }
         const pem = jwkToPem(jwk);
         const user = jwt.verify(token, pem);

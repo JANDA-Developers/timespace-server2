@@ -10,6 +10,7 @@ import { ObjectId } from "mongodb";
 import { ApolloError } from "apollo-server";
 import { genCode } from "./utils/genId";
 import { Zoneinfo, StoreType, Manager, Location } from "../types/graph";
+import { ERROR_CODES } from "../types/values";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.STORE)))
 export class StoreCls extends BaseSchema {
@@ -22,7 +23,7 @@ export class StoreCls extends BaseSchema {
         if (!store) {
             throw new ApolloError(
                 "존재하지 않는 StoreCode입니다",
-                "UNEXIST_STORE"
+                ERROR_CODES.UNEXIST_STORE
             );
         }
         return store;
@@ -37,7 +38,7 @@ export class StoreCls extends BaseSchema {
         get: id => new ObjectId(id),
         set: id => new ObjectId(id)
     })
-    user: ObjectId;
+    userId: ObjectId;
 
     @prop({
         required: true,

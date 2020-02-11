@@ -13,6 +13,7 @@ import {
 import { ProductModel } from "../../../models/Product";
 import { StoreModel } from "../../../models/Store";
 import { ObjectId } from "mongodb";
+import { ERROR_CODES } from "../../../types/values";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -32,13 +33,13 @@ const resolvers: Resolvers = {
                         if (!product) {
                             throw new ApolloError(
                                 "존재하지 않는 ProductId",
-                                "UNEXIST_PRODUCT"
+                                ERROR_CODES.UNEXIST_PRODUCT
                             );
                         }
                         if (!product.userId.equals(cognitoUser._id)) {
                             throw new ApolloError(
-                                "상품 삭제 권한이 없습니다.",
-                                "UNAUTHORIZE_USER"
+                                "상품 접근 권한이 없습니다.",
+                                ERROR_CODES.STORE_ACCESS_DENY
                             );
                         }
                         const store = await StoreModel.findById(
@@ -47,7 +48,7 @@ const resolvers: Resolvers = {
                         if (!store) {
                             throw new ApolloError(
                                 "존재하지 않는 Store",
-                                "UNEXIST_STORE"
+                                ERROR_CODES.UNEXIST_STORE
                             );
                         }
 

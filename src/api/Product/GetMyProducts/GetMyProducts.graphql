@@ -1,0 +1,13 @@
+type Query {
+    GetMyProducts(param: GetMyProductsInput!): GetMyProductsResponse!
+}
+
+type GetMyProductsResponse {
+    ok: Boolean!
+    error: Err
+    data: [Product!]
+}
+
+input GetMyProductsInput {
+    storeId: ID!
+}

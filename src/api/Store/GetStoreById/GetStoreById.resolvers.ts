@@ -2,45 +2,41 @@ import { ApolloError } from "apollo-server";
 import { mongoose } from "@typegoose/typegoose";
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
-import { UpdateStoreResponse, UpdateStoreInput } from "../../../types/graph";
+import { GetStoreByIdResponse, GetStoreByIdInput } from "../../../types/graph";
 import {
     defaultResolver,
     privateResolver
 } from "../../../utils/resolverFuncWrapper";
-import { StoreModel } from "../../../models/Store";
 import { ERROR_CODES } from "../../../types/values";
+import { StoreModel } from "../../../models/Store";
 
 const resolvers: Resolvers = {
-    Mutation: {
-        UpdateStore: defaultResolver(
+    Query: {
+        GetStoreById: defaultResolver(
             privateResolver(
-                async (
-                    { args: { param }, context: { req } },
-                    stack
-                ): Promise<UpdateStoreResponse> => {
+                async ({
+                    args: { param },
+                    context: { req }
+                }): Promise<GetStoreByIdResponse> => {
                     const session = await mongoose.startSession();
                     session.startTransaction();
                     try {
                         const { cognitoUser } = req;
-                        const {
-                            storeCode,
-                            updateParam
-                        } = param as UpdateStoreInput;
-                        const store = await StoreModel.findByCode(storeCode);
-                        if (!store.userId.equals(cognitoUser._id)) {
-                            stack.push(cognitoUser, store);
+                        const { storeId } = param as GetStoreByIdInput;
+                        const store = await StoreModel.findById(storeId);
+
+                        if (!store) {
                             throw new ApolloError(
-                                "Store 사용 권한이 없습니다.",
+                                "존재하지 않는 Store",
+                                ERROR_CODES.UNEXIST_STORE
+                            );
+                        }
+                        if (!store.userId.equals(cognitoUser._id)) {
+                            throw new ApolloError(
+                                "Store 접근권한이 없습니다.",
                                 ERROR_CODES.STORE_ACCESS_DENY
                             );
                         }
-                        for (const field in updateParam) {
-                            const value = updateParam[field];
-                            store[field] = value;
-                        }
-                        await store.save({ session });
-                        await session.commitTransaction();
-                        session.endSession();
                         return {
                             ok: true,
                             error: null,

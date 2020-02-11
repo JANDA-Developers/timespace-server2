@@ -32,6 +32,7 @@ export class UserCls extends BaseSchema {
                 { userSub: sub }
             );
         }
+        user.setAttributesFronCognito();
         return user;
     };
 
@@ -55,6 +56,12 @@ export class UserCls extends BaseSchema {
             });
         }
     }
+
+    email: string;
+    phone_number: string;
+    email_verified: boolean;
+    phone_number_verified: boolean;
+    name: string;
 
     @prop()
     _id: ObjectId;

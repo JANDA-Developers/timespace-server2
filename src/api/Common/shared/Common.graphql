@@ -57,6 +57,10 @@ type Query {
     periodTest(param: PeriodInput!): Period!
 }
 
+type Mutation {
+    singleUpload(upload: Upload!): File!
+}
+
 type Location {
     address: String!
     addressDetail: String
@@ -69,4 +73,22 @@ input LocationInput {
     addressDetail: String
     lat: Float!
     lng: Float!
+}
+
+type File {
+    filename: String!
+    mimetype: String!
+    encoding: String!
+}
+
+type JdFile {
+    url: URL!
+    filename: String!
+    mimeType: String!
+    tags: [JdTag!]
+}
+
+type JdTag {
+    Key: String!
+    Value: String!
 }
