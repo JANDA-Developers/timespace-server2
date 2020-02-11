@@ -1,0 +1,16 @@
+type Query {
+    # Store Owner가 쿼리할떄 사용하는 함수임.
+    GetProductsByStoreId(
+        param: GetProductsByStoreIdInput!
+    ): GetProductsByStoreIdResponse!
+}
+
+type GetProductsByStoreIdResponse {
+    ok: Boolean!
+    error: Err
+    data: [Product!]
+}
+
+input GetProductsByStoreIdInput {
+    storeId: ID!
+}

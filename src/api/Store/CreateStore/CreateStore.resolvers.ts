@@ -60,7 +60,7 @@ const resolvers: Resolvers = {
                         const _id = new ObjectId();
                         const store = new StoreModel({
                             _id,
-                            user: userId,
+                            userId,
                             name,
                             type,
                             zoneinfo,

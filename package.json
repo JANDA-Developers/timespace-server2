@@ -56,7 +56,9 @@
         "build": "tsc",
         "prebuild": "rm -rf dist",
         "postbuild": "yarn copy src/api/**/*.graphql src/api/**/*.html dist/api && 7z a ticket-apis.zip ./dist/*",
-        "start": "cd dist && node index.js"
+        "start": "cd dist && node index.js",
+        "upload:dev": "aws s3 cp ./ticket-apis.zip s3://booking.storage.private/dev/ticket/apis.zip",
+        "upload": "aws s3 cp ./ticket-apis.zip s3://booking.storage.private/ticket/apis.zip"
     },
     "dependencies": {
         "@typegoose/typegoose": "^6.2.1",

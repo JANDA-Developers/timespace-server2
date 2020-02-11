@@ -10,6 +10,8 @@ import {
     privateResolver
 } from "../../../utils/resolverFuncWrapper";
 import { ProductModel } from "../../../models/Product";
+import { ERROR_CODES } from "../../../types/values";
+import { ApolloError } from "apollo-server";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -26,9 +28,16 @@ const resolvers: Resolvers = {
                             productCode,
                             updateProductParamInput
                         } = param as UpdateProductInput;
+                        const { cognitoUser } = req;
                         const product = await ProductModel.findByCode(
                             productCode
                         );
+                        if (!product.userId.equals(cognitoUser._id)) {
+                            throw new ApolloError(
+                                "Product 접근 권한이 없습니다.",
+                                ERROR_CODES.PRODUCT_ACCESS_DENY
+                            );
+                        }
                         for (const fieldName in updateProductParamInput) {
                             const element = updateProductParamInput[fieldName];
                             if (element !== null) {
