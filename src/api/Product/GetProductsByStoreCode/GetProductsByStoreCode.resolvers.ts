@@ -3,8 +3,8 @@ import { mongoose } from "@typegoose/typegoose";
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
 import {
-    GetMyProductsResponse,
-    GetMyProductsInput
+    GetProductsByStoreCodeResponse,
+    GetProductsByStoreCodeInput
 } from "../../../types/graph";
 import {
     defaultResolver,
@@ -16,24 +16,20 @@ import { ERROR_CODES } from "../../../types/values";
 
 const resolvers: Resolvers = {
     Query: {
-        GetMyProducts: defaultResolver(
+        GetProductsByStoreCode: defaultResolver(
             privateResolver(
                 async (
                     { args: { param }, context: { req } },
                     stack
-                ): Promise<GetMyProductsResponse> => {
+                ): Promise<GetProductsByStoreCodeResponse> => {
                     const session = await mongoose.startSession();
                     session.startTransaction();
                     try {
                         const { cognitoUser } = req;
-                        const { storeId } = param as GetMyProductsInput;
-                        const store = await StoreModel.findById(storeId);
-                        if (!store) {
-                            throw new ApolloError(
-                                "존재하지 않는 Store",
-                                ERROR_CODES.UNEXIST_STORE
-                            );
-                        }
+                        const {
+                            storeCode
+                        } = param as GetProductsByStoreCodeInput;
+                        const store = await StoreModel.findByCode(storeCode);
                         if (!store.userId.equals(cognitoUser._id)) {
                             throw new ApolloError(
                                 "조회 권한이 없습니다.",

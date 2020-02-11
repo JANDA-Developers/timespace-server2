@@ -1,0 +1,15 @@
+type Query {
+    GetProductsByStoreCode(
+        param: GetProductsByStoreCodeInput!
+    ): GetProductsByStoreCodeResponse!
+}
+
+type GetProductsByStoreCodeResponse {
+    ok: Boolean!
+    error: Err
+    data: [Product!]
+}
+
+input GetProductsByStoreCodeInput {
+    storeCode: String!
+}
