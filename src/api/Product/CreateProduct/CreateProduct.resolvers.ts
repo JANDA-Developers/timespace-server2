@@ -33,6 +33,8 @@ const resolvers: Resolvers = {
                             optionalParams
                         } = param as CreateProductInput;
 
+                        const { cognitoUser } = req;
+
                         const productId = new ObjectId();
                         const store = await StoreModel.findById(storeId);
                         if (!store) {
@@ -47,6 +49,7 @@ const resolvers: Resolvers = {
                         const product = new ProductModel({
                             _id: productId,
                             name,
+                            userId: cognitoUser._id,
                             images,
                             storeId: stid,
                             description,

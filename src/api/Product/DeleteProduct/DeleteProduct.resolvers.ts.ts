@@ -18,15 +18,29 @@ const resolvers: Resolvers = {
     Mutation: {
         DeleteProduct: defaultResolver(
             privateResolver(
-                async ({ args: { param } }): Promise<DeleteProductResponse> => {
+                async ({
+                    args: { param },
+                    context: { req }
+                }): Promise<DeleteProductResponse> => {
                     const session = await mongoose.startSession();
                     session.startTransaction();
                     try {
-                        const { productCode } = param as DeleteProductInput;
-                        const product = await ProductModel.findByCode(
-                            productCode
-                        );
-                        const productId = new ObjectId(product._id);
+                        const { productId } = param as DeleteProductInput;
+                        const pid = new ObjectId(productId);
+                        const product = await ProductModel.findById(pid);
+                        const { cognitoUser } = req;
+                        if (!product) {
+                            throw new ApolloError(
+                                "존재하지 않는 ProductId",
+                                "UNEXIST_PRODUCT"
+                            );
+                        }
+                        if (!product.userId.equals(cognitoUser._id)) {
+                            throw new ApolloError(
+                                "상품 삭제 권한이 없습니다.",
+                                "UNAUTHORIZE_USER"
+                            );
+                        }
                         const store = await StoreModel.findById(
                             product.storeId
                         );
@@ -38,12 +52,12 @@ const resolvers: Resolvers = {
                         }
 
                         store.products = store.products.filter(
-                            itm => !productId.equals(itm)
+                            itm => !pid.equals(itm)
                         );
 
                         await ProductModel.deleteOne(
                             {
-                                _id: productId
+                                _id: pid
                             },
                             {
                                 session

@@ -1,7 +1,8 @@
 # 티켓 아이템에 관한 스키마.
 type Product implements BaseModel {
     _id: ID!
-    store: Store
+    user: User!
+    store: Store!
     name: String!
     code: String!
     images: [URL!]

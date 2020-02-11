@@ -24,6 +24,9 @@ const resolvers: Resolvers = {
                     // .map(productId => new ObjectId(productId))
                 }
             });
+        },
+        productCount: (store: DocumentType<StoreCls>) => {
+            return (store.products && store.products.length) || 0;
         }
     }
 };

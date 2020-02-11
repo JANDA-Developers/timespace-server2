@@ -29,11 +29,22 @@ export class ProductCls extends BaseSchema {
         return product;
     };
 
-    @prop()
-    name: string;
+    @prop({
+        required: [true, "[UNAUTHORIZED] 로그인 후 사용해주세요."],
+        get: id => new ObjectId(id),
+        set: id => new ObjectId(id)
+    })
+    userId: ObjectId;
+
+    @prop({
+        required: [true, "상점정보가 존재하지 않습니다."],
+        get: id => new ObjectId(id),
+        set: id => new ObjectId(id)
+    })
+    storeId: ObjectId;
 
     @prop()
-    storeId: ObjectId;
+    name: string;
 
     @prop({
         default(this: DocumentType<ProductCls>) {

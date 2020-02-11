@@ -35,7 +35,7 @@ export class UserCls extends BaseSchema {
         return user;
     };
 
-    async getAttributesFronCognito(this: DocumentType<UserCls>): Promise<void> {
+    async setAttributesFronCognito(this: DocumentType<UserCls>): Promise<void> {
         const cognito = new CognitoIdentityServiceProvider();
         const cognitoUser = await cognito
             .adminGetUser({

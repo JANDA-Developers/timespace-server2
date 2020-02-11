@@ -13,6 +13,7 @@ type Store implements BaseModel {
     updatedAt: DateTime!
     expiresAt: DateTime
     products: [Product!]
+    productCount: Int!
 }
 
 enum StoreType {
