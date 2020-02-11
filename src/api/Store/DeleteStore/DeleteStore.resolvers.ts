@@ -38,7 +38,7 @@ const resolvers: Resolvers = {
                         );
                         await StoreModel.updateOne(
                             {
-                                code: store.code
+                                _id: store._id
                             },
                             {
                                 $set: {
@@ -78,7 +78,7 @@ const resolvers: Resolvers = {
                         await UserModel.updateOne(
                             { _id: new ObjectId(cognitoUser._id) },
                             {
-                                $push: {
+                                $addToSet: {
                                     disabledStores: store._id
                                 }
                             },

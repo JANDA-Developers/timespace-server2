@@ -37,7 +37,7 @@ export class ProductCls extends BaseSchema {
 
     @prop({
         default(this: DocumentType<ProductCls>) {
-            return `${genCode(this.storeId)}-${s4(32).toUpperCase()}`;
+            return `${genCode(this.storeId)}-${s4(36).toUpperCase()}`;
         }
     })
     code: string;

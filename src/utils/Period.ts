@@ -1,8 +1,7 @@
 import { ApolloError } from "apollo-server";
 import { dateToMinutes, daysToNumber } from "./utils";
 import { Day } from "../types/graph";
-
-export type Minute = number;
+import { Minute } from "../types/types";
 
 export class PeriodCls {
     constructor({

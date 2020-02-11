@@ -7,7 +7,8 @@ import {
     privateResolver
 } from "../../../utils/resolverFuncWrapper";
 import { StoreModel } from "../../../models/Store";
-import { ObjectId } from "mongodb";
+import { UserModel } from "../../../models/User";
+import { ApolloError } from "apollo-server";
 
 const resolvers: Resolvers = {
     Query: {
@@ -19,8 +20,18 @@ const resolvers: Resolvers = {
                     try {
                         const { cognitoUser } = req;
 
+                        const user = await UserModel.findById(cognitoUser._id);
+                        if (!user) {
+                            throw new ApolloError(
+                                "존재하지 않는 UserId",
+                                "UNEXIST_USER"
+                            );
+                        }
+
                         const stores = await StoreModel.find({
-                            user: new ObjectId(cognitoUser._id)
+                            _id: {
+                                $in: user.stores
+                            }
                         });
                         return {
                             ok: true,

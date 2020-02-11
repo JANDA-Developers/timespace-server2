@@ -1,0 +1,17 @@
+type Mutation {
+    CreateItem(param: CreateItemInput!): CreateItemResponse!
+}
+type CreateItemResponse {
+    ok: Boolean!
+    error: Err
+    data: Item
+}
+input CreateItemInput {
+    name: String!
+    storeId: ID!
+    # 구매자 ID
+    buyer: ID!
+    description: String!
+    dateTimeRange: DateTimeRangeInput
+    gender: Gender
+}
