@@ -98,6 +98,13 @@ export class UserCls extends BaseSchema {
         set: (ids: any[]) => ids.map(id => new ObjectId(id))
     })
     disabledStores: ObjectId[];
+
+    @prop({
+        default: [],
+        get: (ids: any[]) => ids.map(id => new ObjectId(id)),
+        set: (ids: any[]) => ids.map(id => new ObjectId(id))
+    })
+    groupIds: ObjectId[];
 }
 
 export const UserModel = getModelForClass(UserCls);

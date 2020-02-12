@@ -11,7 +11,7 @@ import {
     privateResolver
 } from "../../../utils/resolverFuncWrapper";
 import { ERROR_CODES } from "../../../types/values";
-import { StoreGroupModel } from "../../../models/StoreGroupCls";
+import { StoreGroupModel } from "../../../models/StoreGroup";
 
 const resolvers: Resolvers = {
     Mutation: {

@@ -114,6 +114,13 @@ export class StoreCls extends BaseSchema {
             periodArr.map(period => new PeriodCls(period))
     })
     businessHours: Array<PeriodCls>;
+
+    @prop({
+        default: [],
+        get: (ids: any[]) => ids.map(id => new ObjectId(id)),
+        set: (ids: any[]) => ids.map(id => new ObjectId(id))
+    })
+    groupIds: ObjectId[];
 }
 
 export const StoreModel = getModelForClass(StoreCls);

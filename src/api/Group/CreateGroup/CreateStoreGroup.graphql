@@ -11,5 +11,5 @@ input CreateStoreGroupInput {
     type: GroupType!
     description: String
     tags: [String!]
-    children: [ID!]
+    list: [ID!]
 }

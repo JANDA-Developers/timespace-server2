@@ -1,6 +1,5 @@
 type ProductGroup implements BaseGroup {
     _id: ID!
-    isDefault: Boolean!
     user: User
     name: String!
     type: GroupType!

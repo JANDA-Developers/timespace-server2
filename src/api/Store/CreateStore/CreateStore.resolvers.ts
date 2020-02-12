@@ -11,6 +11,7 @@ import { UserModel } from "../../../models/User";
 import { ObjectId } from "mongodb";
 import { CountryInfoModel } from "../../../models/CountryInfo";
 import { ApolloError } from "apollo-server";
+import { StoreGroupModel } from "../../../models/StoreGroup";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -31,7 +32,8 @@ const resolvers: Resolvers = {
                             description,
                             timezone,
                             intro,
-                            warning
+                            warning,
+                            groupId
                         } = param as CreateStoreInput;
                         let zoneinfo = cognitoUser.zoneinfo;
                         if (timezone) {
@@ -59,6 +61,30 @@ const resolvers: Resolvers = {
                             };
                         }
                         const userId = new ObjectId(cognitoUser._id);
+                        let group = await StoreGroupModel.findById(groupId);
+                        if (!group) {
+                            group = await StoreGroupModel.findOne({
+                                userId,
+                                isDefault: true
+                            });
+                            if (!group) {
+                                group = StoreGroupModel.makeDefaultGroup(
+                                    userId
+                                );
+                                await UserModel.updateOne(
+                                    { _id: userId },
+                                    {
+                                        $push: {
+                                            groupsIds: group._id
+                                        }
+                                    },
+                                    {
+                                        session
+                                    }
+                                );
+                                await group.save({ session });
+                            }
+                        }
                         const _id = new ObjectId();
                         const store = new StoreModel({
                             _id,
@@ -77,9 +103,20 @@ const resolvers: Resolvers = {
                                     (manager && manager.phoneNumber) ||
                                     cognitoUser.phone_number,
                                 isVerifiedPhoneNumber: false
-                            }
+                            },
+                            groupIds: [group._id]
                         });
                         await store.save({ session });
+                        await StoreGroupModel.updateOne(
+                            {
+                                _id: group._id
+                            },
+                            {
+                                $push: {
+                                    list: _id
+                                }
+                            }
+                        );
                         await UserModel.updateOne(
                             { _id: userId },
                             {

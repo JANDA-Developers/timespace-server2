@@ -7,7 +7,7 @@ import {
     privateResolver
 } from "../../../utils/resolverFuncWrapper";
 import { ObjectId } from "mongodb";
-import { StoreGroupModel } from "../../../models/StoreGroupCls";
+import { StoreGroupModel } from "../../../models/StoreGroup";
 
 const resolvers: Resolvers = {
     Mutation: {

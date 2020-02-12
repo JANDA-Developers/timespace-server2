@@ -8,7 +8,7 @@ import { CountryInfoModel } from "../../../models/CountryInfo";
 import { ApolloError } from "apollo-server";
 import { AttributeType } from "aws-sdk/clients/cognitoidentityserviceprovider";
 import { mongoose } from "@typegoose/typegoose";
-import { StoreGroupModel } from "../../../models/StoreGroupCls";
+import { StoreGroupModel } from "../../../models/StoreGroup";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -103,20 +103,13 @@ const resolvers: Resolvers = {
                             UserAttributes: userAttributes
                         })
                         .promise();
+                    const group = StoreGroupModel.makeDefaultGroup(_id);
                     const user = new UserModel({
                         _id,
                         sub: result.UserSub,
                         zoneinfo,
                         loginInfos: [],
-                        roles
-                    });
-                    const group = new StoreGroupModel({
-                        _id: new ObjectId(),
-                        name: "defaultGroup",
-                        isDefault: true,
-                        userId: user._id,
-                        type: "STORE_GROUP",
-                        description: "기본 그룹"
+                        groupIds: [group._id]
                     });
                     // TODO: EmailSignUp 하는 동시에 "기본 그룹"을 생성한다.
                     await user.save({ session });

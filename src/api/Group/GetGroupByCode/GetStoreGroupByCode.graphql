@@ -3,11 +3,13 @@ type Query {
         param: GetStoreGroupByCodeInput!
     ): GetStoreGroupByCodeResponse!
 }
+
 type GetStoreGroupByCodeResponse {
     ok: Boolean!
     error: Err
-    data: BaseGroup
+    data: StoreGroup
 }
+
 input GetStoreGroupByCodeInput {
     groupCode: String!
 }

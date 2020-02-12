@@ -2,16 +2,32 @@ import { createSchemaOptions } from "../abs/BaseSchema";
 import {
     getModelForClass,
     modelOptions,
-    DocumentType
+    DocumentType,
+    prop
 } from "@typegoose/typegoose";
 import { getCollectionName, ModelName } from "./__collectionNames";
 import { ApolloError } from "apollo-server";
 import { ERROR_CODES } from "../types/values";
 import { BaseGroup } from "../abs/BaseGroup";
 import { StoreCls, StoreModel } from "./Store";
+import { ObjectId } from "mongodb";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.GROUP)))
 export class StoreGroupCls extends BaseGroup<StoreCls> {
+    @prop({ default: () => false })
+    isDefault: boolean;
+
+    static makeDefaultGroup(userId: ObjectId | string) {
+        return new StoreGroupModel({
+            _id: new ObjectId(),
+            name: "defaultGroup",
+            isDefault: true,
+            userId,
+            type: "STORE_GROUP",
+            description: "기본 그룹"
+        });
+    }
+
     static async findByCode(
         groupCode: string
     ): Promise<DocumentType<StoreGroupCls>> {

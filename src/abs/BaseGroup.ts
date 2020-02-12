@@ -5,9 +5,6 @@ import { prop, DocumentType } from "@typegoose/typegoose";
 import { genCode } from "../models/utils/genId";
 
 export abstract class BaseGroup<Model extends BaseSchema> extends BaseSchema {
-    @prop({ default: () => false })
-    isDefault: boolean;
-
     @prop({
         set: id => new ObjectId(id),
         get: id => new ObjectId(id),
@@ -37,7 +34,8 @@ export abstract class BaseGroup<Model extends BaseSchema> extends BaseSchema {
     @prop({
         default: [],
         get: (ids: any[]) => ids.map(id => new ObjectId(id)),
-        set: (ids: any[]) => ids.map(id => new ObjectId(id))
+        set: (ids: any[]) => ids.map(id => new ObjectId(id)),
+        _id: false
     })
     list: ObjectId[];
 

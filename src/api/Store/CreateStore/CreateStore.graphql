@@ -16,4 +16,5 @@ input CreateStoreInput {
     timezone: String
     warning: String
     intro: String
+    groupId: ID
 }
