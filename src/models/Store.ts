@@ -9,8 +9,9 @@ import { getCollectionName, ModelName } from "./__collectionNames";
 import { ObjectId } from "mongodb";
 import { ApolloError } from "apollo-server";
 import { genCode } from "./utils/genId";
-import { Zoneinfo, StoreType, Manager, Location } from "../types/graph";
+import { Zoneinfo, StoreType, Manager, Location, Period } from "../types/graph";
 import { ERROR_CODES } from "../types/values";
+import { PeriodCls } from "../utils/Period";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.STORE)))
 export class StoreCls extends BaseSchema {
@@ -101,6 +102,18 @@ export class StoreCls extends BaseSchema {
 
     @prop()
     location: Location;
+
+    @prop({
+        default: (): Array<PeriodCls> => [
+            // 월~금: 09:00 ~ 21:00
+            new PeriodCls({ start: 540, time: 720, days: 62 })
+        ],
+        set: (periodArr: Array<Period>) =>
+            periodArr.map(period => new PeriodCls(period)),
+        get: (periodArr: Array<Period>) =>
+            periodArr.map(period => new PeriodCls(period))
+    })
+    businessHours: Array<PeriodCls>;
 }
 
 export const StoreModel = getModelForClass(StoreCls);

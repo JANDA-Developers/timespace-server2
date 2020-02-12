@@ -36,7 +36,7 @@ const resolvers: Resolvers = {
                         if (!product.userId.equals(cognitoUser._id)) {
                             throw new ApolloError(
                                 "Product 접근권한이 없습니다. ",
-                                ERROR_CODES.PRODUCT_ACCESS_DENY
+                                ERROR_CODES.ACCESS_DENY_PRODUCT
                             );
                         }
                         return {

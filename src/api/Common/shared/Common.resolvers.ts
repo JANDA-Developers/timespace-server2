@@ -5,11 +5,13 @@ import { getIP, daysNumToArr } from "../../../utils/utils";
 import { Zoneinfo, PeriodInput } from "../../../types/graph";
 import { defaultResolver } from "../../../utils/resolverFuncWrapper";
 import { PeriodCls } from "../../../utils/Period";
+import { genCode } from "../../../models/utils/genId";
+import { ObjectId } from "mongodb";
 
 const resolver = {
     BaseModel: {
         __resolveType: (value: any): string => {
-            return "test";
+            return "BaseModel";
         }
     },
     BaseResponse: {
@@ -17,7 +19,6 @@ const resolver = {
             return "BaseResponse";
         }
     },
-    CountryInfo: {},
     // GenderOption: {
     //     ANY: "ANY",
     //     SEPARATELY: "SEPARATELY",
@@ -95,6 +96,15 @@ const resolver = {
         ),
         includeDays: (_, { days }) => {
             return daysNumToArr(days);
+        },
+        GenCodeTest: (
+            __: any,
+            { param: { id = new ObjectId(), units, digits } }
+        ): any => {
+            return {
+                id,
+                code: genCode(id)
+            };
         }
     }
 };

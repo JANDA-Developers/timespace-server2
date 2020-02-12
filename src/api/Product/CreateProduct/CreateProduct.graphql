@@ -12,6 +12,8 @@ input CreateProductInput {
     name: String
     images: [URL]
     description: String
+    intro: String
+    warning: String
     optionalParams: ProductOptionalFieldInput
 }
 

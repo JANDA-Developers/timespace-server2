@@ -31,7 +31,9 @@ const resolvers: Resolvers = {
                             images,
                             name,
                             storeId,
-                            optionalParams
+                            optionalParams,
+                            intro,
+                            warning
                         } = param as CreateProductInput;
 
                         const { cognitoUser } = req;
@@ -56,7 +58,9 @@ const resolvers: Resolvers = {
                             description,
                             usingPeriodOption: store.usingPeriodOption || false,
                             usingCapacityOption:
-                                store.usingCapacityOption || false
+                                store.usingCapacityOption || false,
+                            intro: intro || undefined,
+                            warning: warning || undefined
                         });
                         if (optionalParams) {
                             for (const fieldName in optionalParams) {

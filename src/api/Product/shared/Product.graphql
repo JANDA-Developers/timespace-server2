@@ -1,4 +1,4 @@
-# 티켓 아이템에 관한 스키마.
+# 판매되는 상품 스키마
 type Product implements BaseModel {
     _id: ID!
     user: User!
@@ -11,6 +11,8 @@ type Product implements BaseModel {
     createdAt: DateTime!
     updatedAt: DateTime!
     expiresAt: DateTime
+    warning: String
+    intro: String
 
     peopleCapacity: Int
     genderOption: GenderOption

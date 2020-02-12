@@ -31,7 +31,7 @@ const resolvers: Resolvers = {
                             stack.push(cognitoUser, store);
                             throw new ApolloError(
                                 "Store 사용 권한이 없습니다.",
-                                ERROR_CODES.STORE_ACCESS_DENY
+                                ERROR_CODES.ACCESS_DENY_STORE
                             );
                         }
                         for (const field in updateParam) {

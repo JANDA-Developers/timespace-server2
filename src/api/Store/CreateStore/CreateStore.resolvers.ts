@@ -29,7 +29,9 @@ const resolvers: Resolvers = {
                             type,
                             manager,
                             description,
-                            timezone
+                            timezone,
+                            intro,
+                            warning
                         } = param as CreateStoreInput;
                         let zoneinfo = cognitoUser.zoneinfo;
                         if (timezone) {
@@ -65,6 +67,8 @@ const resolvers: Resolvers = {
                             type,
                             zoneinfo,
                             description,
+                            warning,
+                            intro,
                             manager: {
                                 name:
                                     (manager && manager.name) ||

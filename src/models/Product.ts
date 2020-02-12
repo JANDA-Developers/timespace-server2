@@ -176,6 +176,12 @@ export class ProductCls extends BaseSchema {
         ]
     })
     periodOption: PeriodOption;
+
+    @prop()
+    intro: string;
+
+    @prop()
+    warning: string;
 }
 
 export const ProductModel = getModelForClass(ProductCls);

@@ -10,7 +10,7 @@ import { prop, index } from "@typegoose/typegoose";
         expireAfterSeconds: 0
     }
 )
-export class BaseSchema {
+export abstract class BaseSchema {
     @prop({
         default: () => new ObjectId(),
         get: id => new ObjectId(id),
