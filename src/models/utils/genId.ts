@@ -1,5 +1,4 @@
 import _ from "lodash";
-import { Types } from "mongoose";
 import { getDayOfYear } from "../../utils/dateFuncs";
 import { ObjectId } from "mongodb";
 
@@ -24,12 +23,15 @@ export const genItemCode = (productCode: string, date = new Date()): string => {
         .substr(0, 2)}`;
 };
 
-export const genCode = (id: string | ObjectId): string =>
-    makeCodeByHexString({
+export const genCode = (id: string | ObjectId): string => {
+    const v =
+        (parseInt(typeof id === "string" ? id : id.toHexString(), 36) % 5) + 1;
+    return makeCodeByHexString({
         id,
-        units: [1, 2, 3, 5, 7],
+        units: Array(v).fill(7),
         digits: 6
     });
+};
 
 export const s4 = (base: 16 | 36 = 16): string => {
     return (((1 + Math.random()) * (base === 16 ? 0x10000 : 0x1000000)) | 0)
@@ -54,7 +56,7 @@ export const makeCodeByHexString = ({
     units: number[];
     digits?: number;
 }): string => {
-    const arr: string[] = new Types.ObjectId(id).toHexString().split("");
+    const arr: string[] = new ObjectId(id).toHexString().split("");
     const chunkArr = units.map(n => _.chunk(arr, n).map(s => s.join("")));
     const sumTotal = chunkArr
         .map(strHexArrs => sumHexArr(strHexArrs))
