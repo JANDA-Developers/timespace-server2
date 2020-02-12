@@ -7,11 +7,15 @@ import { ObjectId } from "mongodb";
 import { CountryInfoModel } from "../../../models/CountryInfo";
 import { ApolloError } from "apollo-server";
 import { AttributeType } from "aws-sdk/clients/cognitoidentityserviceprovider";
+import { mongoose } from "@typegoose/typegoose";
+import { StoreGroupModel } from "../../../models/StoreGroupCls";
 
 const resolvers: Resolvers = {
     Mutation: {
         EmailSignUp: defaultResolver(
             async ({ args: { param } }): Promise<EmailSignUpResponse> => {
+                const session = await mongoose.startSession();
+                session.startTransaction();
                 try {
                     const {
                         username,
@@ -99,12 +103,26 @@ const resolvers: Resolvers = {
                             UserAttributes: userAttributes
                         })
                         .promise();
-                    await UserModel.create({
+                    const user = new UserModel({
                         _id,
                         sub: result.UserSub,
                         zoneinfo,
-                        loginInfos: []
+                        loginInfos: [],
+                        roles
                     });
+                    const group = new StoreGroupModel({
+                        _id: new ObjectId(),
+                        name: "defaultGroup",
+                        isDefault: true,
+                        userId: user._id,
+                        type: "STORE_GROUP",
+                        description: "기본 그룹"
+                    });
+                    // TODO: EmailSignUp 하는 동시에 "기본 그룹"을 생성한다.
+                    await user.save({ session });
+                    await group.save({ session });
+                    await session.commitTransaction();
+                    session.endSession();
                     return {
                         ok: true,
                         error: null,
@@ -127,6 +145,8 @@ const resolvers: Resolvers = {
                         }
                     };
                 } catch (error) {
+                    await session.abortTransaction();
+                    session.endSession();
                     return {
                         ok: false,
                         error: {

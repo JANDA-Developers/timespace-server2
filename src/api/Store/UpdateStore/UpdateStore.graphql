@@ -14,5 +14,5 @@ input UpdateStoreInput {
 input StoreUpdateParamInput {
     name: String!
     description: String!
-    businessHours: [Period!]
+    businessHours: [PeriodInput!]
 }

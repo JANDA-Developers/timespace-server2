@@ -92,3 +92,18 @@ type JdTag {
     Key: String!
     Value: String!
 }
+
+type Query {
+    GenCodeTest(param: GenCodeTestInput!): GenCodeTestResult!
+}
+
+input GenCodeTestInput {
+    id: ID!
+    units: [Int!]
+    digits: Int!
+}
+
+type GenCodeTestResult {
+    code: String!
+    id: String!
+}

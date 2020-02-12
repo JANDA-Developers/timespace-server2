@@ -1,0 +1,15 @@
+type Mutation {
+    CreateStoreGroup(param: CreateStoreGroupInput!): CreateStoreGroupResponse!
+}
+type CreateStoreGroupResponse {
+    ok: Boolean!
+    error: Err
+    data: BaseGroup
+}
+input CreateStoreGroupInput {
+    name: String!
+    type: GroupType!
+    description: String
+    tags: [String!]
+    children: [ID!]
+}

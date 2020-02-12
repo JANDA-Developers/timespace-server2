@@ -1,4 +1,4 @@
-interface BaseGroup {
+type ProductGroup implements BaseGroup {
     _id: ID!
     isDefault: Boolean!
     user: User
@@ -7,13 +7,8 @@ interface BaseGroup {
     code: String!
     description: String
     tags: [String!]
-    list: [BaseModel!]
+    list: [Product!]
     createdAt: DateTime!
     updatedAt: DateTime!
     expiresAt: DateTime!
-}
-
-enum GroupType {
-    STORE_GROUP
-    PRODUCT_GROUP
 }
