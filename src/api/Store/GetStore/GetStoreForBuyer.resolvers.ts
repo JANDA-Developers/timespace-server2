@@ -2,20 +2,20 @@ import { mongoose } from "@typegoose/typegoose";
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
 import {
-    GetStoreByCodeResponse,
-    GetStoreByCodeInput
+    GetStoreForBuyerResponse,
+    GetStoreForBuyerInput
 } from "../../../types/graph";
 import { defaultResolver } from "../../../utils/resolverFuncWrapper";
 import { StoreModel } from "../../../models/Store";
 
 const resolvers: Resolvers = {
     Query: {
-        GetStoreByCode: defaultResolver(
-            async ({ args: { param } }): Promise<GetStoreByCodeResponse> => {
+        GetStoreForBuyer: defaultResolver(
+            async ({ args: { param } }): Promise<GetStoreForBuyerResponse> => {
                 const session = await mongoose.startSession();
                 session.startTransaction();
                 try {
-                    const { storeCode } = param as GetStoreByCodeInput;
+                    const { storeCode } = param as GetStoreForBuyerInput;
                     const store = await StoreModel.findByCode(storeCode);
                     return {
                         ok: true,

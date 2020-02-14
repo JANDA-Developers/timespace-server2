@@ -2,7 +2,10 @@ import { ApolloError } from "apollo-server";
 import { mongoose } from "@typegoose/typegoose";
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
-import { CreateItemResponse, CreateItemInput } from "../../../types/graph";
+import {
+    CreateItemForBuyerResponse,
+    CreateItemForBuyerInput
+} from "../../../types/graph";
 import {
     defaultResolver,
     privateResolver
@@ -10,12 +13,12 @@ import {
 
 const resolvers: Resolvers = {
     Mutation: {
-        CreateItem: defaultResolver(
+        CreateItemForBuyer: defaultResolver(
             privateResolver(
-                async (
-                    { parent, info, args: { param }, context: { req } },
-                    stack
-                ): Promise<CreateItemResponse> => {
+                async ({
+                    args: { param },
+                    context: { req }
+                }): Promise<CreateItemForBuyerResponse> => {
                     const session = await mongoose.startSession();
                     session.startTransaction();
                     try {
@@ -26,7 +29,7 @@ const resolvers: Resolvers = {
                             name,
                             storeId,
                             dateTimeRange
-                        } = param as CreateItemInput;
+                        } = param as CreateItemForBuyerInput;
                         console.log({
                             buyer,
                             description,

@@ -2,8 +2,8 @@ import { mongoose } from "@typegoose/typegoose";
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
 import {
-    GetProductsByStoreCodeResponse,
-    GetProductsByStoreCodeInput
+    GetProductsForBuyerResponse,
+    GetProductsForBuyerInput
 } from "../../../types/graph";
 import { defaultResolver } from "../../../utils/resolverFuncWrapper";
 import { StoreModel } from "../../../models/Store";
@@ -11,14 +11,14 @@ import { ProductModel } from "../../../models/Product";
 
 const resolvers: Resolvers = {
     Query: {
-        GetProductsByStoreCode: defaultResolver(
+        GetProductsForBuyer: defaultResolver(
             async ({
                 args: { param }
-            }): Promise<GetProductsByStoreCodeResponse> => {
+            }): Promise<GetProductsForBuyerResponse> => {
                 const session = await mongoose.startSession();
                 session.startTransaction();
                 try {
-                    const { storeCode } = param as GetProductsByStoreCodeInput;
+                    const { storeCode } = param as GetProductsForBuyerInput;
                     const store = await StoreModel.findByCode(storeCode);
                     const products = await ProductModel.find({
                         _id: {

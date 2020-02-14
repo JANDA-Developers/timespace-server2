@@ -1,14 +1,16 @@
 type Mutation {
-    CreateItem(param: CreateItemInput!): CreateItemResponse!
+    CreateItemForBuyer(
+        param: CreateItemForBuyerInput!
+    ): CreateItemForBuyerResponse!
 }
-type CreateItemResponse {
+type CreateItemForBuyerResponse {
     ok: Boolean!
     error: Err
     data: Item
 }
-input CreateItemInput {
+input CreateItemForBuyerInput {
     name: String!
-    storeId: ID!
+    storeCode: ID!
     # 구매자 ID
     buyer: ID!
     description: String!
