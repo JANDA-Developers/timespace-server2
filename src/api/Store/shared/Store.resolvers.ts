@@ -23,13 +23,6 @@ const resolvers: Resolvers = {
         },
         productCount: (store: DocumentType<StoreCls>) => {
             return (store.products && store.products.length) || 0;
-        },
-        businessHours: (store: DocumentType<StoreCls>) => {
-            console.log(
-                "Store.Businesshours ======================================"
-            );
-            console.log(store);
-            return store.businessHours;
         }
     }
 };

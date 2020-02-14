@@ -98,11 +98,20 @@ export class StoreCls extends BaseSchema {
     })
     products: ObjectId[];
 
-    @prop({ default: true })
+    @prop({
+        default(this: DocumentType<StoreCls>) {
+            if (this.type === "LEASE") {
+                return true;
+            }
+            return false;
+        }
+    })
     usingPeriodOption: boolean;
 
     @prop({
-        default: true
+        default(this: DocumentType<StoreCls>) {
+            return false;
+        }
     })
     usingCapacityOption: boolean;
 

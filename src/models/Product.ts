@@ -129,16 +129,16 @@ export class ProductCls extends BaseSchema {
             {
                 validator(
                     this: DocumentType<ProductCls>,
-                    enabledPeriod: Array<PeriodCls>
+                    businessHours: Array<PeriodCls>
                 ): boolean {
                     return (
-                        enabledPeriod.filter(
+                        businessHours.filter(
                             period => period.time < this.periodOption.min
                         ).length === 0
                     );
                 },
                 message:
-                    "enabledPeriod.time 값이 periodOption.min보다 작습니다."
+                    "BusinessHours.time 값이 periodOption.min보다 작습니다."
             }
         ],
         default: () => [],
@@ -146,14 +146,14 @@ export class ProductCls extends BaseSchema {
             function(this: DocumentType<ProductCls>) {
                 return this.usingPeriodOption;
             },
-            "EnabledPeriod가 설정되지 않았습니다."
+            "BusinessHours가 설정되지 않았습니다."
         ],
         get: (periodArr: Array<PeriodCls>) =>
             mergePeriods(periodArr.map(p => new PeriodCls(p))),
         set: (periodArr: Array<PeriodWithDays>): Array<PeriodCls> =>
             splitPeriods(periodArr)
     })
-    enabledPeriod: Array<PeriodWithDays>;
+    businessHours: Array<PeriodWithDays>;
 
     @prop({
         validate: [

@@ -18,6 +18,6 @@ input UpdateProductParamInput {
 
     peopleCapacity: Int
     genderOption: GenderOption
-    enabledPeriod: [PeriodInput!]
+    businessHours: [PeriodInput!]
     periodOption: PeriodOptionInput
 }

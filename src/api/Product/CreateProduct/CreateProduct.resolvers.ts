@@ -55,12 +55,12 @@ const resolvers: Resolvers = {
                             userId: cognitoUser._id,
                             storeId: store._id,
                             description,
-                            usingPeriodOption: store.usingPeriodOption || false,
-                            usingCapacityOption:
-                                store.usingCapacityOption || false,
                             intro: intro || undefined,
                             warning: warning || undefined
                         });
+                        product.usingPeriodOption = store.usingPeriodOption;
+                        product.usingCapacityOption = store.usingCapacityOption;
+
                         if (optionalParams) {
                             for (const fieldName in optionalParams) {
                                 const param = optionalParams[fieldName];
@@ -68,11 +68,13 @@ const resolvers: Resolvers = {
                                     product[fieldName] = param;
                                 }
                             }
+                            if (!product.businessHours) {
+                                product.businessHours = store.businessHours;
+                            }
+                            if (!product.periodOption) {
+                                product.periodOption = store.periodOption;
+                            }
                         }
-                        // if (optionalParams?.enabledPeriod) {
-                        //     const productEnabled = optionalParams.enabledPeriod;
-                        //     const businessHours = store.businessHours;
-                        // }
 
                         // TODO: Compare BusinessHours between "Store" and "ProductInput"
                         await product.save({ session });

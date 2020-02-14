@@ -16,6 +16,6 @@ type Product implements BaseModel {
 
     peopleCapacity: Int
     genderOption: GenderOption
-    enabledPeriod: [Period!]
+    businessHours: [Period!]
     periodOption: PeriodOption
 }

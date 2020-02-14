@@ -20,7 +20,7 @@ input CreateProductInput {
 input ProductOptionalFieldInput {
     peopleCapacity: Int
     genderOption: GenderOption
-    enabledPeriod: [PeriodInput!]
+    businessHours: [PeriodInput!]
     disabledPeriod: [PeriodInput!]
     periodOption: PeriodOptionInput
 }
