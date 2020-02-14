@@ -14,3 +14,13 @@ export enum ERROR_CODES {
     UNEXIST_USER = "UNEXIST_USER",
     UNDEFINED_JWK = "UNDEFINED_JWK"
 }
+
+export enum DayEnum {
+    SUN = 0b0000001,
+    MON = 0b0000010,
+    TUE = 0b0000100,
+    WED = 0b0001000,
+    THU = 0b0010000,
+    FRI = 0b0100000,
+    SAT = 0b1000000
+}

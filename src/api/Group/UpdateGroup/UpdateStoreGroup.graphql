@@ -1,0 +1,13 @@
+type Mutation {
+    UpdateStoreGroup(param: UpdateStoreGroupInput!): UpdateStoreGroupResponse!
+}
+type UpdateStoreGroupResponse {
+    ok: Boolean!
+    error: Err
+    data: StoreGroup
+}
+input UpdateStoreGroupInput {
+    name: String
+    description: String
+    list: [ID]
+}

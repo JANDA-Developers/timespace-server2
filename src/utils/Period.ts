@@ -1,30 +1,28 @@
 import { ApolloError } from "apollo-server";
-import { dateToMinutes, daysToNumber } from "./utils";
-import { Day } from "../types/graph";
+import { dateToMinutes } from "./utils";
 import { Minute } from "../types/values";
 
 export class PeriodCls {
+    // 분(Minute) 단위 시간 사용
+    start: Minute;
+    end: Minute;
+    time: Minute;
+    // 1, 2, 4, 8, 16, 32, 64 의 숫자...
+    day: number;
+
     constructor({
         start = 0,
-        time = 1440,
-        days = 127 // 매일매일...
+        end,
+        day
     }: {
         start: number;
-        time: number;
-        days: number | Day[];
+        day: number;
+        end: number;
     }) {
         this.start = start;
-        this.time = time;
-        if (time) {
-            this.end = start + time;
-        }
-        this.end = start + time;
-        this.days =
-            typeof days === "number"
-                ? days % 128
-                : days.length === 0
-                ? 0
-                : daysToNumber(days);
+        this.end = end;
+        this.time = end - start;
+        this.day = day;
         this.validate();
     }
 
@@ -38,37 +36,44 @@ export class PeriodCls {
                 }
             );
         }
-        if (this.time < 0) {
+        if (this.end < 0) {
             throw new ApolloError(
-                "[PeriodCls] Period.time 값은 음수가 될 수 없습니다.",
+                "[PeriodCls] Period.end 값은 음수가 될 수 없습니다.",
+                "PERIOD_START_NEGATIVE",
+                {
+                    end: this.end
+                }
+            );
+        }
+        if (this.time <= 0) {
+            throw new ApolloError(
+                "[PeriodCls] Period.time 값은 음수 또는 0이 될 수 없습니다.",
                 "PERIOD_TIME_NEGATIVE",
                 {
                     time: this.time
                 }
             );
         }
-        this.end = this.start + this.time;
-        // !보류
-        // if (time > 1440) {
-        //     throw new ApolloError(
-        //         "[PeriodCls] Period.time 값은 1440분을 초과할 수 없습니다.",
-        //         "PERIOD_TIME_EXCEED_LIMIT",
-        //         {
-        //             time
-        //         }
-        //     );
-        // }
+        if (this.start >= this.end) {
+            throw new ApolloError(
+                "[PeriodCls] start값이 end값보다 크거나 같습니다.",
+                "PERIOD_START_OVER_END",
+                {
+                    start: this.start,
+                    end: this.end
+                }
+            );
+        }
     }
-    // 분(Minute) 단위 시간 사용
-    start: Minute;
-    end: Minute;
-    time: Minute;
-    days: number;
+
+    isSameTime({ start, end }: { start: number; end: number }): boolean {
+        return start === this.start && end === this.end;
+    }
 
     isIn(this: PeriodCls, time: Date): boolean {
         const date: Date = time;
         const minutes = dateToMinutes(date);
-        const includedDay = (this.days & (1 << date.getDay())) !== 0;
+        const includedDay = (this.day & (1 << date.getDay())) !== 0;
         return includedDay && this.start <= minutes && minutes <= this.end;
     }
 
@@ -76,13 +81,35 @@ export class PeriodCls {
         // 이제 겹치는 부분들을 구해볼까?
         const start = this.start < period.start ? period.start : this.start;
         const end = this.end > period.end ? period.end : this.end;
-        const days = this.days & period.days;
+        const day = this.day & period.day;
         const p = new PeriodCls({
             start,
-            time: end - start,
-            days
+            end,
+            day
         });
         return p;
+    }
+
+    /**
+     * 포함관계를 알아봄. Period가 target을 포함하는지...
+     * @param period 메인
+     * @param target 포함되는지 알아볼 대상
+     * @param options
+     */
+    isInclude(
+        this: PeriodCls,
+        target: PeriodCls,
+        options = { exceptDays: false, exceptTime: false }
+    ): boolean {
+        const isIncludeDays =
+            options.exceptDays === false
+                ? (this.day & target.day) === target.day
+                : true;
+        const isIncludeTimes =
+            options.exceptTime === false
+                ? this.start <= target.start && this.end >= target.end
+                : true;
+        return options.exceptDays !== false && isIncludeDays && isIncludeTimes;
     }
 
     // differences(this: PeriodCls): PeriodCls[] {}

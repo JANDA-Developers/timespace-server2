@@ -54,7 +54,10 @@ type Err {
 
 type Query {
     includeDays(days: Int!): [Day!]
-    periodTest(param: PeriodInput!): Period!
+    periodTest(param: PeriodTestInput!): [Period!]
+}
+input PeriodTestInput {
+    periods: [PeriodInput!]
 }
 
 type Mutation {

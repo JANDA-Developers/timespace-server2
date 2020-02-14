@@ -28,12 +28,17 @@ const resolvers: Resolvers = {
                                 ERROR_CODES.UNEXIST_USER
                             );
                         }
-
+                        console.log(
+                            "Start ==========================================="
+                        );
                         const stores = await StoreModel.find({
                             _id: {
                                 $in: user.stores
                             }
                         });
+                        console.log(
+                            "End ==========================================="
+                        );
                         return {
                             ok: true,
                             error: null,

@@ -17,4 +17,6 @@ input CreateStoreInput {
     warning: String
     intro: String
     groupId: ID
+    businessHours: [PeriodInput!]
+    periodOption: PeriodOptionInput!
 }

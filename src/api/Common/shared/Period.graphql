@@ -36,7 +36,8 @@ type PeriodOption {
 
 input PeriodInput {
     start: Int!
-    time: Int!
+    # 분 단위 계산
+    end: Int!
     days: [Day!]
 }
 

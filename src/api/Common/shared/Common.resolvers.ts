@@ -1,12 +1,18 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { CountryInfoModel } from "../../../models/CountryInfo";
 import { getGeoInfoByIP } from "../../../utils/geoLocationAPI";
-import { getIP, daysNumToArr } from "../../../utils/utils";
+import { getIP } from "../../../utils/utils";
 import { Zoneinfo, PeriodInput } from "../../../types/graph";
 import { defaultResolver } from "../../../utils/resolverFuncWrapper";
 import { PeriodCls } from "../../../utils/Period";
 import { genCode } from "../../../models/utils/genId";
 import { ObjectId } from "mongodb";
+import {
+    splitPeriods,
+    mergePeriods,
+    daysNumToArr
+} from "../../../utils/periodFuncs";
+import { DayEnum } from "../../../types/values";
 
 const resolver = {
     BaseModel: {
@@ -19,34 +25,17 @@ const resolver = {
             return "BaseResponse";
         }
     },
-    // GenderOption: {
-    //     ANY: "ANY",
-    //     SEPARATELY: "SEPARATELY",
-    //     MALE: "MALE",
-    //     FEMALE: "FEMALE"
-    // },
     Day: {
-        // TODO: 여기서 연구해야 할것은... 뭐가있냐 다한것 같은데? 좀더 생각해보자
-        SUN: 0b0000001,
-        MON: 0b0000010,
-        TUE: 0b0000100,
-        WED: 0b0001000,
-        THU: 0b0010000,
-        FRI: 0b0100000,
-        SAT: 0b1000000
+        SUN: DayEnum.SUN,
+        MON: DayEnum.MON,
+        TUE: DayEnum.TUE,
+        WED: DayEnum.WED,
+        THU: DayEnum.THU,
+        FRI: DayEnum.FRI,
+        SAT: DayEnum.SAT
     },
-    // TODO: 여기서 더 연구해야 할것은... GenderOptions을 Gender로 % 연산 했을때 나머지가 0이면 포함관계, 0이 아니면 포함되지 않음.. 렛츠고
-    // GenderOption: {
-    //     MALE: 2,
-    //     FEMALE: 3,
-    //     ANY: 6,
-    // },
-    // Gender: {
-    //     MALE: 2,
-    //     FEMALE: 3
-    // },
     Period: {
-        days: (obj: PeriodCls) => daysNumToArr(obj.days),
+        days: (obj: any) => daysNumToArr(obj.days),
         isIn: (obj: PeriodCls, { date }) => {
             obj.validate();
             return obj.isIn(date);
@@ -59,17 +48,21 @@ const resolver = {
             const p = new PeriodCls(period);
             return obj.intersactions(p);
         }
-        // differences: () => {},
-        // disperse: () => {}
     },
     Query: {
-        periodTest: (_, { param }: { param: PeriodInput }) => {
-            return new PeriodCls({
-                ...param,
-                days: (param.days as any[]).reduce(
-                    (d1: number, d2: number) => d1 + d2
-                )
+        periodTest: (
+            _: any,
+            { param: { periods } }: { param: { periods: PeriodInput[] } }
+        ) => {
+            console.log("Periods=======================================");
+            console.info(periods);
+            const periodClasses = splitPeriods(periods);
+            console.log(periodClasses);
+            const result = mergePeriods(periodClasses);
+            console.log({
+                result
             });
+            return result;
         },
         countries: async (_, { countryName }): Promise<any[]> => {
             const result = await CountryInfoModel.find({

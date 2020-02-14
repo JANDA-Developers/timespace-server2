@@ -19,21 +19,21 @@ const resolvers: Resolvers = {
     Mutation: {
         CreateProduct: defaultResolver(
             privateResolver(
-                async (
-                    { args: { param }, context: { req } },
-                    stack
-                ): Promise<CreateProductResponse> => {
+                async ({
+                    args: { param },
+                    context: { req }
+                }): Promise<CreateProductResponse> => {
                     const session = await mongoose.startSession();
                     session.startTransaction();
                     try {
                         const {
                             description,
-                            images,
+                            // images,
                             name,
                             storeId,
-                            optionalParams,
                             intro,
-                            warning
+                            warning,
+                            optionalParams
                         } = param as CreateProductInput;
 
                         const { cognitoUser } = req;
@@ -47,14 +47,13 @@ const resolvers: Resolvers = {
                             );
                         }
 
-                        const stid = new ObjectId(storeId);
+                        // TODO: Image Upload to S3, after that, save result in product
 
                         const product = new ProductModel({
                             _id: productId,
                             name,
                             userId: cognitoUser._id,
-                            images,
-                            storeId: stid,
+                            storeId: store._id,
                             description,
                             usingPeriodOption: store.usingPeriodOption || false,
                             usingCapacityOption:
@@ -70,11 +69,17 @@ const resolvers: Resolvers = {
                                 }
                             }
                         }
+                        // if (optionalParams?.enabledPeriod) {
+                        //     const productEnabled = optionalParams.enabledPeriod;
+                        //     const businessHours = store.businessHours;
+                        // }
+
+                        // TODO: Compare BusinessHours between "Store" and "ProductInput"
                         await product.save({ session });
 
                         await StoreModel.updateOne(
                             {
-                                _id: stid
+                                _id: store._id
                             },
                             {
                                 $push: {

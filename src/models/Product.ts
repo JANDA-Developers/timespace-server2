@@ -8,9 +8,11 @@ import {
 import { getCollectionName, ModelName } from "./__collectionNames";
 import { ObjectId } from "mongodb";
 import { PeriodCls } from "../utils/Period";
-import { GenderOption, PeriodOption, Period } from "../types/graph";
+import { GenderOption, PeriodOption } from "../types/graph";
 import { genCode, s4 } from "./utils/genId";
 import { ApolloError } from "apollo-server";
+import { splitPeriods, mergePeriods } from "../utils/periodFuncs";
+import { PeriodWithDays } from "../utils/PeriodWithDays";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.PRODUCT)))
 export class ProductCls extends BaseSchema {
@@ -146,12 +148,12 @@ export class ProductCls extends BaseSchema {
             },
             "EnabledPeriod가 설정되지 않았습니다."
         ],
-        set: (periodList: Array<Period>) =>
-            periodList.map(p => new PeriodCls(p)),
-        get: (periodList: Array<Period>) =>
-            periodList.map(p => new PeriodCls(p))
+        get: (periodArr: Array<PeriodCls>) =>
+            mergePeriods(periodArr.map(p => new PeriodCls(p))),
+        set: (periodArr: Array<PeriodWithDays>): Array<PeriodCls> =>
+            splitPeriods(periodArr)
     })
-    enabledPeriod: Array<PeriodCls>;
+    enabledPeriod: Array<PeriodWithDays>;
 
     @prop({
         validate: [

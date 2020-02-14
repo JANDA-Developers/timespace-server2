@@ -9,9 +9,18 @@ import { getCollectionName, ModelName } from "./__collectionNames";
 import { ObjectId } from "mongodb";
 import { ApolloError } from "apollo-server";
 import { genCode } from "./utils/genId";
-import { Zoneinfo, StoreType, Manager, Location, Period } from "../types/graph";
+import {
+    Zoneinfo,
+    StoreType,
+    Manager,
+    Location,
+    PeriodOption
+} from "../types/graph";
 import { ERROR_CODES } from "../types/values";
 import { PeriodCls } from "../utils/Period";
+import { mergePeriods, splitPeriods } from "../utils/periodFuncs";
+import { PeriodWithDays } from "../utils/PeriodWithDays";
+import _ from "lodash";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.STORE)))
 export class StoreCls extends BaseSchema {
@@ -104,16 +113,50 @@ export class StoreCls extends BaseSchema {
     location: Location;
 
     @prop({
-        default: (): Array<PeriodCls> => [
-            // 월~금: 09:00 ~ 21:00
-            new PeriodCls({ start: 540, time: 720, days: 62 })
-        ],
-        set: (periodArr: Array<Period>) =>
-            periodArr.map(period => new PeriodCls(period)),
-        get: (periodArr: Array<Period>) =>
-            periodArr.map(period => new PeriodCls(period))
+        get: (periodArr: Array<PeriodCls>) =>
+            mergePeriods(periodArr.map(p => new PeriodCls(p))),
+        set: (periodArr: Array<PeriodWithDays>): Array<PeriodCls> =>
+            splitPeriods(periodArr)
     })
-    businessHours: Array<PeriodCls>;
+    businessHours: Array<PeriodWithDays>;
+
+    @prop({
+        validate: [
+            {
+                validator: (v: PeriodOption) => v.max > 0,
+                message: "PeriodOption.max 값은 0또는 음수가 될 수 없습니다."
+            },
+            {
+                validator: (v: PeriodOption) => v.min >= 0,
+                message: "PeriodOption.min 값은 음수가 될 수 없습니다."
+            },
+            {
+                validator: (v: PeriodOption) => v.unit >= 0,
+                message: "PeriodOption.unit 값은 음수가 될 수 없습니다."
+            }
+        ]
+        // required: [
+        //     function(this: DocumentType<StoreCls>) {
+        //         return this.usingPeriodOption;
+        //     },
+        //     "PeriodOption가 설정되지 않았습니다."
+        // ]
+    })
+    periodOption: PeriodOption;
+
+    // getBussinessHoursToString(
+    //     this: DocumentType<StoreCls>
+    // ): { days: string; hours: string } {
+    //     // TODO: 영업시간 String으로 구하기
+    //     // 1. 겹치는 부분들 다 취합해서 Array<Period> 구하기
+    //     // 2. String으로 출력하기
+    //     // 어떻게 겹치는 부분을 구하지?
+    //     let result = "";
+    //     this.businessHours.forEach(item => {
+    //         const { days, start, end } = item;
+    //         const daysArr = "";
+    //     });
+    // }
 
     @prop({
         default: [],
@@ -121,6 +164,12 @@ export class StoreCls extends BaseSchema {
         set: (ids: any[]) => ids.map(id => new ObjectId(id))
     })
     groupIds: ObjectId[];
+
+    @prop()
+    warning: string;
+
+    @prop()
+    intro: string;
 }
 
 export const StoreModel = getModelForClass(StoreCls);

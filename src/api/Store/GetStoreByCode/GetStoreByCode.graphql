@@ -1,5 +1,5 @@
 type Query {
-    # 외부에서 Store를 조회할떄 사용함
+    # 외부에서 Store를 조회할떄 사용함 => ex) Buyer가 예약을 위해 조회할떄 사용
     GetStoreByCode(param: GetStoreByCodeInput!): GetStoreByCodeResponse!
 }
 type GetStoreByCodeResponse {

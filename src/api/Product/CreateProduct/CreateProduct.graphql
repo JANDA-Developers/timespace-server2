@@ -10,7 +10,7 @@ type CreateProductResponse implements BaseResponse {
 input CreateProductInput {
     storeId: ID!
     name: String
-    images: [URL]
+    images: [Upload!]
     description: String
     intro: String
     warning: String

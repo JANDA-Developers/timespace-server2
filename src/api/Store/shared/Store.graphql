@@ -15,6 +15,9 @@ type Store implements BaseModel {
     products: [Product!]
     productCount: Int!
     businessHours: [Period!]
+    periodOption: PeriodOption
+    intro: String!
+    warning: String!
 }
 
 enum StoreType {
