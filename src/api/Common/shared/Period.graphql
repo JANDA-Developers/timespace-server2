@@ -32,6 +32,8 @@ type PeriodOption {
     min: Int!
     # 선택 단위
     unit: Int!
+    # timezone으로 인한 시간 보정값 => Hour 단위임 (ex - Asia/Seoul => +9)
+    offset: Int!
 }
 
 input PeriodInput {
@@ -45,4 +47,5 @@ input PeriodOptionInput {
     max: Int!
     min: Int!
     unit: Int!
+    offset: Int!
 }

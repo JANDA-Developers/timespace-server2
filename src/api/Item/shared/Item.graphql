@@ -6,5 +6,4 @@ type Item {
     code: String!
     name: String!
     memo: String
-    moduleDatas: Object
 }

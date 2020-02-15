@@ -92,6 +92,7 @@ class App {
             if (data) {
                 data._id = data["custom:_id"];
                 data.zoneinfo = JSON.parse(data.zoneinfo);
+                // Raw Data임... DB에 있는 Cognito User 절대 아님
                 req.cognitoUser = data;
             }
         } else {

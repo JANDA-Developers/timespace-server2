@@ -37,10 +37,6 @@ const resolvers: Resolvers = {
                             businessHours,
                             periodOption
                         } = param as CreateStoreInput;
-                        console.log(
-                            "CreateSTore ==============================="
-                        );
-                        console.log(businessHours);
                         let zoneinfo = cognitoUser.zoneinfo;
                         if (timezone) {
                             const countryInfo = await CountryInfoModel.findOne({
@@ -101,8 +97,8 @@ const resolvers: Resolvers = {
                             description,
                             warning,
                             intro,
-                            businessHours,
                             periodOption,
+                            businessHours,
                             manager: {
                                 name:
                                     (manager && manager.name) ||
@@ -123,6 +119,9 @@ const resolvers: Resolvers = {
                                 $push: {
                                     list: _id
                                 }
+                            },
+                            {
+                                session
                             }
                         );
                         await UserModel.updateOne(

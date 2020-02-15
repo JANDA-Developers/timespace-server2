@@ -3,6 +3,7 @@ import { ProductCls } from "../../../models/Product";
 import { DocumentType } from "@typegoose/typegoose";
 import { StoreModel } from "../../../models/Store";
 import { UserModel } from "../../../models/User";
+import { ProductSchedules } from "../../../types/graph";
 
 const resolvers: Resolvers = {
     Product: {
@@ -16,6 +17,29 @@ const resolvers: Resolvers = {
             }
             await user.setAttributesFronCognito();
             return user;
+        },
+        items: async (product: DocumentType<ProductCls>, { date }) => {
+            return await product.getItems(date);
+        },
+        schedules: async (
+            product: DocumentType<ProductCls>,
+            { dateTime }
+        ): Promise<ProductSchedules> => {
+            return await product.getSchedulesByDate(dateTime);
+        },
+        intro: product => {
+            if (!product.intro) {
+                return "";
+            } else {
+                return product.intro;
+            }
+        },
+        warning: product => {
+            if (!product.warning) {
+                return "";
+            } else {
+                return product.warning;
+            }
         }
     }
 };

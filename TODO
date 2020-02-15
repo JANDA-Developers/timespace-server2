@@ -1,8 +1,15 @@
 User Flow:
   About Cognito: 
-    ☐ Let's study about cognito
+    ✔ Let's study about cognito @done(20-02-15 19:20)
 
   Sign Up / In:
-    ☐ SignUp
-    ☐ SignIn
-    ☐ Testing
+    ✔ SignUp @done(20-02-15 19:20)
+    ✔ SignIn @done(20-02-15 19:20)
+    ✔ Testing @done(20-02-15 19:20)
+
+Schemas: 
+  Product:
+    ☐ BusinessHours, PeriodOption Validation
+      # Validation
+    ☐ Need Interface For ItemIsAbleToBuy
+      # Validate with PeriodOption & DateRange

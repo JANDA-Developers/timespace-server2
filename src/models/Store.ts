@@ -122,10 +122,29 @@ export class StoreCls extends BaseSchema {
     location: Location;
 
     @prop({
-        get: (periodArr: Array<PeriodCls>) =>
-            mergePeriods(periodArr.map(p => new PeriodCls(p))),
-        set: (periodArr: Array<PeriodWithDays>): Array<PeriodCls> =>
-            splitPeriods(periodArr)
+        get(this: DocumentType<StoreCls>, periodArr: Array<PeriodCls>) {
+            return mergePeriods(periodArr.map(p => new PeriodCls(p)));
+        },
+        set(
+            this: DocumentType<StoreCls>,
+            periodArr: Array<PeriodWithDays>
+        ): Array<PeriodCls> {
+            if (!periodArr.length) {
+                return [];
+            }
+            const offsetMinute = this.periodOption.offset * 60;
+            return splitPeriods(
+                periodArr.map(
+                    (p): PeriodWithDays => {
+                        return {
+                            ...p,
+                            start: p.start - offsetMinute,
+                            end: p.end - offsetMinute
+                        };
+                    }
+                )
+            );
+        }
     })
     businessHours: Array<PeriodWithDays>;
 

@@ -1,4 +1,4 @@
-import { ONE_MINUTE, ONE_HOUR, ONE_DAY } from "./dateFuncs";
+import { ONE_MINUTE, ONE_HOUR } from "./dateFuncs";
 import { ClientSession } from "mongoose";
 import { MongoError } from "mongodb";
 import { mongoose } from "@typegoose/typegoose";
@@ -24,9 +24,6 @@ export const getLocalDate = (date: Date, offsetHour?: number) => {
     );
 };
 
-export const dateToMinutes = (date: Date) => {
-    return (date.getTime() % ONE_DAY) / ONE_MINUTE;
-};
 export const errorReturn = async (error: any, dbSession?: ClientSession) => {
     if (dbSession) {
         await dbSession.abortTransaction();

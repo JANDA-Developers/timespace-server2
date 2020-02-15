@@ -63,7 +63,7 @@ export const defaultResolver = (resolverFunction: ResolverFunction) => async (
 
 export const privateResolver = (resolverFunction: ResolverFunction) => async (
     { parent, args, context, info },
-    insideLog: any[]
+    stack: any[]
 ): Promise<BaseResponse & { data: any | null }> => {
     try {
         if (!context.req.cognitoUser) {
@@ -82,10 +82,7 @@ export const privateResolver = (resolverFunction: ResolverFunction) => async (
                 jwt: context.req.headers.jwt
             });
         }
-        return await resolverFunction(
-            { parent, args, context, info },
-            insideLog
-        );
+        return await resolverFunction({ parent, args, context, info }, stack);
     } catch (error) {
         return await errorReturn(error);
     }

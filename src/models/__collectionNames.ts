@@ -4,7 +4,7 @@ export enum ModelName {
     STORE = "StoreList",
     GROUP = "GroupList",
     PRODUCT = "ProductList",
-    SALES = "SalesList",
+    ITEM = "ItemList",
     ZONE_INFO = "CountryInfoList",
     NOTIFICATION = "Notifications",
     PAYMETHOD = "PayMethodList",

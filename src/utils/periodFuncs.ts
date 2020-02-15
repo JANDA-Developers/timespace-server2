@@ -49,7 +49,8 @@ export const splitPeriods = (
                 (day): PeriodCls => {
                     return new PeriodCls({
                         ...p,
-                        day
+                        day,
+                        offset: 0
                     });
                 }
             );
@@ -58,6 +59,7 @@ export const splitPeriods = (
                 (day): PeriodCls => {
                     return new PeriodCls({
                         ...p,
+                        offset: 0,
                         day: typeof day === "string" ? DayEnum[day] : day
                     });
                 }

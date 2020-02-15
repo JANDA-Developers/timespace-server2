@@ -62,6 +62,10 @@ const resolvers: Resolvers = {
                         product.usingCapacityOption = store.usingCapacityOption;
 
                         if (optionalParams) {
+                            if (optionalParams.periodOption) {
+                                product.periodOption =
+                                    optionalParams.periodOption;
+                            }
                             for (const fieldName in optionalParams) {
                                 const param = optionalParams[fieldName];
                                 if (param) {

@@ -1,50 +1,54 @@
 import { ApolloError } from "apollo-server";
-import { dateToMinutes } from "./utils";
-import { Minute } from "../types/values";
+import { dateToMinutes } from "./dateFuncs";
+import { Minute, Hour } from "../types/values";
 
 export class PeriodCls {
     // 분(Minute) 단위 시간 사용
     start: Minute;
     end: Minute;
     time: Minute;
+    offset: Hour;
     // 1, 2, 4, 8, 16, 32, 64 의 숫자...
     day: number;
 
     constructor({
         start = 0,
         end,
-        day
+        day,
+        offset = 0
     }: {
         start: number;
         day: number;
         end: number;
+        offset: number;
     }) {
-        this.start = start;
-        this.end = end;
+        this.start = start - offset * 60;
+        this.end = end - offset * 60;
         this.time = end - start;
         this.day = day;
+        this.offset = offset;
         this.validate();
     }
 
     validate(this: PeriodCls) {
-        if (this.start < 0) {
-            throw new ApolloError(
-                "[PeriodCls] Period.start 값은 음수가 될 수 없습니다.",
-                "PERIOD_START_NEGATIVE",
-                {
-                    start: this.start
-                }
-            );
-        }
-        if (this.end < 0) {
-            throw new ApolloError(
-                "[PeriodCls] Period.end 값은 음수가 될 수 없습니다.",
-                "PERIOD_START_NEGATIVE",
-                {
-                    end: this.end
-                }
-            );
-        }
+        // if (this.start < 0) {
+        //     throw new ApolloError(
+        //         "[PeriodCls] Period.start 값은 음수가 될 수 없습니다.",
+        //         "PERIOD_START_NEGATIVE",
+        //         {
+        //             start: this.start
+        //         }
+        //     );
+        // }
+        // if (this.end < 0) {
+        //     throw new ApolloError(
+        //         "[PeriodCls] Period.end 값은 음수가 될 수 없습니다.",
+        //         "PERIOD_START_NEGATIVE",
+        //         {
+        //             end: this.end
+        //         }
+        //     );
+        // }
         if (this.time <= 0) {
             throw new ApolloError(
                 "[PeriodCls] Period.time 값은 음수 또는 0이 될 수 없습니다.",
@@ -85,7 +89,8 @@ export class PeriodCls {
         const p = new PeriodCls({
             start,
             end,
-            day
+            day,
+            offset: 0
         });
         return p;
     }

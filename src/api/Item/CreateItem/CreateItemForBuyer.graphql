@@ -10,9 +10,7 @@ type CreateItemForBuyerResponse {
 }
 input CreateItemForBuyerInput {
     name: String!
-    storeCode: ID!
-    # 구매자 ID
-    buyer: ID!
+    productCode: String!
     description: String!
     dateTimeRange: DateTimeRangeInput
     gender: Gender

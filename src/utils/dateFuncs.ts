@@ -52,3 +52,12 @@ export const getDayOfYear = (date: Date): number => {
         (start.getTimezoneOffset() - date.getTimezoneOffset()) * ONE_MINUTE;
     return Math.floor(diff / ONE_DAY);
 };
+
+export const dateToMinutes = (date: Date) => {
+    return (date.getTime() % ONE_DAY) / ONE_MINUTE;
+};
+
+export const removeHours = (date: Date) => {
+    const time = date.getTime();
+    return new Date(time - (time % ONE_DAY));
+};

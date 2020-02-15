@@ -13,6 +13,7 @@ import {
     daysNumToArr
 } from "../../../utils/periodFuncs";
 import { DayEnum } from "../../../types/values";
+import { ONE_MINUTE } from "../../../utils/dateFuncs";
 
 const resolver = {
     BaseModel: {
@@ -23,6 +24,14 @@ const resolver = {
     BaseResponse: {
         __resolveType: (value): string => {
             return "BaseResponse";
+        }
+    },
+    DateTimeRange: {
+        interval: ({ start, end }) => {
+            return Math.floor(
+                (new Date(start).getTime() - new Date(end).getTime()) /
+                    ONE_MINUTE
+            );
         }
     },
     Day: {
@@ -45,11 +54,15 @@ const resolver = {
             { period }: { period: PeriodCls }
         ): PeriodCls | null => {
             obj.validate();
-            const p = new PeriodCls(period);
+            const p = new PeriodCls({ ...period, offset: 0 });
             return obj.intersactions(p);
         }
     },
     Query: {
+        dateTimeTest: (_: any, { date }: { date: Date }) => {
+            console.log(date.toISOString());
+            return date;
+        },
         periodTest: (
             _: any,
             { param: { periods } }: { param: { periods: PeriodInput[] } }

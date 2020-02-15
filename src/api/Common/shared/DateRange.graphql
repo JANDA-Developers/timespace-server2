@@ -1,12 +1,12 @@
 type DateTimeRange {
-    start: DateTime!
-    end: DateTime!
+    from: DateTime!
+    to: DateTime!
     # 분 단위 시간임.
-    time: Int!
+    interval: Int!
 }
 
-# 비교 시 start는 포함관계, end는 "비"포함관계
+# 비교 시 from은 포함관계, end는 "비"포함관계
 input DateTimeRangeInput {
-    start: DateTime!
-    end: DateTime!
+    from: DateTime!
+    to: DateTime!
 }

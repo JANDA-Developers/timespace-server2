@@ -8,11 +8,21 @@ import {
 import { getCollectionName, ModelName } from "./__collectionNames";
 import { ObjectId } from "mongodb";
 import { PeriodCls } from "../utils/Period";
-import { GenderOption, PeriodOption } from "../types/graph";
+import {
+    GenderOption,
+    PeriodOption,
+    ProductSchedules,
+    ProductSegment,
+    Segment
+} from "../types/graph";
 import { genCode, s4 } from "./utils/genId";
 import { ApolloError } from "apollo-server";
 import { splitPeriods, mergePeriods } from "../utils/periodFuncs";
 import { PeriodWithDays } from "../utils/PeriodWithDays";
+import { ItemCls, ItemModel } from "./Item";
+import { ERROR_CODES } from "../types/values";
+import { ONE_MINUTE, removeHours } from "../utils/dateFuncs";
+import { DateTimeRangeCls } from "../utils/DateTimeRange";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.PRODUCT)))
 export class ProductCls extends BaseSchema {
@@ -117,6 +127,12 @@ export class ProductCls extends BaseSchema {
     })
     genderOption: GenderOption;
 
+    @prop()
+    intro: string;
+
+    @prop()
+    warning: string;
+
     /*
      * =============================================================================================================================
      *
@@ -133,12 +149,37 @@ export class ProductCls extends BaseSchema {
                 ): boolean {
                     return (
                         businessHours.filter(
-                            period => period.time < this.periodOption.min
+                            period => period.time < this.periodOption.max
                         ).length === 0
                     );
                 },
                 message:
-                    "BusinessHours.time 값이 periodOption.min보다 작습니다."
+                    "BusinessHours.time 값이 periodOption.max보다 작습니다."
+            },
+            {
+                validator(
+                    this: DocumentType<ProductCls>,
+                    businessHours: Array<PeriodCls>
+                ): boolean {
+                    const unit = this.periodOption.unit;
+                    return (
+                        businessHours.filter(({ time }) => time % unit !== 0)
+                            .length === 0
+                    );
+                },
+                message: "BusinessHours.time 값이 unit의 배수가 아닙니다."
+            },
+            {
+                validator(
+                    this: DocumentType<ProductCls>,
+                    businessHours: Array<PeriodCls>
+                ): boolean {
+                    return (
+                        businessHours.filter(({ start, end }) => start >= end)
+                            .length === 0
+                    );
+                },
+                message: "end값이 start보다 작거나 같습니다."
             }
         ],
         default: () => [],
@@ -148,10 +189,29 @@ export class ProductCls extends BaseSchema {
             },
             "BusinessHours가 설정되지 않았습니다."
         ],
-        get: (periodArr: Array<PeriodCls>) =>
-            mergePeriods(periodArr.map(p => new PeriodCls(p))),
-        set: (periodArr: Array<PeriodWithDays>): Array<PeriodCls> =>
-            splitPeriods(periodArr)
+        get(this: DocumentType<ProductCls>, periodArr: Array<PeriodCls>) {
+            return mergePeriods(periodArr.map(p => new PeriodCls(p)));
+        },
+        set(
+            this: DocumentType<ProductCls>,
+            periodArr: Array<PeriodWithDays>
+        ): Array<PeriodCls> {
+            if (!periodArr.length) {
+                return [];
+            }
+            const offsetMinute = this.periodOption.offset * 60;
+            return splitPeriods(
+                periodArr.map(
+                    (p): PeriodWithDays => {
+                        return {
+                            ...p,
+                            start: p.start - offsetMinute,
+                            end: p.end - offsetMinute
+                        };
+                    }
+                )
+            );
+        }
     })
     businessHours: Array<PeriodWithDays>;
 
@@ -164,6 +224,14 @@ export class ProductCls extends BaseSchema {
             {
                 validator: (v: PeriodOption) => v.min >= 0,
                 message: "PeriodOption.min 값은 음수가 될 수 없습니다."
+            },
+            {
+                validator: (v: PeriodOption) => v.max % v.unit === 0,
+                message: "PeriodOption.max 값이 unit 의 배수가 아닙니다."
+            },
+            {
+                validator: (v: PeriodOption) => v.min % v.unit === 0,
+                message: "PeriodOption.min 값이 unit 의 배수가 아닙니다."
             },
             {
                 validator: (v: PeriodOption) => v.unit >= 0,
@@ -179,11 +247,111 @@ export class ProductCls extends BaseSchema {
     })
     periodOption: PeriodOption;
 
-    @prop()
-    intro: string;
+    /**
+     * 해당 기간에 어떤 Item들이 들어있는지... paging 안되어있음.
+     * @param dateTimeRange 날짜 범위 ㄱㄱ
+     */
+    async getItems(
+        this: DocumentType<ProductCls>,
+        date: Date
+    ): Promise<Array<DocumentType<ItemCls>>> {
+        // TODO: 해야됨 ㅎ
+        const { from, to } = { from: date, to: date };
+        const interval = Math.floor(
+            (from.getTime() - to.getTime()) / ONE_MINUTE
+        );
+        const { unit } = this.periodOption;
+        if (interval % unit !== 0 && interval % unit !== 0) {
+            throw new ApolloError(
+                "dateTimeRange 값이 잘못되었습니다. (unit Error)",
+                ERROR_CODES.DATETIMERANGE_UNIT_ERROR,
+                {
+                    interval
+                }
+            );
+        }
+        const items = await ItemModel.find({
+            start: {
+                $lte: to
+            },
+            end: {
+                $gt: from
+            },
+            expiresAt: {
+                $exists: false
+            }
+        });
+        return items;
+    }
 
-    @prop()
-    warning: string;
+    async getSchedulesByDate(
+        this: DocumentType<ProductCls>,
+        date: Date
+    ): Promise<ProductSchedules> {
+        // TODO: 스케줄 어떻게 구할까?
+        // Date로 부터 from, to를 구한다.
+        // 하루 중 최소값의 Date, 최대값의 Date를 구해야함.
+        let st: number = 1440;
+        let ed: number = 0;
+        const cDay = 1 << date.getUTCDay();
+        this.businessHours.forEach(({ days, start, end, time }) => {
+            // days를 비교하여 포함되어있는지 확인 ㄱㄱ
+            const isIncludeInDays = (days & cDay) === cDay;
+            if (isIncludeInDays) {
+                // 포함하고 있으면 뭐 어떻게 해야함?
+                if (start < st) {
+                    st = start;
+                }
+                if (ed < end) {
+                    ed = end;
+                }
+            }
+        });
+        const cDateWithoutHours = removeHours(date).getTime();
+        const from = new Date(cDateWithoutHours + st * ONE_MINUTE);
+        const to = new Date(cDateWithoutHours + ed * ONE_MINUTE);
+        /*
+         * ==================================================================================
+         * 본격적인 로직 시작
+         * ==================================================================================
+         */
+        const dateTimeRange = new DateTimeRangeCls({
+            from,
+            to
+        });
+        const schedules: ProductSegment[] = [];
+        const segmentList: Segment[] = [];
+        console.log(segmentList);
+
+        return {
+            info: {
+                dateTimeRange,
+                unit: this.periodOption.unit
+            },
+            schedules
+        };
+    }
+
+    // async periodsCapacityByDate(
+    //     this: DocumentType<ProductCls>,
+    //     dateTimeRangeCls: DateTimeRangeCls
+    // ) {
+    //     const { from, to } = dateTimeRangeCls;
+    //     const unit = this.periodOption.unit;
+    //     if ((dateToMinutes(from) % unit) + (dateToMinutes(to) % unit) !== 0) {
+    //         throw new ApolloError(
+    //             "from, to 값이 Unit의 배수가 아닙니다.",
+    //             "UNIT_ERROR_FROM_TO"
+    //         );
+    //     }
+    //     // const items = await this.getItems(dateTimeRangeCls);
+    //     // console.log(items);
+
+    //     // TODO: 리턴값 인터페이스 작성하기 ㄱㄱ
+    //     // Unit 문제: 입력되는 시간의 단위를 Unit으로 나누었을때 0가 나와야함. validation 렛츠고
+
+    //     return [];
+    // }
 }
 
 export const ProductModel = getModelForClass(ProductCls);

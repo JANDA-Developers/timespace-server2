@@ -18,9 +18,7 @@ export const genItemCode = (productCode: string, date = new Date()): string => {
         .padStart(2, "0")}${date
         .getMinutes()
         .toString()
-        .padStart(2, "0")}${s4(36)
-        .toUpperCase()
-        .substr(0, 2)}`;
+        .padStart(2, "0")}${s4(36).substr(0, 2)}`.toUpperCase();
 };
 
 export const genCode = (id: string | ObjectId): string => {

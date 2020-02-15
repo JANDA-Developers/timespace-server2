@@ -13,9 +13,32 @@ type Product implements BaseModel {
     expiresAt: DateTime
     warning: String
     intro: String
+    items(date: DateTime!): [Item!]
+    schedules(date: DateTime!): ProductSchedules!
 
     peopleCapacity: Int
     genderOption: GenderOption
     businessHours: [Period!]
+    # Min, Max는 변경 가능하지만 Unit은 변경 불가
     periodOption: PeriodOption
+}
+
+type ProductSegment {
+    segment: Segment!
+    itemCount: Int!
+    maxCount: Int!
+    # 해당 Segment 품절여부
+    soldOut: Boolean!
+    # 권한에 따라서 item이 null 또는 [] 값으로 나올 수 있음
+    items: [Item!]
+}
+
+type ProductScheduleInfo {
+    dateTimeRange: DateTimeRange!
+    unit: Int!
+}
+
+type ProductSchedules {
+    info: ProductScheduleInfo!
+    schedules: [ProductSegment!]
 }

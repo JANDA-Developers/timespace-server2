@@ -9,13 +9,17 @@ import { getCollectionName, ModelName } from "./__collectionNames";
 import { ObjectId } from "mongodb";
 import { genItemCode } from "./utils/genId";
 import { ProductModel } from "./Product";
-import { DateTimeRange } from "../types/graph";
+import { DateTimeRangeCls } from "../utils/DateTimeRange";
 
-@modelOptions(createSchemaOptions(getCollectionName(ModelName.SALES)))
+@modelOptions(createSchemaOptions(getCollectionName(ModelName.ITEM)))
 export class ItemCls extends BaseSchema {
-    async setCode(this: DocumentType<ItemCls>, productCode: string) {
+    async setCode(
+        this: DocumentType<ItemCls>,
+        productCode: string,
+        date = new Date()
+    ) {
         await ProductModel.findByCode(productCode);
-        this.code = genItemCode(productCode, new Date());
+        this.code = genItemCode(productCode, date);
     }
 
     @prop()
@@ -24,16 +28,32 @@ export class ItemCls extends BaseSchema {
     @prop({ required: true })
     code: string;
 
-    @prop()
+    @prop({
+        required: true,
+        set: id => new ObjectId(id),
+        get: id => new ObjectId(id)
+    })
     storeId: ObjectId;
 
-    @prop()
+    @prop({
+        required: true,
+        set: id => new ObjectId(id),
+        get: id => new ObjectId(id)
+    })
+    productId: ObjectId;
+
+    @prop({
+        required: true,
+        set: id => new ObjectId(id),
+        get: id => new ObjectId(id)
+    })
     buyer: ObjectId;
 
     @prop({
-        defualt: undefined
+        set: v => v,
+        get: v => new DateTimeRangeCls(v)
     })
-    dateRange?: DateTimeRange;
+    dateTimeRange: any;
 }
 
 export const ItemModel = getModelForClass(ItemCls);
