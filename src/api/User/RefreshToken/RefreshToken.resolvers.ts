@@ -13,7 +13,7 @@ const resolvers: Resolvers = {
                 stack: any[]
             ): Promise<RefreshTokenResponse> => {
                 const token: string | undefined = req.get("X-JWT");
-                const { user: cognitoUser } = req;
+                const { cognitoUser } = req;
                 if (!token) {
                     throw new ApolloError(
                         "토큰값이 존재하지 않습니다.",
