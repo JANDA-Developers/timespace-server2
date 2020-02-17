@@ -17,7 +17,7 @@ import {
 } from "../types/graph";
 import { genCode, s4 } from "./utils/genId";
 import { ApolloError } from "apollo-server";
-import { splitPeriods, mergePeriods } from "../utils/periodFuncs";
+import { getPeriodFromDB, setPeriodToDB } from "../utils/periodFuncs";
 import { PeriodWithDays } from "../utils/PeriodWithDays";
 import { ItemCls, ItemModel } from "./Item";
 import { ERROR_CODES } from "../types/values";
@@ -65,7 +65,7 @@ export class ProductCls extends BaseSchema {
     })
     code: string;
 
-    @prop()
+    @prop({ default: [] })
     images: string[];
 
     @prop()
@@ -182,7 +182,6 @@ export class ProductCls extends BaseSchema {
                 message: "end값이 start보다 작거나 같습니다."
             }
         ],
-        default: () => [],
         required: [
             function(this: DocumentType<ProductCls>) {
                 return this.usingPeriodOption;
@@ -190,28 +189,19 @@ export class ProductCls extends BaseSchema {
             "BusinessHours가 설정되지 않았습니다."
         ],
         get(this: DocumentType<ProductCls>, periodArr: Array<PeriodCls>) {
-            return mergePeriods(periodArr.map(p => new PeriodCls(p)));
+            return getPeriodFromDB(periodArr, this.periodOption.offset);
         },
         set(
             this: DocumentType<ProductCls>,
             periodArr: Array<PeriodWithDays>
         ): Array<PeriodCls> {
-            if (!periodArr.length) {
+            try {
+                return setPeriodToDB(periodArr, this.periodOption.offset);
+            } catch (error) {
                 return [];
             }
-            const offsetMinute = this.periodOption.offset * 60;
-            return splitPeriods(
-                periodArr.map(
-                    (p): PeriodWithDays => {
-                        return {
-                            ...p,
-                            start: p.start - offsetMinute,
-                            end: p.end - offsetMinute
-                        };
-                    }
-                )
-            );
-        }
+        },
+        default: []
     })
     businessHours: Array<PeriodWithDays>;
 
@@ -255,13 +245,38 @@ export class ProductCls extends BaseSchema {
         this: DocumentType<ProductCls>,
         date: Date
     ): Promise<Array<DocumentType<ItemCls>>> {
+        // TODO: 스케줄 어떻게 구할까?
+        // Date로 부터 from, to를 구한다.
+        // 하루 중 최소값의 Date, 최대값의 Date를 구해야함.
+        const offsetMinutes = this.periodOption.offset * 60;
+        const mDate = new Date(date.getTime() - offsetMinutes * 60000);
+        let st: number = 1440 - offsetMinutes;
+        let ed: number = 0 - offsetMinutes;
+        const cDay = 1 << mDate.getDay();
+        this.businessHours.forEach(({ days, start, end, time }) => {
+            // days를 비교하여 포함되어있는지 확인 ㄱㄱ
+            const isIncludeInDays = (days & cDay) === cDay;
+            if (isIncludeInDays) {
+                // 포함하고 있으면 뭐 어떻게 해야함?
+                if (start < st) {
+                    // start = -60
+                    st = start;
+                }
+                if (ed < end) {
+                    // end = 720
+                    ed = end;
+                }
+            }
+        });
+        const cDateWithoutHours = removeHours(date).getTime();
+        const from = new Date(cDateWithoutHours + st * ONE_MINUTE);
+        const to = new Date(cDateWithoutHours + ed * ONE_MINUTE);
         // TODO: 해야됨 ㅎ
-        const { from, to } = { from: date, to: date };
         const interval = Math.floor(
             (from.getTime() - to.getTime()) / ONE_MINUTE
         );
         const { unit } = this.periodOption;
-        if (interval % unit !== 0 && interval % unit !== 0) {
+        if (interval % unit !== 0) {
             throw new ApolloError(
                 "dateTimeRange 값이 잘못되었습니다. (unit Error)",
                 ERROR_CODES.DATETIMERANGE_UNIT_ERROR,
@@ -270,11 +285,19 @@ export class ProductCls extends BaseSchema {
                 }
             );
         }
+        console.log(
+            "Items ======================================================"
+        );
+        console.log({
+            from,
+            to
+        });
         const items = await ItemModel.find({
-            start: {
+            productId: this._id,
+            "dateTimeRange.from": {
                 $lte: to
             },
-            end: {
+            "dateTimeRange.to": {
                 $gt: from
             },
             expiresAt: {

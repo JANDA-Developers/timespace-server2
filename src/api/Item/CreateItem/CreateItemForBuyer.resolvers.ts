@@ -14,6 +14,7 @@ import { ApolloError } from "apollo-server";
 import { ERROR_CODES } from "../../../types/values";
 import { ProductModel } from "../../../models/Product";
 import { ObjectId } from "mongodb";
+import { offsetDate, ONE_MINUTE } from "../../../utils/dateFuncs";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -43,13 +44,25 @@ const resolvers: Resolvers = {
                             param.productCode
                         );
                         const item = new ItemModel();
+                        if (param.dateTimeRange) {
+                            const { from, to } = param.dateTimeRange;
+                            offsetDate(from, product.periodOption.offset);
+                            offsetDate(to, product.periodOption.offset);
+                            item.dateTimeRange = {
+                                from,
+                                to,
+                                interval: Math.floor(
+                                    (to.getTime() - from.getTime()) / ONE_MINUTE
+                                )
+                            };
+                        }
                         for (const fieldName in param) {
                             const element = param[fieldName];
                             item[fieldName] = element;
                         }
                         item.productId = product._id;
                         item.storeId = product.storeId;
-                        item.buyer = new ObjectId(cognitoUser._id);
+                        item.buyerId = new ObjectId(cognitoUser._id);
                         await item.setCode(product.code, now);
 
                         // validation 필요함!

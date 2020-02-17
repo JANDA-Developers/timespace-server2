@@ -27,10 +27,9 @@ const resolver = {
         }
     },
     DateTimeRange: {
-        interval: ({ start, end }) => {
+        interval: ({ from, to }) => {
             return Math.floor(
-                (new Date(start).getTime() - new Date(end).getTime()) /
-                    ONE_MINUTE
+                (new Date(to).getTime() - new Date(from).getTime()) / ONE_MINUTE
             );
         }
     },
@@ -54,7 +53,7 @@ const resolver = {
             { period }: { period: PeriodCls }
         ): PeriodCls | null => {
             obj.validate();
-            const p = new PeriodCls({ ...period, offset: 0 });
+            const p = new PeriodCls(period);
             return obj.intersactions(p);
         }
     },

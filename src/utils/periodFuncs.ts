@@ -17,7 +17,9 @@ export const mergePeriods = (
     const temp = sortedPeriod[0];
     const result: Array<PeriodWithDays> = [
         {
-            ...temp,
+            start: temp.start,
+            end: temp.end,
+            time: temp.time,
             days: temp.day
         }
     ];
@@ -29,7 +31,9 @@ export const mergePeriods = (
                 lastOne.days = lastOne.days | element.day;
             } else {
                 result.push({
-                    ...element,
+                    start: element.start,
+                    end: element.end,
+                    time: element.time,
                     days: element.day
                 });
             }
@@ -37,6 +41,8 @@ export const mergePeriods = (
     }
     console.log("MergePeriod ============================================");
     console.log(periods);
+    console.log(result);
+    console.log("MergePeriod End ========================================");
     return result;
 };
 
@@ -44,13 +50,12 @@ export const splitPeriods = (
     periods: Array<PeriodWithDays | PeriodInput>
 ): Array<PeriodCls> => {
     const result = periods.map(p => {
-        if (p instanceof PeriodWithDays) {
+        if (typeof p.days === "number") {
             return daysNumToArr(p.days).map(
                 (day): PeriodCls => {
                     return new PeriodCls({
                         ...p,
-                        day,
-                        offset: 0
+                        day
                     });
                 }
             );
@@ -59,7 +64,6 @@ export const splitPeriods = (
                 (day): PeriodCls => {
                     return new PeriodCls({
                         ...p,
-                        offset: 0,
                         day: typeof day === "string" ? DayEnum[day] : day
                     });
                 }
@@ -84,4 +88,41 @@ export const daysNumToArr = (day: number, criteria = 64): number[] => {
     } else {
         return daysNumToArr(day, criteria >> 1);
     }
+};
+
+export const getPeriodFromDB = (
+    periodArr: Array<PeriodCls>,
+    offset: number
+) => {
+    const result = mergePeriods(
+        periodArr.map(
+            p =>
+                new PeriodCls({
+                    ...p
+                })
+        )
+    );
+    return result;
+};
+
+export const setPeriodToDB = (
+    periodArr: Array<PeriodWithDays>,
+    offset: number
+): Array<PeriodCls> => {
+    if (!periodArr.length) {
+        return [];
+    }
+    const offsetMinute = offset * 60;
+    return splitPeriods(
+        periodArr.map(
+            (p): PeriodWithDays => {
+                return {
+                    days: p.days,
+                    time: p.time,
+                    start: p.start - offsetMinute,
+                    end: p.end - offsetMinute
+                };
+            }
+        )
+    );
 };

@@ -14,6 +14,9 @@ import { ObjectId } from "mongodb";
 import { StoreModel } from "../../../models/Store";
 import { ApolloError } from "apollo-server";
 import { ERROR_CODES } from "../../../types/values";
+import { uploadFile } from "../../../utils/s3Funcs";
+import { PeriodWithDays } from "../../../utils/PeriodWithDays";
+import { daysToNumber } from "../../../utils/periodFuncs";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -28,14 +31,13 @@ const resolvers: Resolvers = {
                     try {
                         const {
                             description,
-                            // images,
                             name,
                             storeId,
                             intro,
                             warning,
-                            optionalParams
+                            optionalParams,
+                            images
                         } = param as CreateProductInput;
-
                         const { cognitoUser } = req;
 
                         const productId = new ObjectId();
@@ -46,9 +48,6 @@ const resolvers: Resolvers = {
                                 ERROR_CODES.UNEXIST_STORE
                             );
                         }
-
-                        // TODO: Image Upload to S3, after that, save result in product
-
                         const product = new ProductModel({
                             _id: productId,
                             name,
@@ -58,25 +57,44 @@ const resolvers: Resolvers = {
                             intro: intro || undefined,
                             warning: warning || undefined
                         });
+
+                        // TODO: Store의 기본값을 미리 상속받고 간다.
                         product.usingPeriodOption = store.usingPeriodOption;
                         product.usingCapacityOption = store.usingCapacityOption;
-
+                        if (store.businessHours && store.periodOption) {
+                            product.periodOption = store.periodOption;
+                            product.businessHours = store.businessHours;
+                        }
                         if (optionalParams) {
                             if (optionalParams.periodOption) {
-                                product.periodOption =
+                                const periodOption =
                                     optionalParams.periodOption;
+                                product.periodOption = {
+                                    ...periodOption,
+                                    offset: periodOption.offset || 0
+                                };
+                            }
+                            if (optionalParams.businessHours) {
+                                const businessHours =
+                                    optionalParams.businessHours.length !== 0
+                                        ? optionalParams.businessHours.map(
+                                              (v): PeriodWithDays =>
+                                                  new PeriodWithDays({
+                                                      start: v.start,
+                                                      end: v.end,
+                                                      days: daysToNumber(
+                                                          v.days as any
+                                                      )
+                                                  })
+                                          )
+                                        : store.businessHours;
+                                product.businessHours = businessHours;
                             }
                             for (const fieldName in optionalParams) {
                                 const param = optionalParams[fieldName];
                                 if (param) {
                                     product[fieldName] = param;
                                 }
-                            }
-                            if (!product.businessHours) {
-                                product.businessHours = store.businessHours;
-                            }
-                            if (!product.periodOption) {
-                                product.periodOption = store.periodOption;
                             }
                         }
 
@@ -96,6 +114,29 @@ const resolvers: Resolvers = {
                                 session
                             }
                         );
+                        if (images) {
+                            for (const file of images) {
+                                const syncedFile = await file;
+                                console.log({ syncedFile });
+                                // TODO: 파일 업로드 구현 ㄱㄱ
+
+                                /* 
+                             ? 파일 업로드 폴더 구조 설정하기
+                             * ${userId}/${houseId}/~~
+
+                             */
+                                // 해당 경로에 폴더 존재여부 확인 & 생성
+                                const { url } = await uploadFile(syncedFile, {
+                                    dir:
+                                        cognitoUser.sub +
+                                        "/" +
+                                        (product.code || "")
+                                });
+                                product.images.push(url);
+                            }
+                        }
+                        // TODO: Image Upload to S3, after that, save result in product
+
                         await session.commitTransaction();
                         session.endSession();
                         return {
@@ -104,6 +145,7 @@ const resolvers: Resolvers = {
                             data: product as any
                         };
                     } catch (error) {
+                        console.log(error);
                         return await errorReturn(error, session);
                     }
                 }

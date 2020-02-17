@@ -19,7 +19,9 @@ const resolvers: Resolvers = {
             return user;
         },
         items: async (product: DocumentType<ProductCls>, { date }) => {
-            return await product.getItems(date);
+            const result = await product.getItems(date);
+            console.log(result.map(r => r.dateTimeRange));
+            return result;
         },
         schedules: async (
             product: DocumentType<ProductCls>,

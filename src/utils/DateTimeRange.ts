@@ -10,7 +10,7 @@ export class DateTimeRangeCls {
         this.from = from;
         this.to = to;
         this.interval = Math.floor(
-            (this.from.getTime() - this.to.getTime()) / ONE_MINUTE
+            (this.to.getTime() - this.from.getTime()) / ONE_MINUTE
         );
     }
 

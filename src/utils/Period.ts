@@ -1,32 +1,28 @@
 import { ApolloError } from "apollo-server";
 import { dateToMinutes } from "./dateFuncs";
-import { Minute, Hour } from "../types/values";
+import { Minute } from "../types/values";
 
 export class PeriodCls {
     // 분(Minute) 단위 시간 사용
     start: Minute;
     end: Minute;
     time: Minute;
-    offset: Hour;
     // 1, 2, 4, 8, 16, 32, 64 의 숫자...
     day: number;
 
     constructor({
         start = 0,
         end,
-        day,
-        offset = 0
+        day
     }: {
         start: number;
         day: number;
         end: number;
-        offset: number;
     }) {
-        this.start = start - offset * 60;
-        this.end = end - offset * 60;
+        this.start = start;
+        this.end = end;
         this.time = end - start;
         this.day = day;
-        this.offset = offset;
         this.validate();
     }
 
@@ -89,8 +85,7 @@ export class PeriodCls {
         const p = new PeriodCls({
             start,
             end,
-            day,
-            offset: 0
+            day
         });
         return p;
     }

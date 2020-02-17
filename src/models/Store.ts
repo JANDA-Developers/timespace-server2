@@ -18,7 +18,7 @@ import {
 } from "../types/graph";
 import { ERROR_CODES } from "../types/values";
 import { PeriodCls } from "../utils/Period";
-import { mergePeriods, splitPeriods } from "../utils/periodFuncs";
+import { setPeriodToDB, getPeriodFromDB } from "../utils/periodFuncs";
 import { PeriodWithDays } from "../utils/PeriodWithDays";
 import _ from "lodash";
 
@@ -122,29 +122,24 @@ export class StoreCls extends BaseSchema {
     location: Location;
 
     @prop({
-        get(this: DocumentType<StoreCls>, periodArr: Array<PeriodCls>) {
-            return mergePeriods(periodArr.map(p => new PeriodCls(p)));
+        get(
+            this: DocumentType<StoreCls>,
+            periodArr: Array<PeriodCls>
+        ): Array<PeriodWithDays> {
+            return getPeriodFromDB(periodArr, this.periodOption.offset);
         },
         set(
             this: DocumentType<StoreCls>,
             periodArr: Array<PeriodWithDays>
         ): Array<PeriodCls> {
-            if (!periodArr.length) {
+            try {
+                return setPeriodToDB(periodArr, this.periodOption.offset);
+            } catch (error) {
+                console.log(error);
                 return [];
             }
-            const offsetMinute = this.periodOption.offset * 60;
-            return splitPeriods(
-                periodArr.map(
-                    (p): PeriodWithDays => {
-                        return {
-                            ...p,
-                            start: p.start - offsetMinute,
-                            end: p.end - offsetMinute
-                        };
-                    }
-                )
-            );
-        }
+        },
+        default: []
     })
     businessHours: Array<PeriodWithDays>;
 

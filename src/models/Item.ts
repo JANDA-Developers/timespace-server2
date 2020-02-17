@@ -10,6 +10,7 @@ import { ObjectId } from "mongodb";
 import { genItemCode } from "./utils/genId";
 import { ProductModel } from "./Product";
 import { DateTimeRangeCls } from "../utils/DateTimeRange";
+import { DateTimeRange } from "../types/graph";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.ITEM)))
 export class ItemCls extends BaseSchema {
@@ -47,13 +48,18 @@ export class ItemCls extends BaseSchema {
         set: id => new ObjectId(id),
         get: id => new ObjectId(id)
     })
-    buyer: ObjectId;
+    buyerId: ObjectId;
 
     @prop({
         set: v => v,
-        get: v => new DateTimeRangeCls(v)
+        get: v => {
+            return new DateTimeRangeCls(v);
+        }
     })
-    dateTimeRange: any;
+    dateTimeRange: DateTimeRange;
+
+    @prop()
+    memo: string;
 }
 
 export const ItemModel = getModelForClass(ItemCls);

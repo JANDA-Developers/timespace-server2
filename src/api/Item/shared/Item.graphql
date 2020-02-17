@@ -1,9 +1,13 @@
-type Item {
+type Item implements BaseModel {
     _id: ID!
     store: Store
-    user: User
+    buyer: User
     product: Product
     code: String!
     name: String!
     memo: String
+    dateTimeRange: DateTimeRange
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    expiresAt: DateTime
 }

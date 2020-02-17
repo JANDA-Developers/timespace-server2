@@ -61,3 +61,6 @@ export const removeHours = (date: Date) => {
     const time = date.getTime();
     return new Date(time - (time % ONE_DAY));
 };
+
+export const offsetDate = (date: Date, offset: number) =>
+    date.setTime(date.getTime() - offset * 60 * 60000);

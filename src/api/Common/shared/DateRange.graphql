@@ -1,7 +1,6 @@
 type DateTimeRange {
     from: DateTime!
     to: DateTime!
-    # 분 단위 시간임.
     interval: Int!
 }
 
