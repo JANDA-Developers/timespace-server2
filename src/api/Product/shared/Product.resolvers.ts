@@ -20,14 +20,18 @@ const resolvers: Resolvers = {
         },
         items: async (product: DocumentType<ProductCls>, { date }) => {
             const result = await product.getItems(date);
-            console.log(result.map(r => r.dateTimeRange));
             return result;
         },
         schedules: async (
             product: DocumentType<ProductCls>,
-            { dateTime }
+            { date }
         ): Promise<ProductSchedules> => {
-            return await product.getSchedulesByDate(dateTime);
+            const result = await product.getSchedulesByDate(date);
+            console.log(
+                "Procuct.Schedules =========================================================="
+            );
+            console.log(result);
+            return result;
         },
         intro: product => {
             if (!product.intro) {

@@ -12,17 +12,24 @@ import {
     GenderOption,
     PeriodOption,
     ProductSchedules,
-    ProductSegment,
-    Segment
+    Segment,
+    Item
 } from "../types/graph";
 import { genCode, s4 } from "./utils/genId";
 import { ApolloError } from "apollo-server";
-import { getPeriodFromDB, setPeriodToDB } from "../utils/periodFuncs";
+import {
+    getPeriodFromDB,
+    setPeriodToDB,
+    extractPeriodFromDate,
+    divideDateTimeRange
+} from "../utils/periodFuncs";
 import { PeriodWithDays } from "../utils/PeriodWithDays";
-import { ItemCls, ItemModel } from "./Item";
+import { ItemCls, ItemModel, ItemProps } from "./Item";
 import { ERROR_CODES } from "../types/values";
 import { ONE_MINUTE, removeHours } from "../utils/dateFuncs";
 import { DateTimeRangeCls } from "../utils/DateTimeRange";
+import { Stage } from "../types/pipeline";
+import _ from "lodash";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.PRODUCT)))
 export class ProductCls extends BaseSchema {
@@ -100,17 +107,17 @@ export class ProductCls extends BaseSchema {
         validate: [
             {
                 validator: (v: number) => v >= 0,
-                message: "PeopleCount는 음수가 될 수 없습니다."
+                message: "capacity는 음수가 될 수 없습니다."
             }
         ],
         required: [
             function(this: DocumentType<ProductCls>) {
                 return this.usingCapacityOption;
             },
-            "PeopleCapacity가 설정되지 않았습니다. "
+            "Capacity가 설정되지 않았습니다. "
         ]
     })
-    peopleCapacity: number;
+    capacity: number;
 
     @prop({
         validate: [
@@ -237,6 +244,164 @@ export class ProductCls extends BaseSchema {
     })
     periodOption: PeriodOption;
 
+    async getSegmentSchedules(
+        this: DocumentType<ProductCls>,
+        dateTimeRange: DateTimeRangeCls,
+        unit: number
+    ): Promise<
+        {
+            itemCount: number;
+            segment: Segment;
+            maxCount: number;
+            soldOut: boolean;
+            items: ObjectId[];
+        }[]
+    > {
+        const unitSeconds = unit * 60;
+        const query: Stage[] = [
+            {
+                $match: {
+                    productId: this._id,
+                    "dateTimeRange.from": {
+                        $lt: dateTimeRange.to
+                    },
+                    "dateTimeRange.to": {
+                        $gt: dateTimeRange.from
+                    }
+                }
+            },
+            {
+                $addFields: {
+                    segments: {
+                        $range: [
+                            {
+                                $divide: [
+                                    {
+                                        $toLong: "$dateTimeRange.from"
+                                    },
+                                    1000
+                                ]
+                            },
+                            {
+                                $divide: [
+                                    {
+                                        $toLong: "$dateTimeRange.to"
+                                    },
+                                    1000
+                                ]
+                            },
+                            // unit
+                            unitSeconds
+                        ]
+                    }
+                }
+            },
+            {
+                $unwind: {
+                    path: "$segments",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $replaceRoot: {
+                    newRoot: {
+                        $mergeObjects: [
+                            {
+                                _id: "$segments"
+                            },
+                            {
+                                item: {
+                                    _id: "$_id",
+                                    name: "$name",
+                                    dateTimeRange: "$dateTimeRange",
+                                    productId: "$productId",
+                                    storeId: "$storeId",
+                                    buyerId: "$buyerId",
+                                    code: "$code",
+                                    createdAt: "$createdAt",
+                                    updatedAt: "$updatedAt"
+                                }
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: "$_id",
+                    items: {
+                        $addToSet: "$item"
+                    }
+                }
+            },
+            {
+                $addFields: {
+                    segment: {
+                        from: {
+                            $toDate: {
+                                $multiply: ["$_id", 1000]
+                            }
+                        },
+                        to: {
+                            $toDate: {
+                                $multiply: [
+                                    { $add: ["$_id", unitSeconds] },
+                                    1000
+                                ]
+                            }
+                        }
+                    },
+                    count: {
+                        $size: "$items"
+                    }
+                }
+            },
+            {
+                $sort: {
+                    "segment.from": 1
+                }
+            }
+        ];
+        const productSegmentList: {
+            _id: number;
+            items: ItemProps[];
+            segment: Segment;
+            count: number;
+        }[] = await ItemModel.aggregate(query);
+        // const result = productSegmentList.map(o => {
+        //     return {
+        //         itemCount: o.count,
+        //         segment: o.segment,
+        //         maxCount: this.capacity,
+        //         soldOut: o.count >= this.capacity,
+        //         items: o.items.map(item => item._id)
+        //     };
+        // });
+        const segmentList = divideDateTimeRange(dateTimeRange, unit);
+
+        const real = segmentList.map(segment => {
+            return {
+                itemCount: 0,
+                segment,
+                maxCount: this.capacity,
+                soldOut: false,
+                items: [] as ObjectId[]
+            };
+        });
+        real.forEach(o => {
+            const filtered = productSegmentList.filter(
+                i => i._id * 1000 === o.segment.from.getTime()
+            );
+            const item = filtered[0];
+            if (item) {
+                o.itemCount = item.count;
+                o.items.push(...item.items.map(i => i._id));
+                o.soldOut = this.capacity <= item.count;
+            }
+        });
+        return real;
+    }
+
     /**
      * 해당 기간에 어떤 Item들이 들어있는지... paging 안되어있음.
      * @param dateTimeRange 날짜 범위 ㄱㄱ
@@ -285,13 +450,6 @@ export class ProductCls extends BaseSchema {
                 }
             );
         }
-        console.log(
-            "Items ======================================================"
-        );
-        console.log({
-            from,
-            to
-        });
         const items = await ItemModel.find({
             productId: this._id,
             "dateTimeRange.from": {
@@ -311,28 +469,11 @@ export class ProductCls extends BaseSchema {
         this: DocumentType<ProductCls>,
         date: Date
     ): Promise<ProductSchedules> {
-        // TODO: 스케줄 어떻게 구할까?
-        // Date로 부터 from, to를 구한다.
-        // 하루 중 최소값의 Date, 최대값의 Date를 구해야함.
-        let st: number = 1440;
-        let ed: number = 0;
-        const cDay = 1 << date.getUTCDay();
-        this.businessHours.forEach(({ days, start, end, time }) => {
-            // days를 비교하여 포함되어있는지 확인 ㄱㄱ
-            const isIncludeInDays = (days & cDay) === cDay;
-            if (isIncludeInDays) {
-                // 포함하고 있으면 뭐 어떻게 해야함?
-                if (start < st) {
-                    st = start;
-                }
-                if (ed < end) {
-                    ed = end;
-                }
-            }
-        });
-        const cDateWithoutHours = removeHours(date).getTime();
-        const from = new Date(cDateWithoutHours + st * ONE_MINUTE);
-        const to = new Date(cDateWithoutHours + ed * ONE_MINUTE);
+        const { from, to, timeMillis } = extractPeriodFromDate(
+            this.businessHours,
+            date
+        );
+        const unit = this.periodOption.unit;
         /*
          * ==================================================================================
          * 본격적인 로직 시작
@@ -342,14 +483,38 @@ export class ProductCls extends BaseSchema {
             from,
             to
         });
-        const schedules: ProductSegment[] = [];
-        const segmentList: Segment[] = [];
-        console.log(segmentList);
+        // Segment 어떻게 구할까... 모든 Segment를 줘야할듯 하지? 끄아앙 ㅜㅜ
+        // TODO: 1. 모든 Segment를 구함.
+        // TODO: 2. 그런 다음에 Segment에 Item을 대입한다.
+
+        // const segmentList: Segment[] = divideDateTimeRange(dateTimeRange, unit);
+        // console.log("Segment List=========================================");
+        // console.log(segmentList);
+        console.log({ timeMillis });
+        // TODO: ItemModel.aggregation ㄱㄱㄱ
+        const list = await this.getSegmentSchedules(
+            dateTimeRange,
+            this.periodOption.unit
+        );
+
+        console.log("list ============================================");
+        console.log(list);
+
+        const schedules = await Promise.all(
+            list.map(async o => {
+                return {
+                    ...o,
+                    items: ((await ItemModel.find({
+                        _id: { $in: o.items }
+                    })) as unknown) as Item[]
+                };
+            })
+        );
 
         return {
             info: {
                 dateTimeRange,
-                unit: this.periodOption.unit
+                unit
             },
             schedules
         };

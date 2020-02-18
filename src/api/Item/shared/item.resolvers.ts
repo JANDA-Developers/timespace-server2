@@ -21,9 +21,6 @@ const resolvers: Resolvers = {
             return user;
         },
         dateTimeRange: async (item: DocumentType<ItemCls>) => {
-            console.log({
-                sdfdsf: item.dateTimeRange
-            });
             return item.dateTimeRange;
         }
     }
