@@ -167,3 +167,25 @@ export const divideDateTimeRange = (
     }
     return segmentList;
 };
+
+export const validatePeriodWithDays = (
+    periodWithDays: PeriodWithDays[]
+): boolean => {
+    // 1. 요일이 겹치는지 확인
+    // 2. offset이 일정하게 들어갔는지 확인
+    let isDuplicate = false;
+    periodWithDays
+        .map(p => {
+            return p.days;
+        })
+        .forEach((days, idx, list) => {
+            for (let i = idx + 1; i < list.length; i++) {
+                if (!isDuplicate && (days & list[i]) !== 0) {
+                    isDuplicate = true;
+                    return;
+                }
+            }
+        });
+
+    return isDuplicate;
+};

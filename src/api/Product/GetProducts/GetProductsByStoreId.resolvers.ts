@@ -11,7 +11,7 @@ import {
     privateResolver
 } from "../../../utils/resolverFuncWrapper";
 import { StoreModel } from "../../../models/Store";
-import { ProductModel } from "../../../models/Product";
+import { ProductModel } from "../../../models/Product/Product";
 import { ERROR_CODES } from "../../../types/values";
 
 const resolvers: Resolvers = {

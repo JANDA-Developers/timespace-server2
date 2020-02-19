@@ -7,7 +7,7 @@ import {
 } from "GraphType";
 import { defaultResolver } from "../../../utils/resolverFuncWrapper";
 import { StoreModel } from "../../../models/Store";
-import { ProductModel } from "../../../models/Product";
+import { ProductModel } from "../../../models/Product/Product";
 
 const resolvers: Resolvers = {
     Query: {

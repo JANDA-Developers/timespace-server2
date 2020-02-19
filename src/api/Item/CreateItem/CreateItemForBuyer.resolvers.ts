@@ -6,10 +6,10 @@ import {
     defaultResolver,
     privateResolver
 } from "../../../utils/resolverFuncWrapper";
-import { ItemModel } from "../../../models/Item";
+import { ItemModel } from "../../../models/Item/Item";
 import { ApolloError } from "apollo-server";
 import { ERROR_CODES } from "../../../types/values";
-import { ProductModel } from "../../../models/Product";
+import { ProductModel } from "../../../models/Product/Product";
 import { ObjectId } from "mongodb";
 import { offsetDate, ONE_MINUTE } from "../../../utils/dateFuncs";
 

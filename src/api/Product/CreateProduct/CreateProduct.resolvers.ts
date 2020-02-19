@@ -6,7 +6,7 @@ import {
     defaultResolver,
     privateResolver
 } from "../../../utils/resolverFuncWrapper";
-import { ProductModel } from "../../../models/Product";
+import { ProductModel } from "../../../models/Product/Product";
 import { ObjectId } from "mongodb";
 import { StoreModel } from "../../../models/Store";
 import { ApolloError } from "apollo-server";

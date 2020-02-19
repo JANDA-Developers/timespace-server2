@@ -1,7 +1,7 @@
 import { Resolvers } from "../../../types/resolvers";
 import { UserModel } from "../../../models/User";
 import { StoreModel } from "../../../models/Store";
-import { ProductModel } from "../../../models/Product";
+import { ProductModel } from "../../../models/Product/Product";
 const resolvers: Resolvers = {
     BaseGroup: {
         __resolveType: (group: any) => {

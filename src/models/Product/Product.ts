@@ -1,13 +1,13 @@
-import { BaseSchema, createSchemaOptions } from "../abs/BaseSchema";
+import { BaseSchema, createSchemaOptions } from "../../abs/BaseSchema";
 import {
     prop,
     getModelForClass,
     modelOptions,
     DocumentType
 } from "@typegoose/typegoose";
-import { getCollectionName, ModelName } from "./__collectionNames";
+import { getCollectionName, ModelName } from "../__collectionNames";
 import { ObjectId } from "mongodb";
-import { PeriodCls } from "../utils/Period";
+import { PeriodCls } from "../../utils/Period";
 import {
     GenderOption,
     PeriodOption,
@@ -15,24 +15,26 @@ import {
     Segment,
     Item
 } from "GraphType";
-import { genCode, s4 } from "./utils/genId";
+import { genCode, s4 } from "../utils/genId";
 import { ApolloError } from "apollo-server";
 import {
     getPeriodFromDB,
     setPeriodToDB,
     extractPeriodFromDate,
     divideDateTimeRange
-} from "../utils/periodFuncs";
-import { PeriodWithDays } from "../utils/PeriodWithDays";
-import { ItemCls, ItemModel, ItemProps } from "./Item";
-import { ERROR_CODES } from "../types/values";
-import { ONE_MINUTE, removeHours } from "../utils/dateFuncs";
-import { DateTimeRangeCls } from "../utils/DateTimeRange";
-import { Stage } from "../types/pipeline";
+} from "../../utils/periodFuncs";
+import { PeriodWithDays } from "../../utils/PeriodWithDays";
+import { ItemCls, ItemModel, ItemProps } from "../Item/Item";
+import { ERROR_CODES } from "../../types/values";
+import { ONE_MINUTE, removeHours } from "../../utils/dateFuncs";
+import { DateTimeRangeCls } from "../../utils/DateTimeRange";
+import { Stage } from "../../types/pipeline";
 import _ from "lodash";
+import { ProductProps, ProductFuncs } from "./Product.interface";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.PRODUCT)))
-export class ProductCls extends BaseSchema {
+export class ProductCls extends BaseSchema
+    implements ProductProps, ProductFuncs {
     static findByCode = async (
         productCode: string
     ): Promise<DocumentType<ProductCls>> => {
@@ -248,7 +250,16 @@ export class ProductCls extends BaseSchema {
         this: DocumentType<ProductCls>,
         dateTimeRange: DateTimeRangeCls,
         unit: number
-    ) {
+    ): Promise<
+        {
+            _id: number; // * 1000 하면 segment.from 이랑 같아짐
+            items: ItemProps[];
+            segment: Segment;
+            count: number;
+            maxCount: number;
+            soldOut: boolean;
+        }[]
+    > {
         const query: Stage[] = [
             {
                 $match: {

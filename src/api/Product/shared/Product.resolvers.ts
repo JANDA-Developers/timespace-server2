@@ -1,5 +1,5 @@
 import { Resolvers } from "../../../types/resolvers";
-import { ProductCls } from "../../../models/Product";
+import { ProductCls } from "../../../models/Product/Product";
 import { DocumentType } from "@typegoose/typegoose";
 import { StoreModel } from "../../../models/Store";
 import { UserModel } from "../../../models/User";

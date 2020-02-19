@@ -7,7 +7,7 @@ import {
 } from "@typegoose/typegoose";
 import { getCollectionName, ModelName } from "./__collectionNames";
 import { ObjectId } from "mongodb";
-import { ProductModel, ProductCls } from "./Product";
+import { ProductModel, ProductCls } from "./Product/Product";
 import { GroupType } from "GraphType";
 import { ApolloError } from "apollo-server";
 import { ERROR_CODES } from "../types/values";

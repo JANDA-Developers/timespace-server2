@@ -1,29 +1,20 @@
-import { BaseSchema, createSchemaOptions } from "../abs/BaseSchema";
+import { BaseSchema, createSchemaOptions } from "../../abs/BaseSchema";
 import {
     prop,
     getModelForClass,
     modelOptions,
     DocumentType
 } from "@typegoose/typegoose";
-import { getCollectionName, ModelName } from "./__collectionNames";
+import { getCollectionName, ModelName } from "../__collectionNames";
 import { ObjectId } from "mongodb";
-import { genItemCode } from "./utils/genId";
-import { ProductModel } from "./Product";
-import { DateTimeRangeCls } from "../utils/DateTimeRange";
+import { genItemCode } from "../utils/genId";
+import { ProductModel } from "../Product/Product";
+import { DateTimeRangeCls } from "../../utils/DateTimeRange";
 import { DateTimeRange } from "GraphType";
-
-export interface ItemProps extends BaseSchema {
-    name: string;
-    code: string;
-    storeId: ObjectId;
-    productId: ObjectId;
-    buyerId: ObjectId;
-    dateTimeRange: DateTimeRange;
-    memo: string;
-}
+import { ItemProps, ItemFuncs } from "./Item.interface";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.ITEM)))
-export class ItemCls extends BaseSchema implements ItemProps {
+export class ItemCls extends BaseSchema implements ItemProps, ItemFuncs {
     @prop()
     name: string;
 
