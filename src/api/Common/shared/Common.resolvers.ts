@@ -2,7 +2,7 @@
 import { CountryInfoModel } from "../../../models/CountryInfo";
 import { getGeoInfoByIP } from "../../../utils/geoLocationAPI";
 import { getIP } from "../../../utils/utils";
-import { Zoneinfo, PeriodInput } from "../../../types/graph";
+import { Zoneinfo, PeriodInput } from "GraphType";
 import { defaultResolver } from "../../../utils/resolverFuncWrapper";
 import { PeriodCls } from "../../../utils/Period";
 import { genCode } from "../../../models/utils/genId";
@@ -44,10 +44,10 @@ const resolver = {
     },
     Period: {
         days: (obj: any) => daysNumToArr(obj.days),
-        isIn: (obj: PeriodCls, { date }) => {
-            obj.validate();
-            return obj.isIn(date);
-        },
+        // isIn: (obj: PeriodCls, { date }) => {
+        //     obj.validate();
+        //     return obj.isIn(date);
+        // },
         intersactions: (
             obj: PeriodCls,
             { period }: { period: PeriodCls }

@@ -1,4 +1,4 @@
-import { GroupType } from "../types/graph";
+import { GroupType } from "GraphType";
 import { ObjectId } from "mongodb";
 import { BaseSchema } from "./BaseSchema";
 import { prop, DocumentType } from "@typegoose/typegoose";

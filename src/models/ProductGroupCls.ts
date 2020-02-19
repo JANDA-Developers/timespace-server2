@@ -8,7 +8,7 @@ import {
 import { getCollectionName, ModelName } from "./__collectionNames";
 import { ObjectId } from "mongodb";
 import { ProductModel, ProductCls } from "./Product";
-import { GroupType } from "../types/graph";
+import { GroupType } from "GraphType";
 import { ApolloError } from "apollo-server";
 import { ERROR_CODES } from "../types/values";
 import { BaseGroup } from "../abs/BaseGroup";

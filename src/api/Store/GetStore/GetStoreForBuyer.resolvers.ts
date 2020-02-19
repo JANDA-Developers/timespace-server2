@@ -1,10 +1,7 @@
 import { mongoose } from "@typegoose/typegoose";
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
-import {
-    GetStoreForBuyerResponse,
-    GetStoreForBuyerInput
-} from "../../../types/graph";
+import { GetStoreForBuyerResponse, GetStoreForBuyerInput } from "GraphType";
 import { defaultResolver } from "../../../utils/resolverFuncWrapper";
 import { StoreModel } from "../../../models/Store";
 

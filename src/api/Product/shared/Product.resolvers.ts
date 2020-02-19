@@ -3,7 +3,7 @@ import { ProductCls } from "../../../models/Product";
 import { DocumentType } from "@typegoose/typegoose";
 import { StoreModel } from "../../../models/Store";
 import { UserModel } from "../../../models/User";
-import { ProductSchedules } from "../../../types/graph";
+import { ProductSchedules } from "GraphType";
 
 const resolvers: Resolvers = {
     Product: {

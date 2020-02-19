@@ -1,7 +1,7 @@
 import { mongoose } from "@typegoose/typegoose";
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
-import { DeleteStoreResponse, DeleteStoreInput } from "../../../types/graph";
+import { DeleteStoreResponse, DeleteStoreInput } from "GraphType";
 import {
     defaultResolver,
     privateResolver

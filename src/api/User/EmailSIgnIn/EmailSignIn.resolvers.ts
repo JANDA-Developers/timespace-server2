@@ -1,8 +1,5 @@
 import { Resolvers } from "../../../types/resolvers";
-import {
-    EmailSignInMutationArgs,
-    EmailSignInResponse
-} from "../../../types/graph";
+import { EmailSignInMutationArgs, EmailSignInResponse } from "GraphType";
 import { CognitoIdentityServiceProvider } from "aws-sdk";
 import { defaultResolver } from "../../../utils/resolverFuncWrapper";
 import { UserModel, LoggedInInfo } from "../../../models/User";

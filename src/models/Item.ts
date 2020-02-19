@@ -10,7 +10,7 @@ import { ObjectId } from "mongodb";
 import { genItemCode } from "./utils/genId";
 import { ProductModel } from "./Product";
 import { DateTimeRangeCls } from "../utils/DateTimeRange";
-import { DateTimeRange } from "../types/graph";
+import { DateTimeRange } from "GraphType";
 
 export interface ItemProps extends BaseSchema {
     name: string;

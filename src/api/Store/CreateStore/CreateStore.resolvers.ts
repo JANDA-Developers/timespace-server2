@@ -4,7 +4,7 @@ import {
     privateResolver
 } from "../../../utils/resolverFuncWrapper";
 import { StoreModel } from "../../../models/Store";
-import { CreateStoreInput, CreateStoreResponse } from "../../../types/graph";
+import { CreateStoreInput, CreateStoreResponse } from "GraphType";
 import { errorReturn } from "../../../utils/utils";
 import { mongoose } from "@typegoose/typegoose";
 import { UserModel } from "../../../models/User";

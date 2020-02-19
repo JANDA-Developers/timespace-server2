@@ -2,7 +2,7 @@ import { Resolvers } from "../../../types/resolvers";
 import { UserModel } from "../../../models/User";
 import { StoreModel } from "../../../models/Store";
 import { ObjectId } from "mongodb";
-import { UserRole } from "../../../types/graph";
+import { UserRole } from "GraphType";
 import { DocumentType } from "@typegoose/typegoose";
 import { StoreGroupCls, StoreGroupModel } from "../../../models/StoreGroup";
 

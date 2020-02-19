@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import jwkToPem from "jwk-to-pem";
 import axios from "axios";
-import { BaseResponse } from "../types/graph";
+import { BaseResponse } from "GraphType";
 import { ApolloError } from "apollo-server";
 import { ERROR_CODES } from "../types/values";
 

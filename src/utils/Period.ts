@@ -1,6 +1,7 @@
 import { ApolloError } from "apollo-server";
-import { dateToMinutes } from "./dateFuncs";
+import { ONE_DAY, ONE_MINUTE } from "./dateFuncs";
 import { Minute } from "../types/values";
+import { DateTimeRangeCls } from "./DateTimeRange";
 
 export class PeriodCls {
     // 분(Minute) 단위 시간 사용
@@ -27,24 +28,6 @@ export class PeriodCls {
     }
 
     validate(this: PeriodCls) {
-        // if (this.start < 0) {
-        //     throw new ApolloError(
-        //         "[PeriodCls] Period.start 값은 음수가 될 수 없습니다.",
-        //         "PERIOD_START_NEGATIVE",
-        //         {
-        //             start: this.start
-        //         }
-        //     );
-        // }
-        // if (this.end < 0) {
-        //     throw new ApolloError(
-        //         "[PeriodCls] Period.end 값은 음수가 될 수 없습니다.",
-        //         "PERIOD_START_NEGATIVE",
-        //         {
-        //             end: this.end
-        //         }
-        //     );
-        // }
         if (this.time <= 0) {
             throw new ApolloError(
                 "[PeriodCls] Period.time 값은 음수 또는 0이 될 수 없습니다.",
@@ -70,12 +53,12 @@ export class PeriodCls {
         return start === this.start && end === this.end;
     }
 
-    isIn(this: PeriodCls, time: Date): boolean {
-        const date: Date = time;
-        const minutes = dateToMinutes(date);
-        const includedDay = (this.day & (1 << date.getDay())) !== 0;
-        return includedDay && this.start <= minutes && minutes <= this.end;
-    }
+    // isIn(this: PeriodCls, time: Date): boolean {
+    //     const date: Date = time;
+    //     const minutes = dateToMinutes(date);
+    //     const includedDay = (this.day & (1 << date.getDay())) !== 0;
+    //     return includedDay && this.start <= minutes && minutes <= this.end;
+    // }
 
     intersactions(this: PeriodCls, period: PeriodCls): PeriodCls | null {
         // 이제 겹치는 부분들을 구해볼까?
@@ -110,6 +93,34 @@ export class PeriodCls {
                 ? this.start <= target.start && this.end >= target.end
                 : true;
         return options.exceptDays !== false && isIncludeDays && isIncludeTimes;
+    }
+
+    toDateTimeRange(this: PeriodCls, date: Date): DateTimeRangeCls {
+        const time = date.getTime() - (date.getTime() % ONE_DAY);
+        const from = new Date(time + this.start * ONE_MINUTE);
+        const to = new Date(time + this.end * ONE_MINUTE);
+        return new DateTimeRangeCls({ from, to });
+    }
+
+    isSubsetOfPeriod(
+        this: PeriodCls,
+        dateTimeRange: DateTimeRangeCls
+    ): boolean {
+        const { from, to } = dateTimeRange;
+        const { start, end } = this;
+        console.log({ start, end });
+        const fDay = from.getUTCDay();
+        const tDay = to.getUTCDay();
+        if (fDay === tDay) {
+            const day = fDay;
+            const time = from.getTime();
+            console.log(time);
+            return day === this.day && false;
+        } else if (fDay < tDay) {
+            return false;
+        } else {
+            return false;
+        }
     }
 
     // differences(this: PeriodCls): PeriodCls[] {}

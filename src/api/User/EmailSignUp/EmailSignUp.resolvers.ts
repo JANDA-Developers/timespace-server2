@@ -1,5 +1,5 @@
 import { Resolvers } from "../../../types/resolvers";
-import { EmailSignUpResponse, EmailSignUpInput } from "../../../types/graph";
+import { EmailSignUpResponse, EmailSignUpInput } from "GraphType";
 import { CognitoIdentityServiceProvider } from "aws-sdk";
 import { defaultResolver } from "../../../utils/resolverFuncWrapper";
 import { UserModel } from "../../../models/User";

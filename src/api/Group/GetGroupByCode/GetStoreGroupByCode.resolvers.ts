@@ -4,7 +4,7 @@ import { Resolvers } from "../../../types/resolvers";
 import {
     GetStoreGroupByCodeResponse,
     GetStoreGroupByCodeInput
-} from "../../../types/graph";
+} from "GraphType";
 import { defaultResolver } from "../../../utils/resolverFuncWrapper";
 import { ProductGroupModel } from "../../../models/ProductGroupCls";
 

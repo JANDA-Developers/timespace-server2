@@ -5,7 +5,7 @@ import { Resolvers } from "../../../types/resolvers";
 import {
     GetProductsByStoreIdResponse,
     GetProductsByStoreIdInput
-} from "../../../types/graph";
+} from "GraphType";
 import {
     defaultResolver,
     privateResolver

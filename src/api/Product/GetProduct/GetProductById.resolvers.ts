@@ -2,10 +2,7 @@ import { ApolloError } from "apollo-server";
 import { mongoose } from "@typegoose/typegoose";
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
-import {
-    GetProductByIdResponse,
-    GetProductByIdInput
-} from "../../../types/graph";
+import { GetProductByIdResponse, GetProductByIdInput } from "GraphType";
 import {
     defaultResolver,
     privateResolver

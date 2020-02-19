@@ -1,5 +1,5 @@
 import { CognitoIdentityServiceProvider } from "aws-sdk";
-import { BaseResponse } from "../types/graph";
+import { BaseResponse } from "GraphType";
 
 export const refreshToken = async (
     refreshToken: string

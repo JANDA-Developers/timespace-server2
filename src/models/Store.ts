@@ -15,7 +15,7 @@ import {
     Manager,
     Location,
     PeriodOption
-} from "../types/graph";
+} from "GraphType";
 import { ERROR_CODES } from "../types/values";
 import { PeriodCls } from "../utils/Period";
 import { setPeriodToDB, getPeriodFromDB } from "../utils/periodFuncs";

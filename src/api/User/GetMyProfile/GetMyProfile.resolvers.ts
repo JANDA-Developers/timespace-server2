@@ -3,7 +3,7 @@ import {
     privateResolver,
     defaultResolver
 } from "../../../utils/resolverFuncWrapper";
-import { GetMyProfileResponse } from "../../../types/graph";
+import { GetMyProfileResponse } from "GraphType";
 
 const resolvers: Resolvers = {
     Query: {

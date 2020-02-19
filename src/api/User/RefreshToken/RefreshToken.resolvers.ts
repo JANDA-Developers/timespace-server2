@@ -2,7 +2,7 @@ import { Resolvers } from "../../../types/resolvers";
 import { defaultResolver } from "../../../utils/resolverFuncWrapper";
 import { ApolloError } from "apollo-server";
 import { refreshToken } from "../../../utils/refreshToken";
-import { RefreshTokenResponse } from "../../../types/graph";
+import { RefreshTokenResponse } from "GraphType";
 import { UserModel } from "../../../models/User";
 
 const resolvers: Resolvers = {

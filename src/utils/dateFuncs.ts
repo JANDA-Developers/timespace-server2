@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { Minute } from "../types/values";
 
 export const ONE_MINUTE = 1000 * 60;
 export const ONE_HOUR = ONE_MINUTE * 60;
@@ -53,8 +54,15 @@ export const getDayOfYear = (date: Date): number => {
     return Math.floor(diff / ONE_DAY);
 };
 
-export const dateToMinutes = (date: Date) => {
-    return (date.getTime() % ONE_DAY) / ONE_MINUTE;
+export const dateToMinutes = (dateTime: Date, date?: Date) => {
+    const nDate = new Date((date || dateTime).getTime());
+    nDate.setTime(nDate.getTime() - (nDate.getTime() % ONE_DAY));
+
+    return Math.floor((dateTime.getTime() - nDate.getTime()) / ONE_MINUTE);
+};
+
+export const dateDistance = (target: Date, st: Date): Minute => {
+    return Math.floor((target.getTime() - st.getTime()) / ONE_MINUTE);
 };
 
 export const removeHours = (date: Date) => {

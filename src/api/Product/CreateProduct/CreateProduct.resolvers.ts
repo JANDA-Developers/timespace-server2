@@ -1,10 +1,7 @@
 import { mongoose } from "@typegoose/typegoose";
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
-import {
-    CreateProductResponse,
-    CreateProductInput
-} from "../../../types/graph";
+import { CreateProductResponse, CreateProductInput } from "GraphType";
 import {
     defaultResolver,
     privateResolver

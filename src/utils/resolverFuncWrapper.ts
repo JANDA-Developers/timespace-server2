@@ -2,7 +2,7 @@ import { fmtLog } from "../logger";
 import { ApolloError } from "apollo-server";
 import { getIP, getLocalDate, errorReturn } from "./utils";
 import { ResolverFunction } from "../types/resolvers";
-import { BaseResponse } from "../types/graph";
+import { BaseResponse } from "GraphType";
 
 /**
  * 리솔버 로거... 로그 찍어주는 아이 ㅎㅎ

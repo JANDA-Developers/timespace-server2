@@ -2,7 +2,7 @@ import { ApolloError } from "apollo-server";
 import { mongoose } from "@typegoose/typegoose";
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
-import { DeleteItemResponse, DeleteItemInput } from "../../../types/graph";
+import { DeleteItemResponse, DeleteItemInput } from "GraphType";
 import { defaultResolver } from "../../../utils/resolverFuncWrapper";
 
 const resolvers: Resolvers = {

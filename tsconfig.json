@@ -19,7 +19,10 @@
         "esModuleInterop": true,
         "skipLibCheck": true,
         "experimentalDecorators": true,
-        "emitDecoratorMetadata": true
+        "emitDecoratorMetadata": true,
+        "paths": {
+            "GraphType": ["src/types/graph.d.ts"]
+        }
     },
     "include": ["src/**/*"],
     "exclude": [

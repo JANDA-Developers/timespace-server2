@@ -4,7 +4,7 @@ import { Resolvers } from "../../../types/resolvers";
 import {
     GetProductsForBuyerResponse,
     GetProductsForBuyerInput
-} from "../../../types/graph";
+} from "GraphType";
 import { defaultResolver } from "../../../utils/resolverFuncWrapper";
 import { StoreModel } from "../../../models/Store";
 import { ProductModel } from "../../../models/Product";

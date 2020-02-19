@@ -1,6 +1,6 @@
 import { S3 } from "aws-sdk";
 import uuid = require("uuid");
-import { Upload, JdFile } from "../types/graph";
+import { Upload, JdFile } from "GraphType";
 
 export const bucketName = process.env.AWS_BUCKETNAME || "";
 

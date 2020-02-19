@@ -1,5 +1,5 @@
 import { Resolvers } from "../../../types/resolvers";
-import { HealthCheckResponse } from "../../../types/graph";
+import { HealthCheckResponse } from "GraphType";
 const resolvers: Resolvers = {
     Query: {
         HealthCheck: async (): Promise<HealthCheckResponse> => {

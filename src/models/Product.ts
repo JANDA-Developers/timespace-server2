@@ -14,7 +14,7 @@ import {
     ProductSchedules,
     Segment,
     Item
-} from "../types/graph";
+} from "GraphType";
 import { genCode, s4 } from "./utils/genId";
 import { ApolloError } from "apollo-server";
 import {
@@ -244,20 +244,11 @@ export class ProductCls extends BaseSchema {
     })
     periodOption: PeriodOption;
 
-    async getSegmentSchedules(
+    async segmentListWithItems(
         this: DocumentType<ProductCls>,
         dateTimeRange: DateTimeRangeCls,
         unit: number
-    ): Promise<
-        {
-            itemCount: number;
-            segment: Segment;
-            maxCount: number;
-            soldOut: boolean;
-            items: ObjectId[];
-        }[]
-    > {
-        const unitSeconds = unit * 60;
+    ) {
         const query: Stage[] = [
             {
                 $match: {
@@ -291,7 +282,7 @@ export class ProductCls extends BaseSchema {
                                 ]
                             },
                             // unit
-                            unitSeconds
+                            unit * 60
                         ]
                     }
                 }
@@ -344,15 +335,21 @@ export class ProductCls extends BaseSchema {
                         },
                         to: {
                             $toDate: {
-                                $multiply: [
-                                    { $add: ["$_id", unitSeconds] },
-                                    1000
-                                ]
+                                $multiply: [{ $add: ["$_id", unit] }, 1000]
                             }
                         }
                     },
                     count: {
                         $size: "$items"
+                    },
+                    maxCount: this.capacity,
+                    soldOUt: {
+                        $lte: [
+                            this.capacity,
+                            {
+                                $size: "$items"
+                            }
+                        ]
                     }
                 }
             },
@@ -363,20 +360,37 @@ export class ProductCls extends BaseSchema {
             }
         ];
         const productSegmentList: {
-            _id: number;
+            _id: number; // * 1000 하면 segment.from 이랑 같아짐
             items: ItemProps[];
             segment: Segment;
             count: number;
+            maxCount: number;
+            soldOut: boolean;
         }[] = await ItemModel.aggregate(query);
-        // const result = productSegmentList.map(o => {
-        //     return {
-        //         itemCount: o.count,
-        //         segment: o.segment,
-        //         maxCount: this.capacity,
-        //         soldOut: o.count >= this.capacity,
-        //         items: o.items.map(item => item._id)
-        //     };
-        // });
+        return productSegmentList;
+    }
+
+    /**
+     * dateTimeRange 를 segment로 나누어 배열로 출력함.
+     * items가 없는 segment도 포함하여 출력
+     */
+    async getSegmentSchedules(
+        this: DocumentType<ProductCls>,
+        dateTimeRange: DateTimeRangeCls
+    ): Promise<
+        {
+            itemCount: number;
+            segment: Segment;
+            maxCount: number;
+            soldOut: boolean;
+            items: ObjectId[];
+        }[]
+    > {
+        const unit = this.periodOption.unit;
+        const productSegmentList = await this.segmentListWithItems(
+            dateTimeRange,
+            unit
+        );
         const segmentList = divideDateTimeRange(dateTimeRange, unit);
 
         const real = segmentList.map(segment => {
@@ -469,37 +483,13 @@ export class ProductCls extends BaseSchema {
         this: DocumentType<ProductCls>,
         date: Date
     ): Promise<ProductSchedules> {
-        const { from, to, timeMillis } = extractPeriodFromDate(
-            this.businessHours,
-            date
-        );
+        const { from, to } = extractPeriodFromDate(this.businessHours, date);
         const unit = this.periodOption.unit;
-        /*
-         * ==================================================================================
-         * 본격적인 로직 시작
-         * ==================================================================================
-         */
         const dateTimeRange = new DateTimeRangeCls({
             from,
             to
         });
-        // Segment 어떻게 구할까... 모든 Segment를 줘야할듯 하지? 끄아앙 ㅜㅜ
-        // TODO: 1. 모든 Segment를 구함.
-        // TODO: 2. 그런 다음에 Segment에 Item을 대입한다.
-
-        // const segmentList: Segment[] = divideDateTimeRange(dateTimeRange, unit);
-        // console.log("Segment List=========================================");
-        // console.log(segmentList);
-        console.log({ timeMillis });
-        // TODO: ItemModel.aggregation ㄱㄱㄱ
-        const list = await this.getSegmentSchedules(
-            dateTimeRange,
-            this.periodOption.unit
-        );
-
-        console.log("list ============================================");
-        console.log(list);
-
+        const list = await this.getSegmentSchedules(dateTimeRange);
         const schedules = await Promise.all(
             list.map(async o => {
                 return {
@@ -510,7 +500,6 @@ export class ProductCls extends BaseSchema {
                 };
             })
         );
-
         return {
             info: {
                 dateTimeRange,
@@ -519,27 +508,6 @@ export class ProductCls extends BaseSchema {
             schedules
         };
     }
-
-    // async periodsCapacityByDate(
-    //     this: DocumentType<ProductCls>,
-    //     dateTimeRangeCls: DateTimeRangeCls
-    // ) {
-    //     const { from, to } = dateTimeRangeCls;
-    //     const unit = this.periodOption.unit;
-    //     if ((dateToMinutes(from) % unit) + (dateToMinutes(to) % unit) !== 0) {
-    //         throw new ApolloError(
-    //             "from, to 값이 Unit의 배수가 아닙니다.",
-    //             "UNIT_ERROR_FROM_TO"
-    //         );
-    //     }
-    //     // const items = await this.getItems(dateTimeRangeCls);
-    //     // console.log(items);
-
-    //     // TODO: 리턴값 인터페이스 작성하기 ㄱㄱ
-    //     // Unit 문제: 입력되는 시간의 단위를 Unit으로 나누었을때 0가 나와야함. validation 렛츠고
-
-    //     return [];
-    // }
 }
 
 export const ProductModel = getModelForClass(ProductCls);

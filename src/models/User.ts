@@ -8,7 +8,7 @@ import { getCollectionName, ModelName } from "./__collectionNames";
 import { ObjectId } from "mongodb";
 import { ApolloError } from "apollo-server";
 import { BaseSchema, createSchemaOptions } from "../abs/BaseSchema";
-import { Zoneinfo, UserRole } from "../types/graph";
+import { Zoneinfo, UserRole } from "GraphType";
 import { CognitoIdentityServiceProvider } from "aws-sdk";
 
 export type LoggedInInfo = {

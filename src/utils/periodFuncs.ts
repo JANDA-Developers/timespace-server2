@@ -1,15 +1,10 @@
 import { PeriodCls } from "./Period";
 import _ from "lodash";
 import { PeriodWithDays } from "./PeriodWithDays";
-import { PeriodInput, Segment } from "../types/graph";
+import { PeriodInput, Segment } from "GraphType";
 import { DayEnum } from "../types/values";
 import { removeHours, ONE_MINUTE } from "./dateFuncs";
 import { DateTimeRangeCls } from "./DateTimeRange";
-
-export const isIncludePeriod = (
-    periods: Array<PeriodCls>,
-    targets: Array<PeriodCls>
-) => {};
 
 export const mergePeriods = (
     periods: Array<PeriodCls>
@@ -41,10 +36,6 @@ export const mergePeriods = (
             }
         }
     }
-    console.log("MergePeriod ============================================");
-    console.log(periods);
-    console.log(result);
-    console.log("MergePeriod End ========================================");
     return result;
 };
 
@@ -129,20 +120,38 @@ export const setPeriodToDB = (
     );
 };
 
+export const offsetDays = (days: number, offset: number) => {
+    const includeSunday = (days & DayEnum.SUN) === days;
+    const includeSaturday = (days & DayEnum.SAT) === days;
+    if (offset < 0) {
+        return includeSunday
+            ? (days >> -offset) | DayEnum.SAT
+            : days >> -offset;
+    } else {
+        return includeSaturday
+            ? (days >> offset) | DayEnum.SUN
+            : days >> offset;
+    }
+};
+
 export const extractPeriodFromDate = (
     periodArr: Array<PeriodWithDays>,
     date: Date
 ) => {
     let st: number = 1440;
     let ed: number = 0;
-    console.log(
-        "GetSchedulesByDate Start ======================================================================="
-    );
-    console.log(date);
-    const cDay = 1 << date.getUTCDay();
+    const day = 1 << date.getUTCDay();
     periodArr.forEach(({ days, start, end }) => {
         // days를 비교하여 포함되어있는지 확인 ㄱㄱ
-        const isIncludeInDays = (days & cDay) === cDay;
+        const isNegativeStartValue = start < 0;
+        const isOverEndValue = end >= 1440;
+
+        const realDays = offsetDays(
+            days,
+            isNegativeStartValue ? -1 : isOverEndValue ? 1 : 0
+        );
+
+        const isIncludeInDays = (days & day) === day;
         if (isIncludeInDays) {
             // 포함하고 있으면 뭐 어떻게 해야함?
             if (start < st) {
@@ -156,10 +165,6 @@ export const extractPeriodFromDate = (
     const cDateWithoutHours = removeHours(date).getTime();
     const from = new Date(cDateWithoutHours + st * ONE_MINUTE);
     const to = new Date(cDateWithoutHours + ed * ONE_MINUTE);
-    console.log({
-        from,
-        to
-    });
     return {
         timeMillis: cDateWithoutHours,
         from,
