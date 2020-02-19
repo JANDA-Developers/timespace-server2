@@ -25,12 +25,12 @@ const resolvers: Resolvers = {
         schedules: async (
             product: DocumentType<ProductCls>,
             { date }
-        ): Promise<ProductSchedules> => {
+        ): Promise<ProductSchedules | null> => {
             const result = await product.getSchedulesByDate(date);
-            console.log(
-                "Procuct.Schedules =========================================================="
-            );
-            console.log(result);
+            // console.log(
+            //     "Procuct.Schedules =========================================================="
+            // );
+            // console.info(result);
             return result;
         },
         intro: product => {

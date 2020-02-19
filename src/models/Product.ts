@@ -196,7 +196,7 @@ export class ProductCls extends BaseSchema {
             "BusinessHours가 설정되지 않았습니다."
         ],
         get(this: DocumentType<ProductCls>, periodArr: Array<PeriodCls>) {
-            return getPeriodFromDB(periodArr);
+            return getPeriodFromDB(periodArr, this.periodOption.offset);
         },
         set(
             this: DocumentType<ProductCls>,
@@ -482,13 +482,16 @@ export class ProductCls extends BaseSchema {
     async getSchedulesByDate(
         this: DocumentType<ProductCls>,
         date: Date
-    ): Promise<ProductSchedules> {
-        const { from, to } = extractPeriodFromDate(this.businessHours, date);
+    ): Promise<ProductSchedules | null> {
         const unit = this.periodOption.unit;
-        const dateTimeRange = new DateTimeRangeCls({
-            from,
-            to
-        });
+        const dateTimeRange = extractPeriodFromDate(
+            this.businessHours,
+            date,
+            this.periodOption.offset
+        );
+        if (!dateTimeRange) {
+            return null;
+        }
         const list = await this.getSegmentSchedules(dateTimeRange);
         const schedules = await Promise.all(
             list.map(async o => {

@@ -132,7 +132,7 @@ export class StoreCls extends BaseSchema {
             this: DocumentType<StoreCls>,
             periodArr: Array<PeriodCls>
         ): Array<PeriodWithDays> {
-            return getPeriodFromDB(periodArr);
+            return getPeriodFromDB(periodArr, this.periodOption.offset);
         },
         set(
             this: DocumentType<StoreCls>,

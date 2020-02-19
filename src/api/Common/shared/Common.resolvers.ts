@@ -65,13 +65,15 @@ const resolver = {
         },
         periodTest: (
             _: any,
-            { param: { periods } }: { param: { periods: PeriodInput[] } }
+            {
+                param: { periods, offset }
+            }: { param: { periods: PeriodInput[]; offset: number } }
         ) => {
             console.log("Periods=======================================");
             console.info(periods);
-            const periodClasses = splitPeriods(periods, 9);
+            const periodClasses = splitPeriods(periods, offset);
             console.log(periodClasses);
-            const result = mergePeriods(periodClasses);
+            const result = mergePeriods(periodClasses, offset);
             console.log({
                 result
             });

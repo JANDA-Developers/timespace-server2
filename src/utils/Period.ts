@@ -128,34 +128,21 @@ export class PeriodCls {
         return options.exceptDays !== false && isIncludeDays && isIncludeTimes;
     }
 
-    toDateTimeRange(this: PeriodCls, date: Date): DateTimeRangeCls {
-        const time = date.getTime() - (date.getTime() % ONE_DAY);
-        const from = new Date(time + this.start * ONE_MINUTE);
-        const to = new Date(time + this.end * ONE_MINUTE);
-        return new DateTimeRangeCls({ from, to });
-    }
-
-    isSubsetOfPeriod(
+    toDateTimeRange(
         this: PeriodCls,
-        dateTimeRange: DateTimeRangeCls
-    ): boolean {
-        const { from, to } = dateTimeRange;
-        const { start, end } = this;
-        console.log({ start, end });
-        const fDay = from.getUTCDay();
-        const tDay = to.getUTCDay();
-        if (fDay === tDay) {
-            const day = fDay;
-            const time = from.getTime();
-            console.log(time);
-            return day === this.day && false;
-        } else if (fDay < tDay) {
-            return false;
+        /** Date 단위로... 날짜로... */ date: Date
+    ): DateTimeRangeCls {
+        if ((this.day & (1 << date.getUTCDay())) !== 0) {
+            const time = date.getTime() - (date.getTime() % ONE_DAY);
+            // 날짜 구함
+            const offsetMillisec = this.offset * 60000;
+            const from = new Date(
+                time + this.start * ONE_MINUTE - offsetMillisec
+            );
+            const to = new Date(time + this.end * ONE_MINUTE - offsetMillisec);
+            return new DateTimeRangeCls({ from, to });
         } else {
-            return false;
+            throw new ApolloError("date가 Period의 범위에 포함되지 않습니다.");
         }
     }
-
-    // differences(this: PeriodCls): PeriodCls[] {}
-    // disperse(this: PeriodCls): PeriodCls[] {}
 }

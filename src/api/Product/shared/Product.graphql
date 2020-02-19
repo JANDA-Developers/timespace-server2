@@ -14,7 +14,8 @@ type Product implements BaseModel {
     warning: String
     intro: String
     items(date: DateTime!): [Item!]
-    schedules(date: DateTime!): ProductSchedules!
+    # null이 출력되는 경우 해당 date값이 영업시간이 포함되지 않기 때문임.
+    schedules(date: DateTime!): ProductSchedules
 
     capacity: Int
     genderOption: GenderOption

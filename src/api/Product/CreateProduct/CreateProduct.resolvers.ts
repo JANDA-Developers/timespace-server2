@@ -63,15 +63,16 @@ const resolvers: Resolvers = {
                             product.businessHours = store.businessHours;
                         }
                         if (optionalParams) {
-                            if (optionalParams.periodOption) {
+                            if (
+                                optionalParams.periodOption &&
+                                optionalParams.businessHours
+                            ) {
                                 const periodOption =
                                     optionalParams.periodOption;
                                 product.periodOption = {
                                     ...periodOption,
                                     offset: periodOption.offset || 0
                                 };
-                            }
-                            if (optionalParams.businessHours) {
                                 const businessHours =
                                     optionalParams.businessHours.length !== 0
                                         ? optionalParams.businessHours.map(
@@ -81,7 +82,10 @@ const resolvers: Resolvers = {
                                                       end: v.end,
                                                       days: daysToNumber(
                                                           v.days as any
-                                                      )
+                                                      ),
+                                                      offset:
+                                                          periodOption.offset ||
+                                                          0
                                                   })
                                           )
                                         : store.businessHours;
