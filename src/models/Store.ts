@@ -36,6 +36,12 @@ export class StoreCls extends BaseSchema {
                 ERROR_CODES.UNEXIST_STORE
             );
         }
+        if (store.expiresAt) {
+            throw new ApolloError(
+                "존재하지 않는 Store 입니다.(삭제됨)",
+                ERROR_CODES.UNEXIST_STORE
+            );
+        }
         return store;
     };
 
@@ -126,7 +132,7 @@ export class StoreCls extends BaseSchema {
             this: DocumentType<StoreCls>,
             periodArr: Array<PeriodCls>
         ): Array<PeriodWithDays> {
-            return getPeriodFromDB(periodArr, this.periodOption.offset);
+            return getPeriodFromDB(periodArr);
         },
         set(
             this: DocumentType<StoreCls>,

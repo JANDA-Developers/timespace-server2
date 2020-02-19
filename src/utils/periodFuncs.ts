@@ -2,7 +2,7 @@ import { PeriodCls } from "./Period";
 import _ from "lodash";
 import { PeriodWithDays } from "./PeriodWithDays";
 import { PeriodInput, Segment } from "GraphType";
-import { DayEnum } from "../types/values";
+import { DayEnum, Hour } from "../types/values";
 import { removeHours, ONE_MINUTE } from "./dateFuncs";
 import { DateTimeRangeCls } from "./DateTimeRange";
 
@@ -40,7 +40,8 @@ export const mergePeriods = (
 };
 
 export const splitPeriods = (
-    periods: Array<PeriodWithDays | PeriodInput>
+    periods: Array<PeriodWithDays | PeriodInput>,
+    offset: Hour
 ): Array<PeriodCls> => {
     const result = periods.map(p => {
         if (typeof p.days === "number") {
@@ -48,7 +49,8 @@ export const splitPeriods = (
                 (day): PeriodCls => {
                     return new PeriodCls({
                         ...p,
-                        day
+                        day,
+                        offset: offset * 60
                     });
                 }
             );
@@ -57,7 +59,8 @@ export const splitPeriods = (
                 (day): PeriodCls => {
                     return new PeriodCls({
                         ...p,
-                        day: typeof day === "string" ? DayEnum[day] : day
+                        day: typeof day === "string" ? DayEnum[day] : day,
+                        offset: offset * 60
                     });
                 }
             );
@@ -83,10 +86,7 @@ export const daysNumToArr = (day: number, criteria = 64): number[] => {
     }
 };
 
-export const getPeriodFromDB = (
-    periodArr: Array<PeriodCls>,
-    offset: number
-) => {
+export const getPeriodFromDB = (periodArr: Array<PeriodCls>) => {
     const result = mergePeriods(
         periodArr.map(
             p =>
@@ -105,18 +105,18 @@ export const setPeriodToDB = (
     if (!periodArr.length) {
         return [];
     }
-    const offsetMinute = offset * 60;
     return splitPeriods(
         periodArr.map(
             (p): PeriodWithDays => {
                 return {
                     days: p.days,
                     time: p.time,
-                    start: p.start - offsetMinute,
-                    end: p.end - offsetMinute
+                    start: p.start,
+                    end: p.end
                 };
             }
-        )
+        ),
+        offset
     );
 };
 
@@ -150,6 +150,8 @@ export const extractPeriodFromDate = (
             days,
             isNegativeStartValue ? -1 : isOverEndValue ? 1 : 0
         );
+
+        console.log(realDays);
 
         const isIncludeInDays = (days & day) === day;
         if (isIncludeInDays) {

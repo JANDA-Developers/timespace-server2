@@ -196,7 +196,7 @@ export class ProductCls extends BaseSchema {
             "BusinessHours가 설정되지 않았습니다."
         ],
         get(this: DocumentType<ProductCls>, periodArr: Array<PeriodCls>) {
-            return getPeriodFromDB(periodArr, this.periodOption.offset);
+            return getPeriodFromDB(periodArr);
         },
         set(
             this: DocumentType<ProductCls>,

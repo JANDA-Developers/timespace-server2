@@ -14,6 +14,7 @@ import {
 } from "../../../utils/periodFuncs";
 import { DayEnum } from "../../../types/values";
 import { ONE_MINUTE } from "../../../utils/dateFuncs";
+import { ApolloError } from "apollo-server";
 
 const resolver = {
     BaseModel: {
@@ -68,7 +69,7 @@ const resolver = {
         ) => {
             console.log("Periods=======================================");
             console.info(periods);
-            const periodClasses = splitPeriods(periods);
+            const periodClasses = splitPeriods(periods, 9);
             console.log(periodClasses);
             const result = mergePeriods(periodClasses);
             console.log({
@@ -90,12 +91,19 @@ const resolver = {
                     country_code2,
                     country_name
                 } = await getGeoInfoByIP(getIP(req)[0]);
+
+                if (!time_zone) {
+                    throw new ApolloError(
+                        `Timezone is falcy value ${time_zone}`,
+                        "TIMEZONE_IS_FALCY"
+                    );
+                }
                 return {
-                    tz: time_zone?.name || "",
+                    tz: time_zone.name || "",
                     callingCode: calling_code || "",
                     code: country_code2 || "",
                     name: country_name || "",
-                    offset: time_zone?.offset || -1
+                    offset: time_zone.offset || -1
                 };
             }
         ),

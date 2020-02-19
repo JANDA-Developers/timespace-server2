@@ -1,6 +1,6 @@
 import { ApolloError } from "apollo-server";
 import { ONE_DAY, ONE_MINUTE } from "./dateFuncs";
-import { Minute } from "../types/values";
+import { Minute, DaysNum } from "../types/values";
 import { DateTimeRangeCls } from "./DateTimeRange";
 
 export class PeriodCls {
@@ -9,25 +9,57 @@ export class PeriodCls {
     end: Minute;
     time: Minute;
     // 1, 2, 4, 8, 16, 32, 64 의 숫자...
-    day: number;
+    day: DaysNum;
+    offset: Minute;
 
     constructor({
         start = 0,
         end,
-        day
+        day,
+        offset
     }: {
-        start: number;
-        day: number;
-        end: number;
+        start: Minute;
+        day: DaysNum;
+        end: Minute;
+        offset: Minute;
     }) {
         this.start = start;
         this.end = end;
         this.time = end - start;
         this.day = day;
+        this.offset = offset;
         this.validate();
     }
 
     validate(this: PeriodCls) {
+        if (this.start < 0) {
+            throw new ApolloError(
+                "[PeriodCls] Period.start 값은 음수가 될 수 없습니다.",
+                "PERIOD_START_NEGATIVE",
+                {
+                    start: this.start
+                }
+            );
+        }
+        if (this.end < 0) {
+            throw new ApolloError(
+                "[PeriodCls] Period.end 값은 하루(1440분)을 넘길 수 없습니다.",
+                "PERIOD_END_OVER_ONEDAY",
+                {
+                    end: this.end
+                }
+            );
+        }
+
+        if (this.time > 1440) {
+            throw new ApolloError(
+                "[PeriodCls] Period.time 값은 하루(1440분)을 넘길 수 없습니다.",
+                "PERIOD_TIME_OVER_ONEDAY",
+                {
+                    time: this.time
+                }
+            );
+        }
         if (this.time <= 0) {
             throw new ApolloError(
                 "[PeriodCls] Period.time 값은 음수 또는 0이 될 수 없습니다.",
@@ -68,7 +100,8 @@ export class PeriodCls {
         const p = new PeriodCls({
             start,
             end,
-            day
+            day,
+            offset: period.offset
         });
         return p;
     }

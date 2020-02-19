@@ -86,8 +86,8 @@ class App {
         const token = req.get("X-JWT") || req.get("x-jwt");
         if (token) {
             const { ok, error, data } = await decodeKey(token);
-            if (!ok) {
-                req.headers["x-jwt"] = error?.code || "";
+            if (!ok && error) {
+                req.headers["x-jwt"] = error.code || "";
             }
             if (data) {
                 data._id = data["custom:_id"];

@@ -54,11 +54,17 @@ const resolvers: Resolvers = {
                             const tz = countryInfo.timezones.find(
                                 tz => tz.name === timezone
                             );
+                            if (!tz) {
+                                throw new ApolloError(
+                                    `Timezone is falcy value ${tz}`,
+                                    "TIMEZONE_IS_FALCY"
+                                );
+                            }
                             zoneinfo = {
                                 name: countryInfo.countryName,
-                                tz: tz?.name,
+                                tz: tz.name,
                                 code: countryInfo.countryCode,
-                                offset: tz?.offset,
+                                offset: tz.offset,
                                 callingCode: countryInfo.callingCode
                             };
                         }
