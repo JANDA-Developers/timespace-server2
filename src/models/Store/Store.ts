@@ -1,33 +1,36 @@
-import { BaseSchema, createSchemaOptions } from "../abs/BaseSchema";
+import { BaseSchema, createSchemaOptions } from "../../abs/BaseSchema";
 import {
     prop,
     getModelForClass,
     modelOptions,
     DocumentType
 } from "@typegoose/typegoose";
-import { getCollectionName, ModelName } from "./__collectionNames";
+import { getCollectionName, ModelName } from "../__collectionNames";
 import { ObjectId } from "mongodb";
 import { ApolloError } from "apollo-server";
-import { genCode } from "./utils/genId";
+import { genCode } from "../utils/genId";
 import {
     Zoneinfo,
     StoreType,
     Manager,
     Location,
-    PeriodOption
+    PeriodOption,
+    CustomField,
+    CustomFieldDefineInput
 } from "GraphType";
-import { ERROR_CODES } from "../types/values";
-import { PeriodCls } from "../utils/Period";
+import { ERROR_CODES } from "../../types/values";
+import { PeriodCls } from "../../utils/Period";
 import {
     setPeriodToDB,
     getPeriodFromDB,
     validatePeriod
-} from "../utils/periodFuncs";
-import { PeriodWithDays } from "../utils/PeriodWithDays";
+} from "../../utils/periodFuncs";
+import { PeriodWithDays } from "../../utils/PeriodWithDays";
 import _ from "lodash";
+import { StoreProps, StoreFuncs } from "./Store.interface";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.STORE)))
-export class StoreCls extends BaseSchema {
+export class StoreCls extends BaseSchema implements StoreProps, StoreFuncs {
     static findByCode = async (
         storeCode: string
     ): Promise<DocumentType<StoreCls>> => {
@@ -158,7 +161,7 @@ export class StoreCls extends BaseSchema {
                     console.log(businessHours);
                     return validatePeriod(businessHours);
                 },
-                message: ""
+                message: "Validation Fail"
             }
         ],
         default: []
@@ -180,12 +183,6 @@ export class StoreCls extends BaseSchema {
                 message: "PeriodOption.unit 값은 음수가 될 수 없습니다."
             }
         ]
-        // required: [
-        //     function(this: DocumentType<StoreCls>) {
-        //         return this.usingPeriodOption;
-        //     },
-        //     "PeriodOption가 설정되지 않았습니다."
-        // ]
     })
     periodOption: PeriodOption;
 
@@ -215,6 +212,43 @@ export class StoreCls extends BaseSchema {
 
     @prop()
     intro: string;
+
+    @prop({
+        default: [],
+        set(this: DocumentType<StoreCls>, cf: CustomFieldDefineInput[]) {
+            return cf.map(c => {
+                return {
+                    key: new ObjectId(c.key || undefined),
+                    ...c
+                };
+            });
+        },
+        get(this: DocumentType<StoreCls>, cf: CustomField[]) {
+            return cf;
+        },
+        validate: [
+            {
+                validator(
+                    this: DocumentType<StoreCls>,
+                    value: CustomField[]
+                ): boolean {
+                    console.log({
+                        value
+                    });
+                    let result = true;
+                    value.forEach(v => {
+                        if (v.type === "LIST" && v.list.length === 0) {
+                            result = false;
+                        }
+                    });
+                    return result;
+                },
+                message:
+                    "CustomField Validation Error => type=List but List is empty"
+            }
+        ]
+    })
+    customFields: CustomField[];
 }
 
 export const StoreModel = getModelForClass(StoreCls);

@@ -2,7 +2,7 @@
 import { CountryInfoModel } from "../../../models/CountryInfo";
 import { getGeoInfoByIP } from "../../../utils/geoLocationAPI";
 import { getIP } from "../../../utils/utils";
-import { Zoneinfo, PeriodInput } from "GraphType";
+import { Zoneinfo, PeriodInput, CustomField } from "GraphType";
 import { defaultResolver } from "../../../utils/resolverFuncWrapper";
 import { PeriodCls } from "../../../utils/Period";
 import { genCode } from "../../../models/utils/genId";
@@ -56,6 +56,15 @@ const resolver = {
             obj.validate();
             const p = new PeriodCls(period);
             return obj.intersactions(p);
+        }
+    },
+    CustomField: {
+        list: (parent: CustomField): string[] => {
+            if (parent.type === "LIST") {
+                return parent.list;
+            } else {
+                return [];
+            }
         }
     },
     Query: {

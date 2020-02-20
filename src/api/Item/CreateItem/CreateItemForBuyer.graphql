@@ -9,9 +9,9 @@ type CreateItemForBuyerResponse {
     data: Item
 }
 input CreateItemForBuyerInput {
-    name: String!
+    name: String
     productCode: String!
-    description: String!
+    description: String
     dateTimeRange: DateTimeRangeInput
     gender: Gender
 }

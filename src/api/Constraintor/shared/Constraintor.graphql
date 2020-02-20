@@ -1,4 +1,0 @@
-type Constraintor {
-    _id: ID!
-    name: String!
-}

@@ -8,7 +8,7 @@ import {
     privateResolver
 } from "../../../utils/resolverFuncWrapper";
 import { ERROR_CODES } from "../../../types/values";
-import { StoreModel } from "../../../models/Store";
+import { StoreModel } from "../../../models/Store/Store";
 
 const resolvers: Resolvers = {
     Query: {

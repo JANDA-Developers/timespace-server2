@@ -18,10 +18,10 @@ const resolvers: Resolvers = {
     Mutation: {
         CreateItem: defaultResolver(
             privateResolver(
-                async (
-                    { parent, info, args, context: { req } },
-                    stack
-                ): Promise<CreateItemResponse> => {
+                async ({
+                    args,
+                    context: { req }
+                }): Promise<CreateItemResponse> => {
                     const session = await mongoose.startSession();
                     session.startTransaction();
                     try {

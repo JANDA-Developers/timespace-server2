@@ -45,7 +45,7 @@
         "ts-node": "^8.6.2"
     },
     "scripts": {
-        "test": "jest --detectOpenHandles --forceExit",
+        "test": "jest --detectOpenHandles --watch",
         "predev": "yarn run types",
         "dev": "cd src && ts-node index.ts -e ts,graphql",
         "dev:local": "cp .env.localhost .env && yarn run dev",
@@ -55,7 +55,7 @@
         "types": "graphql-to-typescript ./src/schema.graphql ./src/types/graph.d.ts",
         "build": "tsc",
         "prebuild": "rm -rf dist",
-        "postbuild": "yarn copy src/api/**/*.graphql src/api/**/*.html dist/api && 7z a ticket-apis.zip ./dist/*",
+        "postbuild": "yarn copy src/api/**/*.graphql src/api/**/*.html dist/api && 7z a ticket-apis.zip ./dist/* && yarn run upload:dev && rm -rf ticket-apis.zip",
         "start": "cd dist && node index.js",
         "upload:dev": "aws s3 cp ./ticket-apis.zip s3://booking.storage.private/dev/ticket/apis.zip",
         "upload": "aws s3 cp ./ticket-apis.zip s3://booking.storage.private/ticket/apis.zip"

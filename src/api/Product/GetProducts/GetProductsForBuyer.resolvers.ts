@@ -6,7 +6,7 @@ import {
     GetProductsForBuyerInput
 } from "GraphType";
 import { defaultResolver } from "../../../utils/resolverFuncWrapper";
-import { StoreModel } from "../../../models/Store";
+import { StoreModel } from "../../../models/Store/Store";
 import { ProductModel } from "../../../models/Product/Product";
 
 const resolvers: Resolvers = {

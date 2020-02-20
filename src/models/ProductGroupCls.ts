@@ -63,6 +63,9 @@ export class ProductGroupCls extends BaseGroup<ProductCls> {
         return await ProductModel.find({
             _id: {
                 $in: this.list
+            },
+            expiresAt: {
+                $exists: false
             }
         });
     }

@@ -1,0 +1,11 @@
+type Query {
+    GetItemById(param: GetItemByIdInput!): GetItemByIdResponse!
+}
+type GetItemByIdResponse {
+    ok: Boolean!
+    error: Err
+    data: Item
+}
+input GetItemByIdInput {
+    itemId: ID!
+}

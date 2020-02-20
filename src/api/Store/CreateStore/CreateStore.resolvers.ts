@@ -3,7 +3,7 @@ import {
     defaultResolver,
     privateResolver
 } from "../../../utils/resolverFuncWrapper";
-import { StoreModel } from "../../../models/Store";
+import { StoreModel } from "../../../models/Store/Store";
 import { CreateStoreInput, CreateStoreResponse } from "GraphType";
 import { errorReturn } from "../../../utils/utils";
 import { mongoose } from "@typegoose/typegoose";
@@ -35,7 +35,8 @@ const resolvers: Resolvers = {
                             warning,
                             groupId,
                             businessHours,
-                            periodOption
+                            periodOption,
+                            customFieldInput
                         } = param as CreateStoreInput;
                         let zoneinfo = cognitoUser.zoneinfo;
                         if (timezone) {
@@ -114,7 +115,8 @@ const resolvers: Resolvers = {
                                     cognitoUser.phone_number,
                                 isVerifiedPhoneNumber: false
                             },
-                            groupIds: [group._id]
+                            groupIds: [group._id],
+                            customFields: customFieldInput
                         });
                         await store.save({ session });
                         await StoreGroupModel.updateOne(

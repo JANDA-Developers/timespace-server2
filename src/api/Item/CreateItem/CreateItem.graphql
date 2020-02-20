@@ -10,6 +10,7 @@ input CreateItemInput {
     storeId: ID!
     productId: ID!
     description: String
+    customFieldValues: [CustomFieldInput!]
     phoneNumber: String
     name: String
     dateTimeRange: DateTimeRangeInput

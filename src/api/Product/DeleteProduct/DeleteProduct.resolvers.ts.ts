@@ -8,7 +8,7 @@ import {
     privateResolver
 } from "../../../utils/resolverFuncWrapper";
 import { ProductModel } from "../../../models/Product/Product";
-import { StoreModel } from "../../../models/Store";
+import { StoreModel } from "../../../models/Store/Store";
 import { ObjectId } from "mongodb";
 import { ERROR_CODES } from "../../../types/values";
 

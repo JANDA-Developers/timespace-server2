@@ -3,7 +3,7 @@ import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
 import { GetStoreForBuyerResponse, GetStoreForBuyerInput } from "GraphType";
 import { defaultResolver } from "../../../utils/resolverFuncWrapper";
-import { StoreModel } from "../../../models/Store";
+import { StoreModel } from "../../../models/Store/Store";
 
 const resolvers: Resolvers = {
     Query: {

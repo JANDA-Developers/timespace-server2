@@ -1,0 +1,29 @@
+type CustomField {
+    key: ID!
+    label: String!
+    type: CustomFieldType!
+    # type===LIST 인 경우 표시할 선택목록
+    list: [String!]
+}
+
+enum CustomFieldType {
+    STRING
+    LIST
+}
+
+input CustomFieldDefineInput {
+    key: ID
+    label: String!
+    type: CustomFieldType!
+    list: [String!]
+}
+
+type CustomFieldValue {
+    key: ID!
+    value: String!
+}
+
+input CustomFieldInput {
+    key: ID!
+    value: String!
+}

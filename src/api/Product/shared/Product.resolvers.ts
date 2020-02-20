@@ -1,7 +1,7 @@
 import { Resolvers } from "../../../types/resolvers";
 import { ProductCls } from "../../../models/Product/Product";
 import { DocumentType } from "@typegoose/typegoose";
-import { StoreModel } from "../../../models/Store";
+import { StoreModel } from "../../../models/Store/Store";
 import { UserModel } from "../../../models/User";
 import { ProductSchedules } from "GraphType";
 

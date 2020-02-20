@@ -7,7 +7,21 @@ type Item implements BaseModel {
     name: String!
     memo: String
     dateTimeRange: DateTimeRange
+    customFieldValues: [CustomFieldValue!]
+    agreeWithPrivacyPolicy: AgreeWithPrivacyPolicy!
     createdAt: DateTime!
     updatedAt: DateTime!
     expiresAt: DateTime
+}
+
+# TODO 나중에 작업해야됨 => Store에 어떤식으로 Content 전문을 저장할지 고민해보기... 버전도 있어야할듯 ㅜ
+type AgreeWithPrivacyPolicy {
+    agree: Boolean!
+    updatedAt: DateTime!
+    createdAt: DateTime!
+}
+
+input AgreeWithPrivacyPolicyInput {
+    agree: Boolean!
+    date: DateTime
 }

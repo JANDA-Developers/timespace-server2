@@ -6,7 +6,7 @@ import {
     defaultResolver,
     privateResolver
 } from "../../../utils/resolverFuncWrapper";
-import { StoreModel } from "../../../models/Store";
+import { StoreModel } from "../../../models/Store/Store";
 import { UserModel } from "../../../models/User";
 import { ObjectId } from "mongodb";
 import { ProductModel } from "../../../models/Product/Product";

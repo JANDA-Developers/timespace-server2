@@ -7,7 +7,7 @@ type UpdateStoreResponse {
     data: Store
 }
 input UpdateStoreInput {
-    storeCode: String!
+    storeId: ID!
     updateParam: StoreUpdateParamInput!
 }
 
@@ -15,4 +15,5 @@ input StoreUpdateParamInput {
     name: String!
     description: String!
     businessHours: [PeriodInput!]
+    customFields: [CustomFieldDefineInput!]
 }

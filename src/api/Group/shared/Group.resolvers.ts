@@ -1,6 +1,6 @@
 import { Resolvers } from "../../../types/resolvers";
 import { UserModel } from "../../../models/User";
-import { StoreModel } from "../../../models/Store";
+import { StoreModel } from "../../../models/Store/Store";
 import { ProductModel } from "../../../models/Product/Product";
 const resolvers: Resolvers = {
     BaseGroup: {

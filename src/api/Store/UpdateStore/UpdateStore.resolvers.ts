@@ -7,7 +7,7 @@ import {
     defaultResolver,
     privateResolver
 } from "../../../utils/resolverFuncWrapper";
-import { StoreModel } from "../../../models/Store";
+import { StoreModel } from "../../../models/Store/Store";
 import { ERROR_CODES } from "../../../types/values";
 
 const resolvers: Resolvers = {
@@ -23,10 +23,16 @@ const resolvers: Resolvers = {
                     try {
                         const { cognitoUser } = req;
                         const {
-                            storeCode,
+                            storeId,
                             updateParam
                         } = param as UpdateStoreInput;
-                        const store = await StoreModel.findByCode(storeCode);
+                        const store = await StoreModel.findById(storeId);
+                        if (!store) {
+                            throw new ApolloError(
+                                "존재하지 않는 Store",
+                                ERROR_CODES.UNEXIST_STORE
+                            );
+                        }
                         if (!store.userId.equals(cognitoUser._id)) {
                             stack.push(cognitoUser, store);
                             throw new ApolloError(

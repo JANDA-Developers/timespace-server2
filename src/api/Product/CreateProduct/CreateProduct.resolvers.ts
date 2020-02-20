@@ -8,7 +8,7 @@ import {
 } from "../../../utils/resolverFuncWrapper";
 import { ProductModel } from "../../../models/Product/Product";
 import { ObjectId } from "mongodb";
-import { StoreModel } from "../../../models/Store";
+import { StoreModel } from "../../../models/Store/Store";
 import { ApolloError } from "apollo-server";
 import { ERROR_CODES } from "../../../types/values";
 import { uploadFile } from "../../../utils/s3Funcs";

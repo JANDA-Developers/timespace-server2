@@ -9,7 +9,7 @@ import { getCollectionName, ModelName } from "./__collectionNames";
 import { ApolloError } from "apollo-server";
 import { ERROR_CODES } from "../types/values";
 import { BaseGroup } from "../abs/BaseGroup";
-import { StoreCls, StoreModel } from "./Store";
+import { StoreCls, StoreModel } from "./Store/Store";
 import { ObjectId } from "mongodb";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.GROUP)))
@@ -49,6 +49,9 @@ export class StoreGroupCls extends BaseGroup<StoreCls> {
         return await StoreModel.find({
             _id: {
                 $in: this.list
+            },
+            expiresAt: {
+                $exists: false
             }
         });
     }

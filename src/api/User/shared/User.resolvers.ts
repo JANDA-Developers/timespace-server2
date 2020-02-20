@@ -1,6 +1,6 @@
 import { Resolvers } from "../../../types/resolvers";
 import { UserModel } from "../../../models/User";
-import { StoreModel } from "../../../models/Store";
+import { StoreModel } from "../../../models/Store/Store";
 import { ObjectId } from "mongodb";
 import { UserRole } from "GraphType";
 import { DocumentType } from "@typegoose/typegoose";
