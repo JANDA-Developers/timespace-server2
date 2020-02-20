@@ -50,6 +50,7 @@ interface BaseResponse {
 type Err {
     code: String
     msg: String
+    origin: Object
 }
 
 type Query {

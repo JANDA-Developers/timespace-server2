@@ -11,7 +11,8 @@ import { ApolloError } from "apollo-server";
 import { ERROR_CODES } from "../../../types/values";
 import { ProductModel } from "../../../models/Product/Product";
 import { ObjectId } from "mongodb";
-import { offsetDate, ONE_MINUTE } from "../../../utils/dateFuncs";
+import { ONE_MINUTE } from "../../../utils/dateFuncs";
+import { DateTimeRangeCls } from "../../../utils/DateTimeRange";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -28,8 +29,6 @@ const resolvers: Resolvers = {
                         const {
                             param
                         }: { param: CreateItemForBuyerInput } = args;
-                        // TODO: cognitoUser로부터 Buyer 권한이 있는지 확인 ㄱㄱ
-                        console.log(cognitoUser);
                         if (cognitoUser["custom:isBuyer"] !== "1") {
                             throw new ApolloError(
                                 "상품 구매 권한이 없습니다. 먼저 Buyer 인증을 해주세요.",
@@ -43,8 +42,6 @@ const resolvers: Resolvers = {
                         const item = new ItemModel();
                         if (param.dateTimeRange) {
                             const { from, to } = param.dateTimeRange;
-                            offsetDate(from, product.periodOption.offset);
-                            offsetDate(to, product.periodOption.offset);
                             item.dateTimeRange = {
                                 from,
                                 to,
@@ -64,8 +61,31 @@ const resolvers: Resolvers = {
 
                         // validation 필요함!
                         // needConfirm
-                        // const businessHours = product.businessHours;
-                        // const dateTimeRange = param.dateTimeRange;
+                        const dateTimeRange = param.dateTimeRange;
+                        if (dateTimeRange) {
+                            const list = await product.getSegmentSchedules(
+                                new DateTimeRangeCls(dateTimeRange)
+                            );
+                            if (list.length === 0) {
+                                throw new ApolloError(
+                                    "이용 가능한 시간이 아닙니다.",
+                                    ERROR_CODES.UNAVAILABLE_BUSINESSHOURS
+                                );
+                            }
+
+                            const isAvailable = list
+                                .map(l => !l.soldOut)
+                                .filter(t => t).length;
+                            if (!isAvailable) {
+                                throw new ApolloError(
+                                    "SoldOut인 Segment가 존재합니다.",
+                                    ERROR_CODES.UNAVAILABLE_SOLD_OUT,
+                                    {
+                                        segment: list
+                                    }
+                                );
+                            }
+                        }
 
                         // 해당 시간에 예약이 가능한지 확인해야됨 ㅎ
 

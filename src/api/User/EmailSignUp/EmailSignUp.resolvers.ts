@@ -9,6 +9,7 @@ import { ApolloError } from "apollo-server";
 import { AttributeType } from "aws-sdk/clients/cognitoidentityserviceprovider";
 import { mongoose } from "@typegoose/typegoose";
 import { StoreGroupModel } from "../../../models/StoreGroup";
+import { errorReturn } from "../../../utils/utils";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -144,16 +145,7 @@ const resolvers: Resolvers = {
                         }
                     };
                 } catch (error) {
-                    await session.abortTransaction();
-                    session.endSession();
-                    return {
-                        ok: false,
-                        error: {
-                            msg: error.message,
-                            code: error.code || error.extensions.code
-                        },
-                        data: null
-                    };
+                    return await errorReturn(error, session);
                 }
             }
         )

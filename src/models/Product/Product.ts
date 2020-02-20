@@ -24,13 +24,14 @@ import {
     divideDateTimeRange
 } from "../../utils/periodFuncs";
 import { PeriodWithDays } from "../../utils/PeriodWithDays";
-import { ItemCls, ItemModel, ItemProps } from "../Item/Item";
+import { ItemCls, ItemModel } from "../Item/Item";
 import { ERROR_CODES } from "../../types/values";
 import { ONE_MINUTE, removeHours } from "../../utils/dateFuncs";
 import { DateTimeRangeCls } from "../../utils/DateTimeRange";
 import { Stage } from "../../types/pipeline";
 import _ from "lodash";
 import { ProductProps, ProductFuncs } from "./Product.interface";
+import { ItemProps } from "../Item/Item.interface";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.PRODUCT)))
 export class ProductCls extends BaseSchema
@@ -387,7 +388,8 @@ export class ProductCls extends BaseSchema
      */
     async getSegmentSchedules(
         this: DocumentType<ProductCls>,
-        dateTimeRange: DateTimeRangeCls
+        dateTimeRange: DateTimeRangeCls,
+        soldOut?: boolean
     ): Promise<
         {
             itemCount: number;
@@ -424,6 +426,10 @@ export class ProductCls extends BaseSchema
                 o.soldOut = this.capacity <= item.count;
             }
         });
+        if (soldOut !== undefined || soldOut === null) {
+            // soldOut false, true 둘중 하나 출력
+            return real.filter(r => r.soldOut === soldOut);
+        }
         return real;
     }
 
@@ -471,6 +477,9 @@ export class ProductCls extends BaseSchema
                 "dateTimeRange 값이 잘못되었습니다. (unit Error)",
                 ERROR_CODES.DATETIMERANGE_UNIT_ERROR,
                 {
+                    from,
+                    to,
+                    cDateWithoutHours,
                     interval
                 }
             );
@@ -492,7 +501,8 @@ export class ProductCls extends BaseSchema
 
     async getSchedulesByDate(
         this: DocumentType<ProductCls>,
-        date: Date
+        date: Date,
+        soldOut?: boolean
     ): Promise<ProductSchedules | null> {
         const unit = this.periodOption.unit;
         const dateTimeRange = extractPeriodFromDate(
@@ -503,9 +513,12 @@ export class ProductCls extends BaseSchema
         if (!dateTimeRange) {
             return null;
         }
-        const list = await this.getSegmentSchedules(dateTimeRange);
-        const schedules = await Promise.all(
-            list.map(async o => {
+        const itemExistsList = await this.getSegmentSchedules(
+            dateTimeRange,
+            soldOut
+        );
+        const list = await Promise.all(
+            itemExistsList.map(async o => {
                 return {
                     ...o,
                     items: ((await ItemModel.find({
@@ -519,7 +532,7 @@ export class ProductCls extends BaseSchema
                 dateTimeRange,
                 unit
             },
-            schedules
+            list
         };
     }
 }

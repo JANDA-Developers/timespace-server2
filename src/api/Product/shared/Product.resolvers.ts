@@ -19,18 +19,23 @@ const resolvers: Resolvers = {
             return user;
         },
         items: async (product: DocumentType<ProductCls>, { date }) => {
+            console.log({
+                date
+            });
             const result = await product.getItems(date);
             return result;
         },
         schedules: async (
             product: DocumentType<ProductCls>,
-            { date }
+            { date, soldOut }
         ): Promise<ProductSchedules | null> => {
-            const result = await product.getSchedulesByDate(date);
-            // console.log(
-            //     "Procuct.Schedules =========================================================="
-            // );
-            // console.info(result);
+            console.log({
+                dateFromSchedules: date
+            });
+            const result = await product.getSchedulesByDate(
+                date,
+                soldOut === null ? undefined : soldOut
+            );
             return result;
         },
         intro: product => {

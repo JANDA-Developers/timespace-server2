@@ -46,7 +46,8 @@ export const errorReturn = async (error: any, dbSession?: ClientSession) => {
         ok: false,
         error: {
             code,
-            msg
+            msg,
+            origin: error
         },
         data: null
     };

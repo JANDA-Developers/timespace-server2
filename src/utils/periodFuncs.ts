@@ -189,3 +189,20 @@ export const validatePeriodWithDays = (
 
     return isDuplicate;
 };
+
+export const validatePeriod = (periodList: PeriodCls[]): boolean => {
+    let isDuplicate = false;
+    periodList
+        .map((p: PeriodCls) => {
+            return p.day;
+        })
+        .reduce((days, day) => {
+            const temp = days | day;
+            if (days === temp) {
+                isDuplicate = true;
+            }
+            return temp;
+        });
+
+    return !isDuplicate;
+};

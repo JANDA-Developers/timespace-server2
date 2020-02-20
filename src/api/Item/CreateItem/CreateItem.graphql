@@ -8,4 +8,10 @@ type CreateItemResponse {
 }
 input CreateItemInput {
     storeId: ID!
+    productId: ID!
+    description: String
+    phoneNumber: String
+    name: String
+    dateTimeRange: DateTimeRangeInput
+    gender: Gender
 }

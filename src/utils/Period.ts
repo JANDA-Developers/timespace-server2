@@ -41,7 +41,18 @@ export class PeriodCls {
                 }
             );
         }
+
         if (this.end < 0) {
+            throw new ApolloError(
+                "[PeriodCls] Period.end 값은 음수가 될 수 없습니다.",
+                "PERIOD_START_NEGATIVE",
+                {
+                    end: this.end
+                }
+            );
+        }
+
+        if (this.end > 1440) {
             throw new ApolloError(
                 "[PeriodCls] Period.end 값은 하루(1440분)을 넘길 수 없습니다.",
                 "PERIOD_END_OVER_ONEDAY",

@@ -6,18 +6,23 @@ function serialize(value: string | number): Date | null {
     return date;
 }
 
-function parseValue(value: number | Date): string | null {
+function parseValue(value: number | Date) {
     const date = new Date(value);
     if (isNaN(date.getTime())) {
         throw new Error("Invalid Date Value");
     }
-    return date.toISOString();
+    return date;
 }
 
 function parseLiteral(ast: ASTNode): Date | null {
     switch (ast.kind) {
-        case Kind.STRING:
-            return new Date(ast.value);
+        case Kind.STRING: {
+            const d = new Date(ast.value);
+            if (d.toString() === "Invalid Date") {
+                return new Date(parseInt(ast.value));
+            }
+            return d;
+        }
         case Kind.INT:
             return new Date(parseInt(ast.value));
         default:

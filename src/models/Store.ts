@@ -18,7 +18,11 @@ import {
 } from "GraphType";
 import { ERROR_CODES } from "../types/values";
 import { PeriodCls } from "../utils/Period";
-import { setPeriodToDB, getPeriodFromDB } from "../utils/periodFuncs";
+import {
+    setPeriodToDB,
+    getPeriodFromDB,
+    validatePeriod
+} from "../utils/periodFuncs";
 import { PeriodWithDays } from "../utils/PeriodWithDays";
 import _ from "lodash";
 
@@ -141,10 +145,22 @@ export class StoreCls extends BaseSchema {
             try {
                 return setPeriodToDB(periodArr, this.periodOption.offset);
             } catch (error) {
-                console.log(error);
                 return [];
             }
         },
+        validate: [
+            {
+                validator(
+                    this: DocumentType<StoreCls>,
+                    businessHours: Array<PeriodCls>
+                ) {
+                    console.log("In Validator");
+                    console.log(businessHours);
+                    return validatePeriod(businessHours);
+                },
+                message: ""
+            }
+        ],
         default: []
     })
     businessHours: Array<PeriodWithDays>;
