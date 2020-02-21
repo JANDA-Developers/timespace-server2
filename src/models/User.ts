@@ -10,6 +10,7 @@ import { ApolloError } from "apollo-server";
 import { BaseSchema, createSchemaOptions } from "../abs/BaseSchema";
 import { Zoneinfo, UserRole } from "GraphType";
 import { CognitoIdentityServiceProvider } from "aws-sdk";
+import { ERROR_CODES } from "../types/values";
 
 export type LoggedInInfo = {
     idToken: string;
@@ -28,7 +29,7 @@ export class UserCls extends BaseSchema {
         if (!user) {
             throw new ApolloError(
                 "존재하지 않는 UserSub입니다",
-                "INVALID_USER_SUB",
+                ERROR_CODES.INVALID_USER_SUB,
                 { userSub: sub }
             );
         }
@@ -62,9 +63,6 @@ export class UserCls extends BaseSchema {
     email_verified: boolean;
     phone_number_verified: boolean;
     name: string;
-
-    @prop()
-    _id: ObjectId;
 
     @prop({ default: [] })
     roles: UserRole[];

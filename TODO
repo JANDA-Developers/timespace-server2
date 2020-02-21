@@ -1,3 +1,27 @@
+DevOps: 
+  Test Scenario:
+    User:
+      ☐ SignUp
+      ☐ Verification
+      ☐ SignIn
+    Store:
+      ☐ CreateStore
+      ☐ UpdateStore
+      ☐ DeleteStore
+    Product:
+      ☐ CreateProduct
+        # 힝 ㅜㅜ
+      ☐ UpdateProduct
+      ☐ DeleteProduct
+    Item:
+      ☐ CreateItemForBuyer
+      ☐ CreateItem
+      ☐ UpdateItem
+      ☐ CancelItem
+      ☐ DeleteItem
+      ☐ GetItemsForBuyer
+      ☐ GetItems
+
 User Flow:
   About Cognito: 
     ✔ Let's study about cognito @done(20-02-15 19:20)
@@ -6,10 +30,17 @@ User Flow:
     ✔ SignUp @done(20-02-15 19:20)
     ✔ SignIn @done(20-02-15 19:20)
     ✔ Testing @done(20-02-15 19:20)
+  
+  Google Sign In:
+    ☐ Intergrate with google
+    ☐ Need to get some information...
 
 Schemas: 
   Product:
-    ☐ BusinessHours, PeriodOption Validation
+    ✔ BusinessHours, PeriodOption Validation @done(20-02-21 18:58)
       # Validation
-    ☐ Need Interface For ItemIsAbleToBuy
+    ✔ Need Interface For ItemIsAbleToBuy @done(20-02-21 18:58)
       # Validate with PeriodOption & DateRange
+  Item: 
+    ☐ ConfirmItem @high 
+    ☐ CancelItem @high 

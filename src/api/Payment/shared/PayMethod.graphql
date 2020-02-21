@@ -1,14 +1,22 @@
 type PayMethod {
     type: PayMethodType!
-    cardInfo: CardInfo
+    info: PayMethodInfo!
 }
 
-type CardInfo {
+type BillInfo {
     no: String!
     billKey: String!
     isEnabled: Boolean!
     createdAt: DateTime!
     updatedAt: DateTime
+}
+
+union PayMethodInfo = BillInfo | BankTransferInfo
+
+type BankTransferInfo {
+    account: String!
+    bankHolder: String!
+    bankName: String!
 }
 
 enum PayMethodType {

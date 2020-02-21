@@ -131,11 +131,11 @@ export const setPeriodToDB = (
  * @param date 날짜 => Hours 이하 필드들은 0으로 set한 뒤에 사용됨
  * @param offset
  */
-export const extractPeriodFromDate = (
+export const getDateTimeRangeFromPeriodList = (
     periodArr: Array<PeriodWithDays>,
     date: Date,
     offset: Hour
-) => {
+): DateTimeRangeCls | undefined => {
     const periodList = splitPeriods(periodArr, offset);
     // 왜 2개가 나옴?
     const dateRanges = periodList

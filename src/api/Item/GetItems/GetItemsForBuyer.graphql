@@ -1,0 +1,11 @@
+type Query {
+    GetItemsForBuyer(param: GetItemsForBuyerInput!): GetItemsForBuyerResponse!
+}
+type GetItemsForBuyerResponse {
+    ok: Boolean!
+    error: Err
+    data: [Item!]
+}
+input GetItemsForBuyerInput {
+    filter: GetItemsFilterInput!
+}

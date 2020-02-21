@@ -20,13 +20,13 @@ import { ApolloError } from "apollo-server";
 import {
     getPeriodFromDB,
     setPeriodToDB,
-    extractPeriodFromDate,
+    getDateTimeRangeFromPeriodList,
     divideDateTimeRange
 } from "../../utils/periodFuncs";
 import { PeriodWithDays } from "../../utils/PeriodWithDays";
 import { ItemCls, ItemModel } from "../Item/Item";
 import { ERROR_CODES } from "../../types/values";
-import { ONE_MINUTE, removeHours } from "../../utils/dateFuncs";
+import { ONE_MINUTE } from "../../utils/dateFuncs";
 import { DateTimeRangeCls } from "../../utils/DateTimeRange";
 import { Stage } from "../../types/pipeline";
 import _ from "lodash";
@@ -441,33 +441,19 @@ export class ProductCls extends BaseSchema
         this: DocumentType<ProductCls>,
         date: Date
     ): Promise<Array<DocumentType<ItemCls>>> {
-        // TODO: 스케줄 어떻게 구할까?
-        // Date로 부터 from, to를 구한다.
-        // 하루 중 최소값의 Date, 최대값의 Date를 구해야함.
-        const offsetMinutes = this.periodOption.offset * 60;
-        const mDate = new Date(date.getTime() - offsetMinutes * 60000);
-        let st: number = 1440 - offsetMinutes;
-        let ed: number = 0 - offsetMinutes;
-        const cDay = 1 << mDate.getDay();
-        this.businessHours.forEach(({ days, start, end, time }) => {
-            // days를 비교하여 포함되어있는지 확인 ㄱㄱ
-            const isIncludeInDays = (days & cDay) === cDay;
-            if (isIncludeInDays) {
-                // 포함하고 있으면 뭐 어떻게 해야함?
-                if (start < st) {
-                    // start = -60
-                    st = start;
-                }
-                if (ed < end) {
-                    // end = 720
-                    ed = end;
-                }
-            }
-        });
-        const cDateWithoutHours = removeHours(date).getTime();
-        const from = new Date(cDateWithoutHours + st * ONE_MINUTE);
-        const to = new Date(cDateWithoutHours + ed * ONE_MINUTE);
-        // TODO: 해야됨 ㅎ
+        date.setUTCHours(0, 0, 0, 0);
+        const dateTimeRange = getDateTimeRangeFromPeriodList(
+            this.businessHours,
+            date,
+            this.periodOption.offset
+        );
+        if (!dateTimeRange) {
+            throw new ApolloError(
+                "포함되지 않는 날짜입니다.",
+                ERROR_CODES.UNAVAILABLE_QUERY_DATE
+            );
+        }
+        const { from, to } = dateTimeRange;
         const interval = Math.floor(
             (from.getTime() - to.getTime()) / ONE_MINUTE
         );
@@ -479,7 +465,6 @@ export class ProductCls extends BaseSchema
                 {
                     from,
                     to,
-                    cDateWithoutHours,
                     interval
                 }
             );
@@ -505,7 +490,8 @@ export class ProductCls extends BaseSchema
         soldOut?: boolean
     ): Promise<ProductSchedules | null> {
         const unit = this.periodOption.unit;
-        const dateTimeRange = extractPeriodFromDate(
+        date.setUTCHours(0, 0, 0, 0);
+        const dateTimeRange = getDateTimeRangeFromPeriodList(
             this.businessHours,
             date,
             this.periodOption.offset
@@ -517,6 +503,9 @@ export class ProductCls extends BaseSchema
             dateTimeRange,
             soldOut
         );
+        console.info({
+            itemExistsList
+        });
         const list = await Promise.all(
             itemExistsList.map(async o => {
                 return {

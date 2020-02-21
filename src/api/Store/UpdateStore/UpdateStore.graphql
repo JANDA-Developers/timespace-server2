@@ -12,8 +12,12 @@ input UpdateStoreInput {
 }
 
 input StoreUpdateParamInput {
-    name: String!
-    description: String!
+    name: String
+    description: String
     businessHours: [PeriodInput!]
     customFields: [CustomFieldDefineInput!]
+    warning: String
+    intro: String
+    customFieldInput: [CustomFieldDefineInput!]
+    manager: ManagerInput
 }

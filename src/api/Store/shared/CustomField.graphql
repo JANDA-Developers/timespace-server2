@@ -4,6 +4,8 @@ type CustomField {
     type: CustomFieldType!
     # type===LIST 인 경우 표시할 선택목록
     list: [String!]
+    placeHolder: String
+    default: String
 }
 
 enum CustomFieldType {
@@ -16,6 +18,8 @@ input CustomFieldDefineInput {
     label: String!
     type: CustomFieldType!
     list: [String!]
+    placeHolder: String
+    default: String
 }
 
 type CustomFieldValue {

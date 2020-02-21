@@ -1,0 +1,19 @@
+type Query {
+    GetItems(param: GetItemsInput!): GetItemsResponse!
+}
+type GetItemsResponse {
+    ok: Boolean!
+    error: Err
+    data: [Item!]
+}
+input GetItemsInput {
+    storeId: ID!
+    filter: GetItemsFilterInput!
+}
+
+input GetItemsFilterInput {
+    productCode: String
+    productId: String
+    date: DateTime
+    name: String
+}
