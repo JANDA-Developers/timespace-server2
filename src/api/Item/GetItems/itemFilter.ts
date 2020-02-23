@@ -2,6 +2,7 @@ import { GetItemsFilterInput } from "../../../types/graph";
 import { Minute } from "../../../types/values";
 import { ONE_DAY, ONE_HOUR } from "../../../utils/dateFuncs";
 import { ObjectId } from "mongodb";
+import { DateTimeRangeCls } from "../../../utils/DateTimeRange";
 
 export const makeFilterQuery = (
     filter: GetItemsFilterInput,
@@ -15,6 +16,16 @@ export const makeFilterQuery = (
         };
         query["dateTimeRange.from"] = {
             $lt: new Date(nDate.getTime() + ONE_DAY)
+        };
+    }
+    if (filter.dateTimeRange) {
+        const dateTimeRangeCls = new DateTimeRangeCls(filter.dateTimeRange);
+
+        query["dateTimeRange.to"] = {
+            $gt: dateTimeRangeCls.from
+        };
+        query["dateTimeRange.from"] = {
+            $lt: dateTimeRangeCls.to
         };
     }
     if (filter.name) {

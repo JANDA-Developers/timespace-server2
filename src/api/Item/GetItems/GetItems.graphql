@@ -15,5 +15,6 @@ input GetItemsFilterInput {
     productCode: String
     productId: String
     date: DateTime
+    dateTimeRange: DateTimeRangeInput
     name: String
 }

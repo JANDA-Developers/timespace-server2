@@ -15,4 +15,5 @@ input CreateItemForBuyerInput {
     dateTimeRange: DateTimeRangeInput
     gender: Gender
     customFieldValues: [CustomFieldInput!]
+    phoneNumber: String
 }

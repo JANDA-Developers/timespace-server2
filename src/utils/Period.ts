@@ -52,15 +52,16 @@ export class PeriodCls {
             );
         }
 
-        if (this.end > 1440) {
-            throw new ApolloError(
-                "[PeriodCls] Period.end 값은 하루(1440분)을 넘길 수 없습니다.",
-                "PERIOD_END_OVER_ONEDAY",
-                {
-                    end: this.end
-                }
-            );
-        }
+        // 1440을 넘길 수 있음... 다음날 새벽까지 영업을 하는 경우.
+        // if (this.end > 1440) {
+        //     throw new ApolloError(
+        //         "[PeriodCls] Period.end 값은 하루(1440분)을 넘길 수 없습니다.",
+        //         "PERIOD_END_OVER_ONEDAY",
+        //         {
+        //             end: this.end
+        //         }
+        //     );
+        // }
 
         if (this.time > 1440) {
             throw new ApolloError(

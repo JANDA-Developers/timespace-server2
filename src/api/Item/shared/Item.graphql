@@ -6,6 +6,7 @@ type Item implements BaseModel {
     code: String!
     name: String!
     memo: String
+    phoneNumner: String
     dateTimeRange: DateTimeRange
     customFieldValues: [CustomFieldValue!]
     agreeWithPrivacyPolicy: AgreeWithPrivacyPolicy!

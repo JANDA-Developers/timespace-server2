@@ -23,6 +23,10 @@ DevOps:
       ☐ GetItems
 
 User Flow:
+  Commons:
+    Pagination:
+      ☐ Read articles about Cursor Base Pagination
+      ☐ Make it!
   About Cognito: 
     ✔ Let's study about cognito @done(20-02-15 19:20)
 

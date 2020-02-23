@@ -12,6 +12,9 @@ import { ProductModel } from "../Product/Product";
 import { DateTimeRangeCls } from "../../utils/DateTimeRange";
 import { DateTimeRange, CustomFieldValue, CustomFieldInput } from "GraphType";
 import { ItemProps, ItemFuncs } from "./Item.interface";
+import { StoreModel } from "../Store/Store";
+import { ApolloError } from "apollo-server";
+import { ERROR_CODES } from "../../types/values";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.ITEM)))
 export class ItemCls extends BaseSchema implements ItemProps, ItemFuncs {
@@ -64,10 +67,29 @@ export class ItemCls extends BaseSchema implements ItemProps, ItemFuncs {
 
     @prop({
         default: [],
-        set(this: DocumentType<ItemCls>, cf: CustomFieldInput[]) {
+        async set(this: DocumentType<ItemCls>, cf: CustomFieldInput[]) {
+            const store = await StoreModel.findOne({
+                storeId: this.storeId,
+                expiresAt: {
+                    $exists: false
+                }
+            });
+            if (!store) {
+                throw new ApolloError(
+                    "존재하지 않거나 삭제된 Store",
+                    ERROR_CODES.UNEXIST_STORE,
+                    {
+                        store
+                    }
+                );
+            }
+
             return cf.map(c => {
+                const key = new ObjectId(c.key);
+                const field = store.customFields.find(cf => key.equals(cf.key));
                 return {
-                    key: new ObjectId(c.key),
+                    key,
+                    label: (field && field.label) || "",
                     value: c.value
                 };
             });
@@ -82,6 +104,9 @@ export class ItemCls extends BaseSchema implements ItemProps, ItemFuncs {
         }
     })
     customFieldValues: CustomFieldValue[];
+
+    @prop()
+    phoneNumber: string;
 }
 
 export const ItemModel = getModelForClass(ItemCls);
