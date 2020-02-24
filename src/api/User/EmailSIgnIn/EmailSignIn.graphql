@@ -16,5 +16,5 @@ input EmailSignInInput {
 
 type EmailSignInResult {
     token: String!
-    expiresIn: Int!
+    expiresIn: DateTime!
 }

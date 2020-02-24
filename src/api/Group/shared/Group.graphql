@@ -9,7 +9,7 @@ interface BaseGroup {
     list: [BaseModel!]
     createdAt: DateTime!
     updatedAt: DateTime!
-    expiresAt: DateTime!
+    expiresAt: DateTime
 }
 
 enum GroupType {

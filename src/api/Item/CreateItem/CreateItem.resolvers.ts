@@ -13,6 +13,7 @@ import { ItemModel } from "../../../models/Item/Item";
 import { ONE_MINUTE } from "../../../utils/dateFuncs";
 import { ObjectId } from "mongodb";
 import { DateTimeRangeCls } from "../../../utils/DateTimeRange";
+import { StoreModel } from "../../../models/Store/Store";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -51,13 +52,43 @@ const resolvers: Resolvers = {
                                 )
                             };
                         }
+                        const store = await StoreModel.findById(
+                            product.storeId
+                        );
+                        if (!store) {
+                            throw new ApolloError(
+                                "존재하지 않는 StoreId",
+                                ERROR_CODES.UNEXIST_STORE
+                            );
+                        }
                         for (const fieldName in param) {
-                            const element = param[fieldName];
+                            let element = param[fieldName];
+                            if (fieldName === "customFieldValues") {
+                                const field = store.customFields;
+                                element = param.customFieldValues.map(
+                                    cstField => {
+                                        const key = new ObjectId(cstField.key);
+                                        const label = field.find(f =>
+                                            key.equals(f.key)
+                                        )?.label;
+                                        return {
+                                            key,
+                                            label,
+                                            value: cstField.value
+                                        };
+                                    }
+                                );
+                            }
                             item[fieldName] = element;
                         }
                         item.productId = product._id;
                         item.storeId = product.storeId;
                         item.buyerId = new ObjectId(cognitoUser._id);
+                        await item
+                            .applyStatus("PERMITTED", {
+                                workerId: new ObjectId(cognitoUser._id)
+                            })
+                            .save({ session });
                         await item.setCode(product.code, now);
 
                         // validation 필요함!

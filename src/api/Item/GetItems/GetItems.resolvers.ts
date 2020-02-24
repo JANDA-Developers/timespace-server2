@@ -43,7 +43,7 @@ const resolvers: Resolvers = {
                         const items = await ItemModel.find({
                             storeId: store._id,
                             ...query
-                        });
+                        }).sort({ createdAt: -1 });
 
                         return {
                             ok: true,

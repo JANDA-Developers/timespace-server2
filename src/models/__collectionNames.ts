@@ -5,6 +5,7 @@ export enum ModelName {
     GROUP = "GroupList",
     PRODUCT = "ProductList",
     ITEM = "ItemList",
+    ITEM_STATUS_CHANGE = "ItemStatusChangeHistory",
     ZONE_INFO = "CountryInfoList",
     NOTIFICATION = "Notifications",
     PAYMETHOD = "PayMethodList",

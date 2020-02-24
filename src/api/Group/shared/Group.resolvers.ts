@@ -23,6 +23,14 @@ const resolvers: Resolvers = {
         }
     },
     StoreGroup: {
+        user: async (group: any) => {
+            const user = await UserModel.findById(group.userId);
+            if (!user) {
+                return null;
+            }
+            await user.setAttributesFronCognito();
+            return user;
+        },
         list: async (group: any) => {
             return await StoreModel.find({
                 _id: {
@@ -32,6 +40,14 @@ const resolvers: Resolvers = {
         }
     },
     ProductGroup: {
+        user: async (group: any) => {
+            const user = await UserModel.findById(group.userId);
+            if (!user) {
+                return null;
+            }
+            await user.setAttributesFronCognito();
+            return user;
+        },
         list: async (group: any) => {
             return await ProductModel.find({
                 _id: {

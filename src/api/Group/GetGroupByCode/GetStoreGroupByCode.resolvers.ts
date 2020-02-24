@@ -1,4 +1,3 @@
-import { mongoose } from "@typegoose/typegoose";
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
 import {
@@ -6,7 +5,7 @@ import {
     GetStoreGroupByCodeInput
 } from "GraphType";
 import { defaultResolver } from "../../../utils/resolverFuncWrapper";
-import { ProductGroupModel } from "../../../models/ProductGroupCls";
+import { StoreGroupModel } from "../../../models/StoreGroup";
 
 const resolvers: Resolvers = {
     Query: {
@@ -14,18 +13,16 @@ const resolvers: Resolvers = {
             async ({
                 args: { param }
             }): Promise<GetStoreGroupByCodeResponse> => {
-                const session = await mongoose.startSession();
-                session.startTransaction();
                 try {
                     const { groupCode } = param as GetStoreGroupByCodeInput;
-                    const group = await ProductGroupModel.findByCode(groupCode);
+                    const group = await StoreGroupModel.findByCode(groupCode);
                     return {
                         ok: true,
                         error: null,
                         data: group as any
                     };
                 } catch (error) {
-                    return await errorReturn(error, session);
+                    return await errorReturn(error);
                 }
             }
         )

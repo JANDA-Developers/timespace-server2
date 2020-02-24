@@ -9,5 +9,5 @@ type ProductGroup implements BaseGroup {
     list: [Product!]
     createdAt: DateTime!
     updatedAt: DateTime!
-    expiresAt: DateTime!
+    expiresAt: DateTime
 }

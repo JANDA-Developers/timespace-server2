@@ -1,2 +1,4 @@
 graph.d.ts
 *.test.*
+/node_modules
+/dist

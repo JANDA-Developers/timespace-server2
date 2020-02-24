@@ -10,14 +10,31 @@ import { ObjectId } from "mongodb";
 import { genItemCode } from "../utils/genId";
 import { ProductModel } from "../Product/Product";
 import { DateTimeRangeCls } from "../../utils/DateTimeRange";
-import { DateTimeRange, CustomFieldValue, CustomFieldInput } from "GraphType";
+import { DateTimeRange, CustomFieldValue, ItemStatus } from "GraphType";
 import { ItemProps, ItemFuncs } from "./Item.interface";
-import { StoreModel } from "../Store/Store";
+import {
+    ItemStatusChangedCls,
+    ItemStatusChangedHistoryModel
+} from "../ItemStatusChangedHistory/ItemStatusChanged";
+import { ItemStatusHistoryProps } from "../ItemStatusChangedHistory/ItemStatusChanged.interface";
 import { ApolloError } from "apollo-server";
 import { ERROR_CODES } from "../../types/values";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.ITEM)))
 export class ItemCls extends BaseSchema implements ItemProps, ItemFuncs {
+    static async findByCode(itemCode: string): Promise<DocumentType<ItemCls>> {
+        const item = await ItemModel.findOne({
+            code: itemCode
+        });
+        if (!item) {
+            throw new ApolloError(
+                "존재하지 않는 itemCode입니다",
+                ERROR_CODES.UNEXIST_ITEM
+            );
+        }
+        return item;
+    }
+
     @prop()
     name: string;
 
@@ -67,37 +84,21 @@ export class ItemCls extends BaseSchema implements ItemProps, ItemFuncs {
 
     @prop({
         default: [],
-        async set(this: DocumentType<ItemCls>, cf: CustomFieldInput[]) {
-            const store = await StoreModel.findOne({
-                storeId: this.storeId,
-                expiresAt: {
-                    $exists: false
-                }
-            });
-            if (!store) {
-                throw new ApolloError(
-                    "존재하지 않거나 삭제된 Store",
-                    ERROR_CODES.UNEXIST_STORE,
-                    {
-                        store
-                    }
-                );
-            }
-
+        set(this: DocumentType<ItemCls>, cf: any[]) {
             return cf.map(c => {
                 const key = new ObjectId(c.key);
-                const field = store.customFields.find(cf => key.equals(cf.key));
                 return {
                     key,
-                    label: (field && field.label) || "",
+                    label: c.label || "",
                     value: c.value
                 };
             });
         },
-        get(this: DocumentType<ItemCls>, cf: CustomFieldInput[]) {
+        get(this: DocumentType<ItemCls>, cf: any[]) {
             return cf.map(c => {
                 return {
                     key: new ObjectId(c.key),
+                    label: c.label || "",
                     value: c.value
                 };
             });
@@ -107,6 +108,68 @@ export class ItemCls extends BaseSchema implements ItemProps, ItemFuncs {
 
     @prop()
     phoneNumber: string;
+
+    @prop({ default: "PENDING" })
+    status: ItemStatus;
+
+    @prop({
+        default: () => [],
+        get: ids => ids.map((id: any) => new ObjectId(id)),
+        set: ids => ids.map((id: any) => new ObjectId(id))
+    })
+    statusChangedHistory: ObjectId[];
+
+    applyStatus(
+        status: ItemStatus,
+        options: {
+            comment?: string;
+            workerId?: ObjectId;
+        } = {}
+    ): DocumentType<ItemStatusChangedCls> {
+        if (this.status === status && this.status !== "PENDING") {
+            throw new ApolloError(
+                `이미 ${this.status} 상태 입니다.`,
+                status === "PERMITTED"
+                    ? ERROR_CODES.ALREADY_PERMITTED_ITEM
+                    : ERROR_CODES.ALREADY_CANCELED_ITEM,
+                {
+                    loc: "Item.applyStatus",
+                    data: {
+                        currentItemStatus: this.status,
+                        yourInput: status
+                    }
+                }
+            );
+        }
+        if (this.status === "CANCELED" && status === "PERMITTED") {
+            throw new ApolloError(
+                "CANCELED 상태의 아이템은 PERMITTED 상태로 변경할 수 없습니다",
+                ERROR_CODES.IMPOSIBLE_CHANGE_ITEM_STATUS,
+                {
+                    loc: "Item.applyStatus",
+                    data: {
+                        currentItemStatus: this.status,
+                        yourInput: status
+                    }
+                }
+            );
+        }
+        this.status = status;
+        const itemStatusChangedHistory = new ItemStatusChangedHistoryModel({
+            workerId: options.workerId && this.buyerId,
+            comment: options.comment || "",
+            type: "ITEM",
+            status,
+            itemId: this._id
+        } as ItemStatusHistoryProps);
+        const tempArr = [
+            itemStatusChangedHistory._id,
+            ...this.statusChangedHistory
+        ];
+        this.statusChangedHistory = tempArr;
+        console.log(this);
+        return itemStatusChangedHistory;
+    }
 }
 
 export const ItemModel = getModelForClass(ItemCls);

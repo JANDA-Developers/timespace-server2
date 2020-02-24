@@ -24,6 +24,7 @@ input CustomFieldDefineInput {
 
 type CustomFieldValue {
     key: ID!
+    label: String!
     value: String!
 }
 

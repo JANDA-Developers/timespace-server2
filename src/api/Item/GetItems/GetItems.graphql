@@ -17,4 +17,5 @@ input GetItemsFilterInput {
     date: DateTime
     dateTimeRange: DateTimeRangeInput
     name: String
+    status: ItemStatus
 }

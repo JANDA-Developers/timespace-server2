@@ -6,8 +6,11 @@ type Item implements BaseModel {
     code: String!
     name: String!
     memo: String
-    phoneNumner: String
+    status: ItemStatus!
+    statusChangedHistory: [ItemStatusChanged!]
+    phoneNumber: String
     dateTimeRange: DateTimeRange
+    permissionInfo: ItemPermissionInfo
     customFieldValues: [CustomFieldValue!]
     agreeWithPrivacyPolicy: AgreeWithPrivacyPolicy!
     createdAt: DateTime!
@@ -25,4 +28,28 @@ type AgreeWithPrivacyPolicy {
 input AgreeWithPrivacyPolicyInput {
     agree: Boolean!
     date: DateTime
+}
+
+enum ItemStatus {
+    # 취소됨
+    CANCELED
+    # 대기중
+    PENDING
+    # 허가완료
+    PERMITTED
+}
+
+type ItemPermissionInfo {
+    date: DateTime!
+    user: User!
+    comment: String
+}
+
+type ItemStatusChanged {
+    type: String!
+    status: ItemStatus!
+    worker: User!
+    comment: String
+    item: Item!
+    date: DateTime!
 }

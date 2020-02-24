@@ -13,7 +13,7 @@ type Product implements BaseModel {
     expiresAt: DateTime
     warning: String
     intro: String
-    items(date: DateTime!): [Item!]
+    items(date: DateTime!, status: ItemStatus): [Item!]
     # null이 출력되는 경우 해당 date값이 영업시간이 포함되지 않기 때문임.
     schedules(date: DateTime!, soldOut: Boolean): ProductSchedules
 
@@ -22,6 +22,7 @@ type Product implements BaseModel {
     businessHours: [Period!]
     # Min, Max는 변경 가능하지만 Unit은 변경 불가
     periodOption: PeriodOption
+    totalItemCount: Int!
 }
 
 type ProductSegment {

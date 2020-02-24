@@ -10,5 +10,5 @@ type StoreGroup implements BaseGroup {
     list: [Store!]
     createdAt: DateTime!
     updatedAt: DateTime!
-    expiresAt: DateTime!
+    expiresAt: DateTime
 }

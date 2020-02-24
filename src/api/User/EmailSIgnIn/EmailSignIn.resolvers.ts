@@ -89,7 +89,10 @@ const resolvers: Resolvers = {
                     error: null,
                     data: {
                         token: authResult.IdToken || "",
-                        expiresIn: (authResult.ExpiresIn || 0) * 1000
+                        expiresIn: new Date(
+                            (authResult.ExpiresIn || 0) * 1000 +
+                                new Date().getTime()
+                        )
                     }
                 };
             }

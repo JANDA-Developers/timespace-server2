@@ -39,7 +39,7 @@ const resolvers: Resolvers = {
                                 $exists: false
                             },
                             ...query
-                        });
+                        }).sort({ createdAt: -1 });
 
                         return {
                             ok: true,

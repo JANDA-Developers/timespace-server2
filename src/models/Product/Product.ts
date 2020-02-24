@@ -13,7 +13,8 @@ import {
     PeriodOption,
     ProductSchedules,
     Segment,
-    Item
+    Item,
+    ItemStatus
 } from "GraphType";
 import { genCode, s4 } from "../utils/genId";
 import { ApolloError } from "apollo-server";
@@ -32,6 +33,7 @@ import { Stage } from "../../types/pipeline";
 import _ from "lodash";
 import { ProductProps, ProductFuncs } from "./Product.interface";
 import { ItemProps } from "../Item/Item.interface";
+import { removeUndefined } from "../../utils/objectFuncs";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.PRODUCT)))
 export class ProductCls extends BaseSchema
@@ -83,6 +85,9 @@ export class ProductCls extends BaseSchema
 
     @prop({ default: () => true })
     needToConfirm: boolean;
+
+    @prop({ default: () => false })
+    needToPermit: boolean;
 
     @prop({ default: () => false })
     usingPeriodOption: boolean;
@@ -270,7 +275,8 @@ export class ProductCls extends BaseSchema
                     },
                     "dateTimeRange.to": {
                         $gt: dateTimeRange.from
-                    }
+                    },
+                    status: "PERMITTED" as ItemStatus
                 }
             },
             {
@@ -439,7 +445,8 @@ export class ProductCls extends BaseSchema
      */
     async getItems(
         this: DocumentType<ProductCls>,
-        date: Date
+        date: Date,
+        status?: ItemStatus
     ): Promise<Array<DocumentType<ItemCls>>> {
         date.setUTCHours(0, 0, 0, 0);
         const dateTimeRange = getDateTimeRangeFromPeriodList(
@@ -469,18 +476,21 @@ export class ProductCls extends BaseSchema
                 }
             );
         }
-        const items = await ItemModel.find({
-            productId: this._id,
-            "dateTimeRange.from": {
-                $lte: to
-            },
-            "dateTimeRange.to": {
-                $gt: from
-            },
-            expiresAt: {
-                $exists: false
-            }
-        });
+        const items = await ItemModel.find(
+            removeUndefined({
+                productId: this._id,
+                "dateTimeRange.from": {
+                    $lte: to
+                },
+                "dateTimeRange.to": {
+                    $gt: from
+                },
+                status,
+                expiresAt: {
+                    $exists: false
+                }
+            })
+        );
         return items;
     }
 

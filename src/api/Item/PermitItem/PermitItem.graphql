@@ -1,0 +1,13 @@
+type Mutation {
+    PermitItem(param: PermitItemInput!): PermitItemResponse!
+}
+# 아이템 승인
+type PermitItemResponse {
+    ok: Boolean!
+    error: Err
+    data: Item
+}
+input PermitItemInput {
+    itemId: ID!
+    comment: String
+}

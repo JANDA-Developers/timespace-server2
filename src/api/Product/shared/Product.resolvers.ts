@@ -4,6 +4,7 @@ import { DocumentType } from "@typegoose/typegoose";
 import { StoreModel } from "../../../models/Store/Store";
 import { UserModel } from "../../../models/User";
 import { ProductSchedules } from "GraphType";
+import { ItemModel } from "../../../models/Item/Item";
 
 const resolvers: Resolvers = {
     Product: {
@@ -18,12 +19,21 @@ const resolvers: Resolvers = {
             await user.setAttributesFronCognito();
             return user;
         },
-        items: async (product: DocumentType<ProductCls>, { date }) => {
+        items: async (product: DocumentType<ProductCls>, { date, status }) => {
             console.log({
                 date
             });
-            const result = await product.getItems(date);
+            const result = await product.getItems(date, status);
             return result;
+        },
+        totalItemCount: async (product: DocumentType<ProductCls>) => {
+            const itemCount = await ItemModel.find({
+                productId: product._id,
+                expiresAt: {
+                    $exists: false
+                }
+            }).count();
+            return itemCount || 0;
         },
         schedules: async (
             product: DocumentType<ProductCls>,

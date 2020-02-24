@@ -19,7 +19,8 @@ export class ProductGroupCls extends BaseGroup<ProductCls> {
         groupCode: string
     ): Promise<DocumentType<ProductGroupCls>> {
         const group = await ProductGroupModel.findOne({
-            code: groupCode
+            code: groupCode,
+            type: "PRODUCT_GROUP"
         });
         if (!group) {
             throw new ApolloError(

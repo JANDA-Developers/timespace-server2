@@ -4,7 +4,8 @@ import {
     Segment,
     ProductSchedules,
     PeriodOption,
-    GenderOption
+    GenderOption,
+    ItemStatus
 } from "../../types/graph";
 import { ObjectId } from "mongodb";
 import { DocumentType } from "@typegoose/typegoose";
@@ -35,7 +36,10 @@ export interface ProductFuncs {
      * 스케줄 구하는 함수
      */
     getSchedulesByDate(date: Date): Promise<ProductSchedules | null>;
-    getItems(date: Date): Promise<Array<DocumentType<ItemCls>>>;
+    getItems(
+        date: Date,
+        status?: ItemStatus
+    ): Promise<Array<DocumentType<ItemCls>>>;
     getSegmentSchedules(
         dateTimeRange: DateTimeRangeCls
     ): Promise<

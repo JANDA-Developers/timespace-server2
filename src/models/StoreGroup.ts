@@ -14,9 +14,6 @@ import { ObjectId } from "mongodb";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.GROUP)))
 export class StoreGroupCls extends BaseGroup<StoreCls> {
-    @prop({ default: () => false })
-    isDefault: boolean;
-
     static makeDefaultGroup(userId: ObjectId | string) {
         return new StoreGroupModel({
             _id: new ObjectId(),
@@ -32,7 +29,8 @@ export class StoreGroupCls extends BaseGroup<StoreCls> {
         groupCode: string
     ): Promise<DocumentType<StoreGroupCls>> {
         const group = await StoreGroupModel.findOne({
-            code: groupCode
+            code: groupCode,
+            type: "STORE_GROUP"
         });
         if (!group) {
             throw new ApolloError(
@@ -40,6 +38,7 @@ export class StoreGroupCls extends BaseGroup<StoreCls> {
                 ERROR_CODES.UNEXIST_GROUP
             );
         }
+        console.log(group);
         return group;
     }
 
@@ -55,6 +54,9 @@ export class StoreGroupCls extends BaseGroup<StoreCls> {
             }
         });
     }
+
+    @prop()
+    isDefault: boolean;
 }
 
 export const StoreGroupModel = getModelForClass(StoreGroupCls);

@@ -1,4 +1,4 @@
-import { GetItemsFilterInput } from "../../../types/graph";
+import { GetItemsFilterInput } from "GraphType";
 import { Minute } from "../../../types/values";
 import { ONE_DAY, ONE_HOUR } from "../../../utils/dateFuncs";
 import { ObjectId } from "mongodb";
@@ -33,6 +33,9 @@ export const makeFilterQuery = (
     }
     if (filter.productId) {
         query.productId = new ObjectId(filter.productId);
+    }
+    if (filter.status) {
+        query.status = status;
     }
     return query;
 };

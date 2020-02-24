@@ -99,22 +99,6 @@ const resolvers: Resolvers = {
                             }
                         }
 
-                        // TODO: Compare BusinessHours between "Store" and "ProductInput"
-                        await product.save({ session });
-
-                        await StoreModel.updateOne(
-                            {
-                                _id: store._id
-                            },
-                            {
-                                $push: {
-                                    products: productId
-                                }
-                            },
-                            {
-                                session
-                            }
-                        );
                         if (images) {
                             for (const file of images) {
                                 const syncedFile = await file;
@@ -137,6 +121,23 @@ const resolvers: Resolvers = {
                             }
                         }
                         // TODO: Image Upload to S3, after that, save result in product
+
+                        // TODO: Compare BusinessHours between "Store" and "ProductInput"
+                        await product.save({ session });
+
+                        await StoreModel.updateOne(
+                            {
+                                _id: store._id
+                            },
+                            {
+                                $push: {
+                                    products: productId
+                                }
+                            },
+                            {
+                                session
+                            }
+                        );
 
                         await session.commitTransaction();
                         session.endSession();

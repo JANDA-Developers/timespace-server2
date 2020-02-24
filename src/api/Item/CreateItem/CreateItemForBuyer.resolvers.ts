@@ -86,6 +86,17 @@ const resolvers: Resolvers = {
                                 );
                             }
                         }
+                        await item
+                            .applyStatus(
+                                product.needToConfirm ? "PENDING" : "PERMITTED",
+                                {
+                                    workerId: product.needToConfirm
+                                        ? item.buyerId
+                                        : product.userId
+                                    // comment
+                                }
+                            )
+                            .save({ session });
 
                         // 해당 시간에 예약이 가능한지 확인해야됨 ㅎ
 

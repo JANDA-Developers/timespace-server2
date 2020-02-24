@@ -13,6 +13,7 @@ import { ProductModel } from "../../../models/Product/Product";
 import { ONE_DAY } from "../../../utils/dateFuncs";
 import { ApolloError } from "apollo-server";
 import { ERROR_CODES } from "../../../types/values";
+import { StoreGroupModel } from "../../../models/StoreGroup";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -81,6 +82,21 @@ const resolvers: Resolvers = {
                             {
                                 $addToSet: {
                                     disabledStores: store._id
+                                }
+                            },
+                            {
+                                session
+                            }
+                        );
+                        await StoreGroupModel.updateMany(
+                            {
+                                _id: {
+                                    $in: store.groupIds
+                                }
+                            },
+                            {
+                                $pullAll: {
+                                    list: store.groupIds
                                 }
                             },
                             {

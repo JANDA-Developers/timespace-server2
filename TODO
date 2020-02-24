@@ -26,6 +26,7 @@ User Flow:
   Commons:
     Pagination:
       ☐ Read articles about Cursor Base Pagination
+        # https://graphql.org/learn/global-object-identification/
       ☐ Make it!
   About Cognito: 
     ✔ Let's study about cognito @done(20-02-15 19:20)
@@ -38,6 +39,9 @@ User Flow:
   Google Sign In:
     ☐ Intergrate with google
     ☐ Need to get some information...
+  Email Problems:
+    ☐ @high Resend Email to SignUp User
+    ☐ @high Redirect user to Login page When they do email confirm 
 
 Schemas: 
   Product:
@@ -45,6 +49,10 @@ Schemas:
       # Validation
     ✔ Need Interface For ItemIsAbleToBuy @done(20-02-21 18:58)
       # Validate with PeriodOption & DateRange
+    ✔ total item count @done(20-02-25 15:06)
+      # 총 이용 수 및 총 판매 금액
   Item: 
-    ☐ ConfirmItem @high 
-    ☐ CancelItem @high 
+    ✔ PermitItem @high @started(20-02-24 12:13) @done(20-02-24 16:14) @lasted(4h1m15s)
+      # Write Permit `Date` and `User` to Item DB
+    ✔ CancelItem @high @started(20-02-24 12:12) @done(20-02-24 16:13) @lasted(4h1m57s)
+      # Change Item.status to `CANCELED`

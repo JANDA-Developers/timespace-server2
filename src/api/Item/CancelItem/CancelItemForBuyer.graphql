@@ -1,0 +1,14 @@
+type Mutation {
+    CancelItemForBuyer(
+        param: CancelItemForBuyerInput!
+    ): CancelItemForBuyerResponse!
+}
+type CancelItemForBuyerResponse {
+    ok: Boolean!
+    error: Err
+    data: Item
+}
+input CancelItemForBuyerInput {
+    itemCode: String!
+    comment: String
+}

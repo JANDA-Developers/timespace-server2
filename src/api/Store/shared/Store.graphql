@@ -3,6 +3,7 @@ type Store implements BaseModel {
     user: User
     name: String!
     code: String!
+    groups: [StoreGroup!]
     type: StoreType!
     zoneinfo: Zoneinfo!
     description: String
