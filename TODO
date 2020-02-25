@@ -4,6 +4,14 @@ DevOps:
       ☐ SignUp
       ☐ Verification
       ☐ SignIn
+      ☐ DeleteUser
+    Group:
+      ☐ CreateStoreGroup
+      ☐ DeleteStoreGroup
+      ☐ UpdateStoreGroup
+      ☐ CreateProductGroup
+      ☐ DeleteProductGroup
+      ☐ UpdateProductGroup
     Store:
       ☐ CreateStore
       ☐ UpdateStore
@@ -14,13 +22,17 @@ DevOps:
       ☐ UpdateProduct
       ☐ DeleteProduct
     Item:
-      ☐ CreateItemForBuyer
       ☐ CreateItem
+      ☐ CreateItemForBuyer
       ☐ UpdateItem
       ☐ CancelItem
+      ☐ CancelItemForBuyer
+      ☐ PermitItem
       ☐ DeleteItem
       ☐ GetItemsForBuyer
       ☐ GetItems
+      ☐ GetItemById
+      ☐ GetItemForBuyer
 
 User Flow:
   Commons:
@@ -37,8 +49,12 @@ User Flow:
     ✔ Testing @done(20-02-15 19:20)
   
   Google Sign In:
-    ☐ Intergrate with google
-    ☐ Need to get some information...
+    ✔ Intergrate with google @done(20-02-25 17:55)
+    ☐ Apply Custom Domain.
+      # If use google login, the user redirect to our custom sementicURL with some variables. 
+      # So, We intercept that values and add them in Cognito UserPool or make Error
+    ☐ [CustomDomain] Email Auth URL
+    ☐ [CustomDomain] Google Login Problem
   Email Problems:
     ☐ @high Resend Email to SignUp User
     ☐ @high Redirect user to Login page When they do email confirm 
@@ -56,3 +72,6 @@ Schemas:
       # Write Permit `Date` and `User` to Item DB
     ✔ CancelItem @high @started(20-02-24 12:12) @done(20-02-24 16:13) @lasted(4h1m57s)
       # Change Item.status to `CANCELED`
+  Notification: 
+    ☐ Make structure about Notification. (Work Flow, Schema, Interfaces)
+  

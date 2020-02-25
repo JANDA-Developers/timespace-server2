@@ -1,16 +1,28 @@
 import { gql } from "apollo-server";
 import { mutate } from "../../../jest.setup";
 
-export const emailSignUpTestFunc = async () => {
+/**
+ * 회원가입 테스트 Func
+ * @param obj email, timezone, phoneNumner, password, username => string 으로 ㄱㄱ
+ */
+export const emailSignUpTestFunc = async (obj?: any) => {
+    const variables = {
+        email: "dfscodeslave@gmail.com",
+        timezone: "Asia/Seoul",
+        phoneNumber: "+821081208523",
+        password: "akstnp12!@",
+        username: "배경열",
+        ...obj
+    };
     const query = gql`
         mutation {
             EmailSignUp(
                 param: {
-                    email: "dfscodeslave@gmail.com"
-                    timezone: "Asia/Seoul"
-                    phoneNumber: "+8201081208523"
-                    password: "akstnp12!@"
-                    username: "배경열"
+                    email: ${variables.email}
+                    timezone: ${variables.timezone}
+                    phoneNumber: ${variables.phoneNumber}
+                    password: ${variables.password}
+                    username: ${variables.username}
                     roles: [SELLER, BUYER]
                 }
             ) {

@@ -11,6 +11,13 @@ import { BaseSchema, createSchemaOptions } from "../abs/BaseSchema";
 import { Zoneinfo, UserRole } from "GraphType";
 import { CognitoIdentityServiceProvider } from "aws-sdk";
 import { ERROR_CODES } from "../types/values";
+import { ONE_DAY } from "../utils/dateFuncs";
+import { ClientSession } from "mongoose";
+import { StoreModel } from "./Store/Store";
+import { ItemModel } from "./Item/Item";
+import { ProductModel } from "./Product/Product";
+import { StoreGroupModel } from "./StoreGroup";
+import { ItemStatusChangedHistoryModel } from "./ItemStatusChangedHistory/ItemStatusChanged";
 
 export type LoggedInInfo = {
     idToken: string;
@@ -33,7 +40,7 @@ export class UserCls extends BaseSchema {
                 { userSub: sub }
             );
         }
-        user.setAttributesFronCognito();
+        await user.setAttributesFronCognito();
         return user;
     };
 
@@ -103,6 +110,69 @@ export class UserCls extends BaseSchema {
         set: (ids: any[]) => ids.map(id => new ObjectId(id))
     })
     groupIds: ObjectId[];
+
+    async deleteUser(
+        this: DocumentType<UserCls>,
+        session: ClientSession,
+        expiresAt: Date = new Date(new Date().getTime() + 7 * ONE_DAY)
+    ) {
+        const cognito = new CognitoIdentityServiceProvider();
+        const result = await cognito
+            .adminDeleteUser({
+                UserPoolId: process.env.COGNITO_POOL_ID || "",
+                Username: this.sub
+            })
+            .promise();
+        if (result.$response.error) {
+            throw result.$response.error;
+        }
+        const expireQuery = { $set: { expiresAt } };
+        const userId = this._id;
+        await StoreModel.updateMany(
+            {
+                userId
+            },
+            expireQuery,
+            {
+                session
+            }
+        );
+        await ProductModel.updateMany(
+            {
+                userId
+            },
+            expireQuery,
+            {
+                session
+            }
+        );
+        await ItemModel.updateMany(
+            {
+                buyerId: this._id
+            },
+            expireQuery,
+            { session }
+        );
+        await StoreGroupModel.updateMany(
+            {
+                userId
+            },
+            expireQuery,
+            {
+                session
+            }
+        );
+        await ItemStatusChangedHistoryModel.updateMany(
+            {
+                workerId: this._id
+            },
+            expireQuery,
+            {
+                session
+            }
+        );
+        this.expiresAt = expiresAt;
+    }
 }
 
 export const UserModel = getModelForClass(UserCls);

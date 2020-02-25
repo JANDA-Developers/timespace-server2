@@ -78,14 +78,8 @@ const resolver = {
                 param: { periods, offset }
             }: { param: { periods: PeriodInput[]; offset: number } }
         ) => {
-            console.log("Periods=======================================");
-            console.info(periods);
             const periodClasses = splitPeriods(periods, offset);
-            console.log(periodClasses);
             const result = mergePeriods(periodClasses, offset);
-            console.log({
-                result
-            });
             return result;
         },
         countries: async (_, { countryName }): Promise<any[]> => {
