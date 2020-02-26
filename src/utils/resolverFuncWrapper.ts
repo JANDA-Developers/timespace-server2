@@ -3,6 +3,7 @@ import { ApolloError } from "apollo-server";
 import { getIP, getLocalDate, errorReturn } from "./utils";
 import { ResolverFunction } from "../types/resolvers";
 import { BaseResponse } from "GraphType";
+import { ERROR_CODES } from "../types/values";
 
 /**
  * 리솔버 로거... 로그 찍어주는 아이 ㅎㅎ
@@ -16,7 +17,7 @@ export const defaultResolver = (resolverFunction: ResolverFunction) => async (
 ) => {
     const startTime = new Date();
     const stack = [];
-    const { headers, body, user } = context.req;
+    const { headers, body, cognitoUser } = context.req;
     const ips = getIP(context.req);
     let result: any;
     result = await resolverFunction({ parent, args, context, info }, stack);
@@ -26,7 +27,7 @@ export const defaultResolver = (resolverFunction: ResolverFunction) => async (
             utc: startTime.toISOString(),
             localTime: getLocalDate(
                 startTime,
-                (user && parseInt(JSON.parse(user.zoneinfo).offset)) ||
+                (cognitoUser && parseInt(cognitoUser.zoneinfo.offset)) ||
                     undefined
             ).toISOString()
         },
@@ -39,13 +40,13 @@ export const defaultResolver = (resolverFunction: ResolverFunction) => async (
             "X-JWT": headers["X-JWT"] || headers["x-jwt"],
             "user-agent": headers["user-agent"],
             user:
-                (user && {
-                    _id: user.sub,
-                    email: user.email,
+                (cognitoUser && {
+                    sub: cognitoUser.sub,
+                    email: cognitoUser.email,
                     // eslint-disable-next-line @typescript-eslint/camelcase
-                    phone_number: user.phone_number,
-                    name: user.name,
-                    exp: user.exp
+                    phone_number: cognitoUser.phone_number,
+                    name: cognitoUser.name,
+                    exp: cognitoUser.exp
                 }) ||
                 null
         },
@@ -78,9 +79,13 @@ export const privateResolver = (resolverFunction: ResolverFunction) => async (
                     }
                 );
             }
-            throw new ApolloError("Unauthorized", "UNAUTHORIZED", {
-                jwt: context.req.headers.jwt
-            });
+            throw new ApolloError(
+                "Unauthorized",
+                ERROR_CODES.UNAUTHORIZED_USER,
+                {
+                    jwt: context.req.headers.jwt
+                }
+            );
         }
         return await resolverFunction({ parent, args, context, info }, stack);
     } catch (error) {
