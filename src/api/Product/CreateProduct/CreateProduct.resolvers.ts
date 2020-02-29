@@ -33,7 +33,8 @@ const resolvers: Resolvers = {
                             intro,
                             warning,
                             optionalParams,
-                            images
+                            images,
+                            infos
                         } = param as CreateProductInput;
                         const { cognitoUser } = req;
 
@@ -52,7 +53,8 @@ const resolvers: Resolvers = {
                             storeId: store._id,
                             description,
                             intro: intro || undefined,
-                            warning: warning || undefined
+                            warning: warning || undefined,
+                            infos: infos
                         });
 
                         // TODO: Store의 기본값을 미리 상속받고 간다.

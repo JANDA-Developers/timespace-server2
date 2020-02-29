@@ -5,8 +5,9 @@ import {
     ProductSchedules,
     PeriodOption,
     GenderOption,
-    ItemStatus
-} from "../../types/graph";
+    ItemStatus,
+    Info
+} from "GraphType";
 import { ObjectId } from "mongodb";
 import { DocumentType } from "@typegoose/typegoose";
 import { PeriodWithDays } from "../../utils/PeriodWithDays";
@@ -29,6 +30,7 @@ export interface ProductProps extends BaseSchema {
     warning: string;
     businessHours: Array<PeriodWithDays>;
     periodOption: PeriodOption;
+    infos: Info[];
 }
 
 export interface ProductFuncs {

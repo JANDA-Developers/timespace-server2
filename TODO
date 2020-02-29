@@ -1,10 +1,10 @@
 DevOps: 
   Test Scenario:
     User:
-      ☐ SignUp
+      ✔ SignUp @done(20-02-27 04:45)
       ☐ Verification
-      ☐ SignIn
-      ☐ DeleteUser
+      ✔ SignIn @done(20-02-27 04:45)
+      ✔ DeleteUser @done(20-02-27 04:45)
     Group:
       ☐ CreateStoreGroup
       ☐ DeleteStoreGroup
@@ -13,7 +13,7 @@ DevOps:
       ☐ DeleteProductGroup
       ☐ UpdateProductGroup
     Store:
-      ☐ CreateStore
+      ✔ CreateStore @done(20-02-27 04:45)
       ☐ UpdateStore
       ☐ DeleteStore
     Product:
@@ -40,16 +40,8 @@ User Flow:
       ☐ Read articles about Cursor Base Pagination
         # https://graphql.org/learn/global-object-identification/
       ☐ Make it!
-  About Cognito: 
-    ✔ Let's study about cognito @done(20-02-15 19:20)
-
-  Sign Up / In:
-    ✔ SignUp @done(20-02-15 19:20)
-    ✔ SignIn @done(20-02-15 19:20)
-    ✔ Testing @done(20-02-15 19:20)
   
   Google Sign In:
-    ✔ Intergrate with google @done(20-02-25 17:55)
     ☐ Apply Custom Domain.
       # If use google login, the user redirect to our custom sementicURL with some variables. 
       # So, We intercept that values and add them in Cognito UserPool or make Error
@@ -60,18 +52,22 @@ User Flow:
     ☐ @high Redirect user to Login page When they do email confirm 
 
 Schemas: 
-  Product:
-    ✔ BusinessHours, PeriodOption Validation @done(20-02-21 18:58)
-      # Validation
-    ✔ Need Interface For ItemIsAbleToBuy @done(20-02-21 18:58)
-      # Validate with PeriodOption & DateRange
-    ✔ total item count @done(20-02-25 15:06)
-      # 총 이용 수 및 총 판매 금액
-  Item: 
-    ✔ PermitItem @high @started(20-02-24 12:13) @done(20-02-24 16:14) @lasted(4h1m15s)
-      # Write Permit `Date` and `User` to Item DB
-    ✔ CancelItem @high @started(20-02-24 12:12) @done(20-02-24 16:13) @lasted(4h1m57s)
-      # Change Item.status to `CANCELED`
   Notification: 
     ☐ Make structure about Notification. (Work Flow, Schema, Interfaces)
   
+Archive:
+  ✔ Let's study about cognito @done(20-02-15 19:20) @project(User Flow.About Cognito)
+  ✔ SignUp @done(20-02-15 19:20) @project(User Flow.Sign Up / In)
+  ✔ SignIn @done(20-02-15 19:20) @project(User Flow.Sign Up / In)
+  ✔ Testing @done(20-02-15 19:20) @project(User Flow.Sign Up / In)
+  ✔ Intergrate with google @done(20-02-25 17:55) @project(User Flow.Google Sign In)
+  ✔ BusinessHours, PeriodOption Validation @done(20-02-21 18:58) @project(Schemas.Product)
+    # Validation
+  ✔ Need Interface For ItemIsAbleToBuy @done(20-02-21 18:58) @project(Schemas.Product)
+    # Validate with PeriodOption & DateRange
+  ✔ total item count @done(20-02-25 15:06) @project(Schemas.Product)
+    # 총 이용 수 및 총 판매 금액
+  ✔ PermitItem @high @started(20-02-24 12:13) @done(20-02-24 16:14) @lasted(4h1m15s) @project(Schemas.Item)
+    # Write Permit `Date` and `User` to Item DB
+  ✔ CancelItem @high @started(20-02-24 12:12) @done(20-02-24 16:13) @lasted(4h1m57s) @project(Schemas.Item)
+    # Change Item.status to `CANCELED`

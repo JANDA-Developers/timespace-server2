@@ -16,7 +16,8 @@ import {
     Location,
     PeriodOption,
     CustomField,
-    CustomFieldDefineInput
+    CustomFieldDefineInput,
+    Info
 } from "GraphType";
 import { ERROR_CODES } from "../../types/values";
 import { PeriodCls } from "../../utils/Period";
@@ -179,6 +180,14 @@ export class StoreCls extends BaseSchema implements StoreProps, StoreFuncs {
                 message: "PeriodOption.min 값은 음수가 될 수 없습니다."
             },
             {
+                validator: (v: PeriodOption) => v.max % v.unit === 0,
+                message: "PeriodOption.max 값이 unit 의 배수가 아닙니다."
+            },
+            {
+                validator: (v: PeriodOption) => v.min % v.unit === 0,
+                message: "PeriodOption.min 값이 unit 의 배수가 아닙니다."
+            },
+            {
                 validator: (v: PeriodOption) => v.unit >= 0,
                 message: "PeriodOption.unit 값은 음수가 될 수 없습니다."
             }
@@ -249,6 +258,11 @@ export class StoreCls extends BaseSchema implements StoreProps, StoreFuncs {
         ]
     })
     customFields: CustomField[];
+
+    @prop({
+        default: []
+    })
+    infos: Info[];
 }
 
 export const StoreModel = getModelForClass(StoreCls);

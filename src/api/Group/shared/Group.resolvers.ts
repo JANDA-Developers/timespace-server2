@@ -18,7 +18,7 @@ const resolvers: Resolvers = {
             if (!user) {
                 return null;
             }
-            await user.setAttributesFronCognito();
+            await user.setAttributesFromCognito();
             return user;
         }
     },
@@ -28,7 +28,7 @@ const resolvers: Resolvers = {
             if (!user) {
                 return null;
             }
-            await user.setAttributesFronCognito();
+            await user.setAttributesFromCognito();
             return user;
         },
         list: async (group: any) => {
@@ -45,7 +45,7 @@ const resolvers: Resolvers = {
             if (!user) {
                 return null;
             }
-            await user.setAttributesFronCognito();
+            await user.setAttributesFromCognito();
             return user;
         },
         list: async (group: any) => {

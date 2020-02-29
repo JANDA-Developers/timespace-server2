@@ -5,24 +5,16 @@ import { mutate } from "../../../jest.setup";
  * 회원가입 테스트 Func
  * @param obj email, timezone, phoneNumner, password, username => string 으로 ㄱㄱ
  */
-export const emailSignUpTestFunc = async (obj?: any) => {
-    const variables = {
-        email: "dfscodeslave@gmail.com",
-        timezone: "Asia/Seoul",
-        phoneNumber: "+821081208523",
-        password: "akstnp12!@",
-        username: "배경열",
-        ...obj
-    };
-    const query = gql`
+export const emailSignUpTestFunc = async () => {
+    const mutation = gql`
         mutation {
             EmailSignUp(
                 param: {
-                    email: ${variables.email}
-                    timezone: ${variables.timezone}
-                    phoneNumber: ${variables.phoneNumber}
-                    password: ${variables.password}
-                    username: ${variables.username}
+                    email: "dfscodeslave@gmail.com"
+                    timezone: "Asia/Seoul"
+                    phoneNumber: "+8201081208523"
+                    password: "akstnp12!@"
+                    username: "배경열"
                     roles: [SELLER, BUYER]
                 }
             ) {
@@ -43,20 +35,33 @@ export const emailSignUpTestFunc = async (obj?: any) => {
             }
         }
     `;
-    const { data } = await mutate({
-        mutation: query
+
+    const { data, errors } = await mutate({
+        mutation
     });
+    if (errors) {
+        errors.forEach(e => {
+            for (const key in e) {
+                if (e.hasOwnProperty(key)) {
+                    const element = e[key];
+                    console.info(`${key}: ${JSON.stringify(element)}`);
+                }
+            }
+        });
+    }
     expect(data).toMatchObject({
-        ok: true,
-        error: null,
-        data: {
-            CodeDeliveryDetails: {
-                AttributeName: expect.anything(),
-                DeliveryMedium: expect.anything(),
-                Destination: expect.anything()
-            },
-            UserConfirmed: false,
-            UserSub: expect.any(String)
+        EmailSignUp: {
+            ok: true,
+            error: null,
+            data: {
+                CodeDeliveryDetails: {
+                    AttributeName: expect.anything(),
+                    DeliveryMedium: expect.anything(),
+                    Destination: expect.anything()
+                },
+                UserConfirmed: false,
+                UserSub: expect.any(String)
+            }
         }
     });
     return data;

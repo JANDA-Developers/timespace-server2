@@ -4,6 +4,7 @@ import {
     defaultResolver
 } from "../../../utils/resolverFuncWrapper";
 import { GetMyProfileResponse } from "GraphType";
+import { UserModel } from "../../../models/User";
 
 const resolvers: Resolvers = {
     Query: {
@@ -12,12 +13,13 @@ const resolvers: Resolvers = {
                 async ({ context: { req } }): Promise<GetMyProfileResponse> => {
                     try {
                         const { cognitoUser } = req;
-                        // insideLog.push(user);
+
+                        const user = await UserModel.findUser(cognitoUser);
                         return {
                             ok: true,
                             error: null,
                             data: {
-                                user: cognitoUser as any
+                                user: user as any
                             }
                         };
                     } catch (error) {

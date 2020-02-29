@@ -22,7 +22,7 @@ const resolvers: Resolvers = {
         buyer: async (item: DocumentType<ItemCls>, args, { req }) => {
             const user = await UserModel.findById(item.buyerId);
             if (user) {
-                await user.setAttributesFronCognito();
+                await user.setAttributesFromCognito();
             }
             return user;
         },
@@ -49,7 +49,7 @@ const resolvers: Resolvers = {
                     }
                 );
             }
-            await user.setAttributesFronCognito();
+            await user.setAttributesFromCognito();
             return user;
         },
         date: async (obj: DocumentType<ItemStatusChangedCls>) => {

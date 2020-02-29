@@ -20,4 +20,5 @@ input CreateStoreInput {
     businessHours: [PeriodInput!]
     periodOption: PeriodOptionInput!
     customFieldInput: [CustomFieldDefineInput!]
+    infos: [InfoInput!]
 }

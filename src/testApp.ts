@@ -6,19 +6,15 @@ import { ApolloServer } from "apollo-server-express";
 import express, { Express, NextFunction, Response } from "express";
 import axios from "axios";
 import { decodeKey } from "./utils/decodeIdToken";
+import { mongoose } from "@typegoose/typegoose";
+import { testDBUri } from "./test.uri";
 
-class App {
+class TestApp {
     public server: ApolloServer;
     public app: Express;
 
     constructor() {
         const path: string = process.env.GRAPHQL_ENDPOINT || "/graphql";
-        const playground = Boolean(
-            process.env.ENABLE_PLAYGROUND &&
-                process.env.ENABLE_PLAYGROUND.toLowerCase() === "false"
-                ? false
-                : true
-        ).valueOf();
         this.app = express();
         this.server = new ApolloServer({
             schema,
@@ -26,10 +22,16 @@ class App {
                 return {
                     req: ctx.req
                 };
-            },
-            playground
+            }
         });
         this.middlewares();
+        if (mongoose.connections.length === 0) {
+            mongoose.createConnection(testDBUri, {
+                useNewUrlParser: true,
+                useCreateIndex: true,
+                useUnifiedTopology: true
+            });
+        }
 
         this.app.get("/", async (req, res) => {
             try {
@@ -54,7 +56,6 @@ class App {
                 });
             }
         });
-        this.server.applyMiddleware({ app: this.app, path });
     }
 
     private middlewares = (): void => {
@@ -107,4 +108,4 @@ class App {
     };
 }
 
-export default new App().app;
+export default new TestApp();

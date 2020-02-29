@@ -14,7 +14,8 @@ import {
     ProductSchedules,
     Segment,
     Item,
-    ItemStatus
+    ItemStatus,
+    Info
 } from "GraphType";
 import { genCode, s4 } from "../utils/genId";
 import { ApolloError } from "apollo-server";
@@ -251,6 +252,11 @@ export class ProductCls extends BaseSchema
         ]
     })
     periodOption: PeriodOption;
+
+    @prop({
+        default: []
+    })
+    infos: Info[];
 
     async segmentListWithItems(
         this: DocumentType<ProductCls>,
@@ -499,6 +505,7 @@ export class ProductCls extends BaseSchema
         date: Date,
         soldOut?: boolean
     ): Promise<ProductSchedules | null> {
+        console.log("getSchedulesByDate ===================================");
         const unit = this.periodOption.unit;
         date.setUTCHours(0, 0, 0, 0);
         const dateTimeRange = getDateTimeRangeFromPeriodList(
@@ -506,8 +513,21 @@ export class ProductCls extends BaseSchema
             date,
             this.periodOption.offset
         );
+        console.log({
+            dateTimeRange
+        });
         if (!dateTimeRange) {
-            return null;
+            return {
+                info: {
+                    isOpenDate: false,
+                    dateTimeRange: new DateTimeRangeCls({
+                        from: date,
+                        to: date
+                    }),
+                    unit
+                },
+                list: []
+            };
         }
         const itemExistsList = await this.getSegmentSchedules(
             dateTimeRange,
@@ -529,7 +549,8 @@ export class ProductCls extends BaseSchema
         return {
             info: {
                 dateTimeRange,
-                unit
+                unit,
+                isOpenDate: true
             },
             list
         };

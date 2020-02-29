@@ -16,15 +16,16 @@ const resolvers: Resolvers = {
             if (!user) {
                 return null;
             }
-            await user.setAttributesFronCognito();
+            await user.setAttributesFromCognito();
             return user;
         },
         items: async (product: DocumentType<ProductCls>, { date, status }) => {
-            console.log({
-                date
-            });
-            const result = await product.getItems(date, status);
-            return result;
+            try {
+                const result = await product.getItems(date, status);
+                return result;
+            } catch {
+                return [];
+            }
         },
         totalItemCount: async (product: DocumentType<ProductCls>) => {
             const itemCount = await ItemModel.find({
@@ -32,7 +33,7 @@ const resolvers: Resolvers = {
                 expiresAt: {
                     $exists: false
                 }
-            }).count();
+            }).countDocuments();
             return itemCount || 0;
         },
         schedules: async (

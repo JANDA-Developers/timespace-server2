@@ -83,19 +83,6 @@ const resolvers: Resolvers = {
                             Value: _id.toHexString()
                         }
                     ];
-                    roles.forEach((role): void => {
-                        if (role === "BUYER") {
-                            userAttributes.push({
-                                Name: "custom:isBuyer",
-                                Value: "1"
-                            });
-                        } else if (role === "SELLER") {
-                            userAttributes.push({
-                                Name: "custom:isSeller",
-                                Value: "1"
-                            });
-                        }
-                    });
                     if (roles.length === 0) {
                         throw new ApolloError(
                             "User.Roles값이 비어있습니다.",
@@ -116,7 +103,8 @@ const resolvers: Resolvers = {
                         sub: result.UserSub,
                         zoneinfo,
                         loginInfos: [],
-                        groupIds: [group._id]
+                        groupIds: [group._id],
+                        roles: roles
                     });
                     // TODO: EmailSignUp 하는 동시에 "기본 그룹"을 생성한다.
                     await user.save({ session });

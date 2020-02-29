@@ -20,4 +20,5 @@ input StoreUpdateParamInput {
     intro: String
     customFieldInput: [CustomFieldDefineInput!]
     manager: ManagerInput
+    infos: [InfoInput!]
 }

@@ -148,6 +148,8 @@ export class PeriodCls {
             const time = date.getTime() - (date.getTime() % ONE_DAY);
             // 날짜 구함
             const offsetMillisec = this.offset * 60000;
+            console.log("toDateTimeRange ===============================");
+            console.log({ offsetMillisec });
             const from = new Date(
                 time + this.start * ONE_MINUTE - offsetMillisec
             );

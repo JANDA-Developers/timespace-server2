@@ -10,7 +10,7 @@ const resolvers: Resolvers = {
         user: async (store: DocumentType<StoreCls>, args, { req }) => {
             const user = await UserModel.findById(store.userId);
             if (user) {
-                await user.setAttributesFronCognito();
+                await user.setAttributesFromCognito();
             }
             return user;
         },

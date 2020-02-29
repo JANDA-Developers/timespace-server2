@@ -2,7 +2,6 @@ import { Resolvers } from "../../../types/resolvers";
 import { UserModel } from "../../../models/User";
 import { StoreModel } from "../../../models/Store/Store";
 import { ObjectId } from "mongodb";
-import { UserRole } from "GraphType";
 import { DocumentType } from "@typegoose/typegoose";
 import { StoreGroupCls, StoreGroupModel } from "../../../models/StoreGroup";
 
@@ -28,19 +27,20 @@ const resolvers: Resolvers = {
                 }
             });
         },
-        roles: (user): UserRole[] => {
-            const result: UserRole[] = [];
-            if (parseInt(user["custom:isBuyer"]) === 1) {
-                result.push("BUYER");
-            }
-            if (parseInt(user["custom:isSeller"]) === 1) {
-                result.push("SELLER");
-            }
-            if (parseInt(user["custom:isAdmin"]) === 1) {
-                result.push("ADMIN");
-            }
-            return result;
-        },
+        // 더이상 cognito에서 가져오지 않음
+        // roles: (user): UserRole[] => {
+        //     const result: UserRole[] = [];
+        //     if (parseInt(user["custom:isBuyer"]) === 1) {
+        //         result.push("BUYER");
+        //     }
+        //     if (parseInt(user["custom:isSeller"]) === 1) {
+        //         result.push("SELLER");
+        //     }
+        //     if (parseInt(user["custom:isAdmin"]) === 1) {
+        //         result.push("ADMIN");
+        //     }
+        //     return result;
+        // },
         groups: async (user): Promise<Array<DocumentType<StoreGroupCls>>> => {
             if (user.groupIds) {
                 return await StoreGroupModel.find({

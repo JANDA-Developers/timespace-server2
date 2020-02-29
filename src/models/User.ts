@@ -40,28 +40,62 @@ export class UserCls extends BaseSchema {
                 { userSub: sub }
             );
         }
-        await user.setAttributesFronCognito();
+        await user.setAttributesFromCognito();
         return user;
     };
 
-    async setAttributesFronCognito(this: DocumentType<UserCls>): Promise<void> {
-        const cognito = new CognitoIdentityServiceProvider();
-        const cognitoUser = await cognito
-            .adminGetUser({
-                UserPoolId: process.env.COGNITO_POOL_ID || "",
-                Username: this.sub
-            })
-            .promise();
-        const attributes = cognitoUser.UserAttributes;
-        if (attributes) {
-            attributes.forEach(attr => {
-                const { Name, Value } = attr;
-                if (Name === "zoneinfo") {
-                    this.zoneinfo = JSON.parse(Value || "");
-                } else {
-                    this[Name] = Value;
+    static findUser = async (
+        cognitoUser: any
+    ): Promise<DocumentType<UserCls>> => {
+        const user = await UserModel.findOne({
+            sub: cognitoUser.sub
+        });
+        if (!user) {
+            throw new ApolloError(
+                "존재하지 않는 UserSub입니다",
+                ERROR_CODES.INVALID_USER_SUB,
+                { user: cognitoUser }
+            );
+        }
+        await user.setAttributesFromCognito(cognitoUser);
+        return user;
+    };
+
+    async setAttributesFromCognito(
+        this: DocumentType<UserCls>,
+        user?: any
+    ): Promise<void> {
+        let cognitoUser = user;
+        if (!cognitoUser) {
+            const cognito = new CognitoIdentityServiceProvider();
+            cognitoUser = await cognito
+                .adminGetUser({
+                    UserPoolId: process.env.COGNITO_POOL_ID || "",
+                    Username: this.sub
+                })
+                .promise();
+            const attributes = cognitoUser.UserAttributes;
+            if (attributes) {
+                attributes.forEach(attr => {
+                    const { Name, Value } = attr;
+                    if (Name === "zoneinfo") {
+                        this.zoneinfo = JSON.parse(Value || "");
+                    } else if (Value) {
+                        if (Value === "true" || Value === "false") {
+                            this[Name] = Value === "true";
+                        } else {
+                            this[Name] = Value;
+                        }
+                    }
+                });
+            }
+        } else {
+            for (const key in cognitoUser) {
+                const value = cognitoUser[key];
+                if (value !== undefined) {
+                    this[key] = value;
                 }
-            });
+            }
         }
     }
 
@@ -70,6 +104,7 @@ export class UserCls extends BaseSchema {
     email_verified: boolean;
     phone_number_verified: boolean;
     name: string;
+    exp: number;
 
     @prop({ default: [] })
     roles: UserRole[];
@@ -83,7 +118,6 @@ export class UserCls extends BaseSchema {
     @prop()
     refreshTokenLastUpdate: Date;
 
-    // Zoneinfo from graph.d.ts
     @prop()
     zoneinfo: Zoneinfo;
 
