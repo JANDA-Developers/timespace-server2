@@ -99,7 +99,7 @@ export const createStoreFunc: ResolverFunction = async (
                 offset:
                     periodOption.offset === null ||
                     periodOption.offset === undefined
-                        ? cognitoUser.zoneinfo.offset
+                        ? zoneinfo.offset
                         : periodOption.offset
             },
             businessHours,

@@ -147,9 +147,7 @@ export class PeriodCls {
         if ((this.day & (1 << date.getUTCDay())) !== 0) {
             const time = date.getTime() - (date.getTime() % ONE_DAY);
             // 날짜 구함
-            const offsetMillisec = this.offset * 60000;
-            console.log("toDateTimeRange ===============================");
-            console.log({ offsetMillisec });
+            const offsetMillisec = this.offset * ONE_MINUTE;
             const from = new Date(
                 time + this.start * ONE_MINUTE - offsetMillisec
             );
