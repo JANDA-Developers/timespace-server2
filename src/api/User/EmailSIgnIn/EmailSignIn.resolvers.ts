@@ -8,6 +8,7 @@ import { ObjectId } from "mongodb";
 import { ApolloError } from "apollo-server";
 import { getIP, errorReturn } from "../../../utils/utils";
 import { mongoose } from "@typegoose/typegoose";
+import { ERROR_CODES } from "../../../types/values";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -17,10 +18,10 @@ const resolvers: Resolvers = {
                     args: { param },
                     context: { req }
                 }: { parent: any; args: EmailSignInMutationArgs; context: any },
-                insideLog: Array<any>
+                stack: Array<any>
             ): Promise<EmailSignInResponse> => {
                 // Amazon Cognito creates a session which includes the id, access, and refresh tokens of an authenticated user.
-                const { email, password } = param;
+                const { email, password, role } = param;
                 const cognito = new CognitoIdentityServiceProvider();
                 const session = await mongoose.startSession();
                 session.startTransaction();
@@ -48,7 +49,7 @@ const resolvers: Resolvers = {
                      * ======================================================================================================================
                      */
 
-                    insideLog.push(authResult);
+                    stack.push(authResult);
                     // TODO: Token Decode 해서 sub 가져옴
                     const cognitoUser = await decodeKey(authResult.IdToken);
                     // User Refresh Token, Access Token 두가지를 DB에 저장...
@@ -72,7 +73,7 @@ const resolvers: Resolvers = {
                         os: req.headers["user-agent"]
                     };
                     if (!existingUser) {
-                        // TODO DB에 User가 존재하지 않는다면
+                        // DB에 User가 존재하지 않는다면
                         // => DB에 해당 User를 저장함
                         existingUser = new UserModel({
                             _id: new ObjectId(),
@@ -80,12 +81,26 @@ const resolvers: Resolvers = {
                             refreshToken: authResult.RefreshToken || "",
                             refreshTokenLastUpdate: new Date(),
                             loginInfos: [tokenInfos],
-                            zoneinfo: JSON.parse(cognitoUser.data.zoneinfo)
+                            zoneinfo: JSON.parse(cognitoUser.data.zoneinfo),
+                            roles: [role]
                         });
                     } else {
                         existingUser.refreshToken =
                             authResult.RefreshToken || "";
                         existingUser.refreshTokenLastUpdate = new Date();
+                    }
+
+                    if (!existingUser.roles.includes(role)) {
+                        throw new ApolloError(
+                            `접근 권한이 없습니다. (MyUserRoles: ${existingUser.roles.join(
+                                ","
+                            )})`,
+                            ERROR_CODES.ACCESS_DENY_USER,
+                            {
+                                user: existingUser,
+                                toAccess: role
+                            }
+                        );
                     }
                     await existingUser.save({ session });
 
@@ -100,7 +115,8 @@ const resolvers: Resolvers = {
                             expiresIn: new Date(
                                 (authResult.ExpiresIn || 0) * 1000 +
                                     new Date().getTime()
-                            )
+                            ),
+                            role
                         }
                     };
                 } catch (error) {

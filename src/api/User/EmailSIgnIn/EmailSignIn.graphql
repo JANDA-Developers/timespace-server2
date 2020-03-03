@@ -12,9 +12,11 @@ type EmailSignInResponse implements BaseResponse {
 input EmailSignInInput {
     email: EmailAddress!
     password: String!
+    role: UserRole!
 }
 
 type EmailSignInResult {
     token: String!
     expiresIn: DateTime!
+    role: UserRole!
 }

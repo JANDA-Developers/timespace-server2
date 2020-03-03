@@ -4,6 +4,7 @@ type Product implements BaseModel {
     user: User!
     store: Store!
     name: String!
+    subTitle: String
     code: String!
     images: [URL!]
     description: String

@@ -95,8 +95,13 @@ class App {
                 req.headers["x-jwt"] = error.code || "";
             }
             if (data) {
-                data._id = data["custom:_id"];
-                data.zoneinfo = JSON.parse(data.zoneinfo);
+                if (data["custom:_id"]) {
+                    data._id = data["custom:_id"];
+                    if (data.zoneinfo) {
+                        data.zoneinfo = JSON.parse(data.zoneinfo);
+                    }
+                    // 여기서 세팅 요망
+                }
                 // Raw Data임... DB에 있는 Cognito User 절대 아님
                 req.cognitoUser = data;
             }

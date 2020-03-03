@@ -34,7 +34,8 @@ const resolvers: Resolvers = {
                             warning,
                             optionalParams,
                             images,
-                            infos
+                            infos,
+                            subTitle
                         } = param as CreateProductInput;
                         const { cognitoUser } = req;
 
@@ -49,6 +50,7 @@ const resolvers: Resolvers = {
                         const product = new ProductModel({
                             _id: productId,
                             name,
+                            subTitle: subTitle || undefined,
                             userId: cognitoUser._id,
                             storeId: store._id,
                             description,
@@ -108,10 +110,10 @@ const resolvers: Resolvers = {
                                 // TODO: 파일 업로드 구현 ㄱㄱ
 
                                 /* 
-                             ? 파일 업로드 폴더 구조 설정하기
-                             * ${userId}/${houseId}/~~
+                                    ? 파일 업로드 폴더 구조 설정하기
+                                    * ${userId}/${houseId}/~~
 
-                             */
+                                */
                                 // 해당 경로에 폴더 존재여부 확인 & 생성
                                 const { url } = await uploadFile(syncedFile, {
                                     dir:

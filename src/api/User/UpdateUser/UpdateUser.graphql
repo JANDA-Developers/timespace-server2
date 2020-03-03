@@ -1,0 +1,16 @@
+type Mutation {
+    UpdateUser(param: UpdateUserInput!): UpdateUserResponse!
+}
+type UpdateUserResponse {
+    ok: Boolean!
+    error: Err
+    data: User
+}
+input UpdateUserInput {
+    roles: [UserRole!]
+    name: String
+    # callingCode 제거한채로 넣기...
+    phoneNumber: String
+    # timezone... ex) Asia/Seoul
+    timezone: String
+}

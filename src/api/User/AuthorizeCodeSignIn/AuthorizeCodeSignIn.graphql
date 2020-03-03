@@ -1,0 +1,22 @@
+type Query {
+    AuthorizeCodeSignIn(
+        param: AuthorizeCodeSignInInput!
+    ): AuthorizeCodeSignInResponse!
+}
+type AuthorizeCodeSignInResponse {
+    ok: Boolean!
+    error: Err
+    data: AuthorizeCodeSignInResultData
+}
+input AuthorizeCodeSignInInput {
+    authorizeCode: String!
+    role: UserRole!
+}
+
+type AuthorizeCodeSignInResultData {
+    token: String!
+    expiresIn: DateTime!
+    refreshToken: String!
+    accessToken: String!
+    role: UserRole!
+}

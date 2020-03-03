@@ -22,14 +22,16 @@ export const defaultResolver = (resolverFunction: ResolverFunction) => async (
     let result: any;
     result = await resolverFunction({ parent, args, context, info }, stack);
 
+    const offset =
+        (cognitoUser &&
+            cognitoUser.zoneinfo &&
+            parseInt(cognitoUser.zoneinfo.offset)) ||
+        undefined;
+
     fmtLog(result.error ? "err" : "info", {
         when: {
             utc: startTime.toISOString(),
-            localTime: getLocalDate(
-                startTime,
-                (cognitoUser && parseInt(cognitoUser.zoneinfo.offset)) ||
-                    undefined
-            ).toISOString()
+            localTime: getLocalDate(startTime, offset).toISOString()
         },
         who: {
             headers: headers,

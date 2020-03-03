@@ -1,0 +1,18 @@
+type Query {
+    ValidateGoogleUser(
+        param: ValidateGoogleUserInput!
+    ): ValidateGoogleUserResponse!
+}
+type ValidateGoogleUserResponse {
+    ok: Boolean!
+    error: Err
+    data: ValidateGoogleUserResult
+}
+
+input ValidateGoogleUserInput {
+    role: UserRole!
+}
+
+type ValidateGoogleUserResult {
+    isInitiated: Boolean!
+}

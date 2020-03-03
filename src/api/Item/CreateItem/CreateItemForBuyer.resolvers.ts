@@ -13,6 +13,7 @@ import { ProductModel } from "../../../models/Product/Product";
 import { ObjectId } from "mongodb";
 import { ONE_MINUTE } from "../../../utils/dateFuncs";
 import { DateTimeRangeCls } from "../../../utils/DateTimeRange";
+import { UserModel } from "../../../models/User";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -29,7 +30,12 @@ const resolvers: Resolvers = {
                         const {
                             param
                         }: { param: CreateItemForBuyerInput } = args;
-                        if (cognitoUser["custom:isBuyer"] !== "1") {
+                        const user = await UserModel.findUser(cognitoUser);
+                        console.log({
+                            cognitoUser,
+                            roles: cognitoUser.roles
+                        });
+                        if (!user.roles.includes("BUYER")) {
                             throw new ApolloError(
                                 "상품 구매 권한이 없습니다. 먼저 Buyer 인증을 해주세요.",
                                 ERROR_CODES.ACCESS_DENY_ITEM
@@ -56,7 +62,7 @@ const resolvers: Resolvers = {
                         }
                         item.productId = product._id;
                         item.storeId = product.storeId;
-                        item.buyerId = new ObjectId(cognitoUser._id);
+                        item.buyerId = new ObjectId(user._id);
                         await item.setCode(product.code, now);
 
                         // validation 필요함!

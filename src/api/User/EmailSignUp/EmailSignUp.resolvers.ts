@@ -10,6 +10,7 @@ import { AttributeType } from "aws-sdk/clients/cognitoidentityserviceprovider";
 import { mongoose } from "@typegoose/typegoose";
 import { StoreGroupModel } from "../../../models/StoreGroup";
 import { errorReturn } from "../../../utils/utils";
+import _ from "lodash";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -27,6 +28,8 @@ const resolvers: Resolvers = {
                         roles
                     } = param as EmailSignUpInput;
 
+                    const cognito = new CognitoIdentityServiceProvider();
+
                     const countryInfo = await CountryInfoModel.findOne({
                         "timezones.name": timezone
                     });
@@ -41,7 +44,6 @@ const resolvers: Resolvers = {
                         );
                     }
 
-                    const cognito = new CognitoIdentityServiceProvider();
                     const tz = countryInfo.timezones.find(
                         tz => tz.name === timezone
                     );
@@ -71,7 +73,7 @@ const resolvers: Resolvers = {
                         },
                         {
                             Name: "phone_number",
-                            Value: phoneNumber
+                            Value: `${zoneinfo.callingCode}${phoneNumber}`
                         },
                         {
                             Name: "zoneinfo",
@@ -98,13 +100,18 @@ const resolvers: Resolvers = {
                         })
                         .promise();
                     const group = StoreGroupModel.makeDefaultGroup(_id);
+                    if (roles.includes("SELLER")) {
+                        roles.push("BUYER");
+                    } else if (roles.includes("ADMIN")) {
+                        roles.push("BUYER", "SELLER");
+                    }
                     const user = new UserModel({
                         _id,
                         sub: result.UserSub,
                         zoneinfo,
                         loginInfos: [],
                         groupIds: [group._id],
-                        roles: roles
+                        roles: _.uniq(roles)
                     });
                     // TODO: EmailSignUp 하는 동시에 "기본 그룹"을 생성한다.
                     await user.save({ session });

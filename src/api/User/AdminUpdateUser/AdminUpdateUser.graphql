@@ -1,0 +1,16 @@
+type Mutation {
+    AdminUpdateUser(param: AdminUpdateUserInput!): AdminUpdateUserResponse!
+}
+type AdminUpdateUserResponse {
+    ok: Boolean!
+    error: Err
+    data: User
+}
+input AdminUpdateUserInput {
+    userSub: String!
+    updateParam: UpdateUserParamInput!
+}
+
+input UpdateUserParamInput {
+    roles: [UserRole!]
+}

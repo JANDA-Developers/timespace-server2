@@ -50,6 +50,11 @@ export const decodeKey = async (
         }
         const pem = jwkToPem(jwk);
         const user = jwt.verify(token, pem);
+
+        console.log(
+            "decodeKey (decoded User) ==================================================="
+        );
+        console.info(user);
         return {
             ok: true,
             error: null,

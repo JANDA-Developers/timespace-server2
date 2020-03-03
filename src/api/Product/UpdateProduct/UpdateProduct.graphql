@@ -14,8 +14,10 @@ input UpdateProductInput {
 input UpdateProductParamInput {
     name: String
     description: String
+    subTitle: String
     needToConfirm: Boolean
-
+    addImages: [Upload!]
+    deleteImages: [String!]
     peopleCapacity: Int
     genderOption: GenderOption
     businessHours: [PeriodInput!]

@@ -35,6 +35,16 @@ DevOps:
       ☐ GetItemForBuyer
 
 User Flow:
+  User Funcs: 
+    ☐ @today AuthorizeCodeSignIn => axios로 ~/oauth2/token 요청 ㄱㄱ 
+      # https://docs.aws.amazon.com/ko_kr/cognito/latest/developerguide/token-endpoint.html
+      # Client 에서 RefreshToken을 가지고 있다가 UpdateUser메서드에 추가해줘야함. 
+    ✔ AdminUpdateUser & UpdateUser @started(20-03-02 00:45) @done(20-03-02 02:11) @lasted(1h26m13s)
+      # https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_AdminUpdateUserAttributes.html
+    ☐ ChangePassword
+      # https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_ChangePassword.html
+    ☐ After Google Auth, Must set mandatory datas
+      # @file:///C:\dev\jd-ticket-api\src\app.ts#99:38
   Commons:
     Pagination:
       ☐ Read articles about Cursor Base Pagination
@@ -42,11 +52,11 @@ User Flow:
       ☐ Make it!
   
   Google Sign In:
-    ☐ Apply Custom Domain.
+    ✔ Apply Custom Domain. @done(20-03-01 13:02)
       # If use google login, the user redirect to our custom sementicURL with some variables. 
       # So, We intercept that values and add them in Cognito UserPool or make Error
-    ☐ [CustomDomain] Email Auth URL
-    ☐ [CustomDomain] Google Login Problem
+    ✔ [CustomDomain] Email Auth URL @done(20-03-01 13:02)
+    ✔ [CustomDomain] Google Login Problem @done(20-03-01 13:02)
   Email Problems:
     ☐ @high Resend Email to SignUp User
     ☐ @high Redirect user to Login page When they do email confirm 

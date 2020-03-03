@@ -71,6 +71,9 @@ export class ProductCls extends BaseSchema
     @prop()
     name: string;
 
+    @prop()
+    subTitle: string;
+
     @prop({
         default(this: DocumentType<ProductCls>) {
             return `${genCode(this.storeId)}-${s4(36).toUpperCase()}`;
