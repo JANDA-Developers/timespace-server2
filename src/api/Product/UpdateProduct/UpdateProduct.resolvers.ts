@@ -17,10 +17,10 @@ const resolvers: Resolvers = {
     Mutation: {
         UpdateProduct: defaultResolver(
             privateResolver(
-                async ({
-                    args: { param },
-                    context: { req }
-                }): Promise<UpdateProductResponse> => {
+                async (
+                    { args: { param }, context: { req } },
+                    stack
+                ): Promise<UpdateProductResponse> => {
                     const session = await mongoose.startSession();
                     session.startTransaction();
                     try {
@@ -53,35 +53,55 @@ const resolvers: Resolvers = {
                             addImages,
                             deleteImages
                         } = updateProductParamInput;
+                        stack.push({
+                            deleteImages
+                        });
                         if (deleteImages) {
                             const s3 = new S3();
-                            s3.deleteObjects({
-                                Bucket: process.env.AWS_BUCKETNAME || "",
-                                Delete: {
-                                    Objects: [
-                                        {
-                                            Key: "",
-                                            VersionId: ""
-                                        }
-                                    ]
-                                }
-                            });
-                            product.images = _.pullAll(
-                                product.images,
-                                deleteImages
-                            );
+                            const deleteResult = await s3
+                                .deleteObjects({
+                                    Bucket: process.env.AWS_BUCKETNAME || "",
+                                    Delete: {
+                                        Objects: deleteImages.map((imgUrl): {
+                                            Key: string;
+                                            Version?: string;
+                                        } => {
+                                            return {
+                                                Key: imgUrl.split(
+                                                    (process.env
+                                                        .AWS_BUCKETNAME || "") +
+                                                        "/"
+                                                )[1]
+                                            };
+                                        })
+                                    }
+                                })
+                                .promise();
+                            if (deleteResult.Errors) {
+                                stack.push(deleteResult.Errors);
+                            }
+                            // _.pullAll(product.images, deleteImages);
                             // TODO: Images S3에서 삭제하기
+                            product.images = product.images.filter(
+                                img => !deleteImages.includes(img)
+                            );
                         }
+                        stack.push({ afterDeleteImage: product.images });
                         if (addImages) {
+                            stack.push(addImages);
                             for (const file of addImages) {
                                 const syncedFile = await file;
-                                console.log({ syncedFile });
-                                // TODO: 파일 업로드 구현 ㄱㄱ
+                                stack.push({ syncedFile });
+                                stack.push({
+                                    file: {
+                                        name: file.filename,
+                                        mimetype: file.mimetype
+                                    }
+                                });
 
                                 /* 
                                     ? 파일 업로드 폴더 구조 설정하기
                                     * ${userId}/${houseId}/~~
-
                                 */
                                 // 해당 경로에 폴더 존재여부 확인 & 생성
                                 const { url } = await uploadFile(syncedFile, {
@@ -93,6 +113,7 @@ const resolvers: Resolvers = {
                                 product.images.push(url);
                             }
                         }
+                        stack.push("after addImages..........................");
                         await product.save({
                             session
                         });

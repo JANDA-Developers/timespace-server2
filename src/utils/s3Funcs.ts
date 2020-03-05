@@ -1,6 +1,6 @@
 import { S3 } from "aws-sdk";
-import uuid = require("uuid");
 import { Upload, JdFile } from "GraphType";
+import { s4 } from "../models/utils/genId";
 
 export const bucketName = process.env.AWS_BUCKETNAME || "";
 
@@ -8,15 +8,13 @@ export const makeDirPath = (dirPath?: string): string => {
     if (!dirPath) {
         return "";
     }
-    return (
-        dirPath
-            .split("/")
-            .map(path => {
-                return encodeURIComponent(path);
-            })
-            .filter(path => path.length !== 0)
-            .join("/") + "/"
-    );
+    return dirPath
+        .split("/")
+        .map(path => {
+            return encodeURIComponent(path);
+        })
+        .filter(path => path.length !== 0)
+        .join("/");
 };
 /**
  * 결과값으로 S3 URL 리턴함
@@ -35,7 +33,6 @@ export const uploadFile = async (
     }
 ): Promise<JdFile> => {
     // TODO: 여기서 업로드 하기 ㅎㅎ
-    const randomFileName = uuid().replace("-", "");
     const tags = [
         {
             Key: "mimetype",
@@ -52,7 +49,7 @@ export const uploadFile = async (
             ACL: "public-read",
             Bucket: bucketName,
             Body: file.createReadStream(),
-            Key: `${makeDirPath(dir)}${randomFileName}.${
+            Key: `${makeDirPath(dir)}/${s4()}${s4()}/${file.filename}.${
                 file.mimetype.split("/")[1]
             }`
         },

@@ -19,10 +19,10 @@ const resolvers: Resolvers = {
     Mutation: {
         CreateProduct: defaultResolver(
             privateResolver(
-                async ({
-                    args: { param },
-                    context: { req }
-                }): Promise<CreateProductResponse> => {
+                async (
+                    { args: { param }, context: { req } },
+                    stack: any[]
+                ): Promise<CreateProductResponse> => {
                     const session = await mongoose.startSession();
                     session.startTransaction();
                     try {
@@ -106,7 +106,7 @@ const resolvers: Resolvers = {
                         if (images) {
                             for (const file of images) {
                                 const syncedFile = await file;
-                                console.log({ syncedFile });
+                                stack.push(syncedFile);
                                 // TODO: 파일 업로드 구현 ㄱㄱ
 
                                 /* 
