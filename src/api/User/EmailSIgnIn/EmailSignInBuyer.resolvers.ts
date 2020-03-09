@@ -22,8 +22,8 @@ export const EmailSignInBuyerFunc = async (
     try {
         const cognitoSignInResult = await cognito
             .adminInitiateAuth({
-                UserPoolId: process.env.COGNITO_POOL_ID || "",
-                ClientId: process.env.COGNITO_CLIENT_ID || "",
+                UserPoolId: process.env.COGNITO_POOL_ID_BUYER || "",
+                ClientId: process.env.COGNITO_CLIENT_ID_BUYER || "",
                 AuthFlow: "ADMIN_USER_PASSWORD_AUTH",
                 AuthParameters: {
                     USERNAME: email,
