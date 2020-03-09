@@ -21,4 +21,5 @@ input StoreUpdateParamInput {
     customFieldInput: [CustomFieldDefineInput!]
     manager: ManagerInput
     infos: [InfoInput!]
+    bookingPolicy: BookingPolicyInput
 }

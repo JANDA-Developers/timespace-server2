@@ -15,7 +15,8 @@ import {
     Segment,
     Item,
     ItemStatus,
-    Info
+    Info,
+    BookingPolicy
 } from "GraphType";
 import { genCode, s4 } from "../utils/genId";
 import { ApolloError } from "apollo-server";
@@ -260,6 +261,9 @@ export class ProductCls extends BaseSchema
         default: []
     })
     infos: Info[];
+
+    @prop()
+    bookingPolicy: BookingPolicy;
 
     async segmentListWithItems(
         this: DocumentType<ProductCls>,

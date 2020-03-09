@@ -26,6 +26,7 @@ import {
     getPeriodFromDB,
     validatePeriod
 } from "../../utils/periodFuncs";
+import { BookingPolicy } from "GraphType";
 import { PeriodWithDays } from "../../utils/PeriodWithDays";
 import _ from "lodash";
 import { StoreProps, StoreFuncs } from "./Store.interface";
@@ -163,6 +164,31 @@ export class StoreCls extends BaseSchema implements StoreProps, StoreFuncs {
                     return validatePeriod(businessHours);
                 },
                 message: "Validation Fail"
+            },
+            {
+                validator(
+                    this: DocumentType<StoreCls>,
+                    businessHours: Array<PeriodCls>
+                ): boolean {
+                    const unit = this.periodOption.unit;
+                    return (
+                        businessHours.filter(({ time }) => time % unit !== 0)
+                            .length === 0
+                    );
+                },
+                message: "BusinessHours.time 값이 unit의 배수가 아닙니다."
+            },
+            {
+                validator(
+                    this: DocumentType<StoreCls>,
+                    businessHours: Array<PeriodCls>
+                ): boolean {
+                    return (
+                        businessHours.filter(({ start, end }) => start >= end)
+                            .length === 0
+                    );
+                },
+                message: "end값이 start보다 작거나 같습니다."
             }
         ],
         default: []
@@ -258,6 +284,9 @@ export class StoreCls extends BaseSchema implements StoreProps, StoreFuncs {
         ]
     })
     customFields: CustomField[];
+
+    @prop({})
+    bookingPolicy: BookingPolicy;
 
     @prop({
         default: []

@@ -16,7 +16,7 @@ export const defaultResolver = (resolverFunction: ResolverFunction) => async (
     info: any
 ) => {
     const startTime = new Date();
-    const stack = [];
+    const stack: any[] = [];
     const { headers, body, cognitoUser } = context.req;
     const ips = getIP(context.req);
     let result: any;
@@ -57,7 +57,7 @@ export const defaultResolver = (resolverFunction: ResolverFunction) => async (
             resTime: `${new Date().getTime() - startTime.getTime()} ms`,
             body,
             input: args,
-            logStack: stack,
+            stack,
             output: result
         }
     });

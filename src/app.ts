@@ -62,6 +62,7 @@ class App {
         this.app.use(helmet());
         this.useLogger();
         this.app.use(this.jwt);
+        this.app.use(this.jwtForBuyer);
     };
 
     private useLogger = (): void => {
@@ -107,6 +108,34 @@ class App {
             }
         } else {
             req.cognitoUser = undefined;
+        }
+        next();
+    };
+
+    private jwtForBuyer = async (
+        req: any,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> => {
+        const token = req.get("X-JWT-BUYER") || req.get("x-jwt-buyer");
+        if (token) {
+            const { ok, error, data } = await decodeKey(token);
+            if (!ok && error) {
+                req.headers["x-jwt-buyer"] = error.code || "";
+            }
+            if (data) {
+                if (data["custom:_id"]) {
+                    data._id = data["custom:_id"];
+                    if (data.zoneinfo) {
+                        data.zoneinfo = JSON.parse(data.zoneinfo);
+                    }
+                    // 여기서 세팅 요망
+                }
+                // Raw Data임... DB에 있는 Cognito User 절대 아님
+                req.buyer = data;
+            }
+        } else {
+            req.buyer = undefined;
         }
         next();
     };

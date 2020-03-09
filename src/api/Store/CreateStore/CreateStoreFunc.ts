@@ -29,7 +29,8 @@ export const createStoreFunc: ResolverFunction = async (
             businessHours,
             periodOption,
             customFieldInput,
-            infos
+            infos,
+            bookingPolicy
         } = param as CreateStoreInput;
         let zoneinfo = cognitoUser.zoneinfo;
         if (timezone) {
@@ -111,7 +112,11 @@ export const createStoreFunc: ResolverFunction = async (
                 isVerifiedPhoneNumber: false
             },
             groupIds: [group._id],
-            customFields: customFieldInput
+            customFields: customFieldInput,
+            bookingPolicy: bookingPolicy || {
+                limitFirstBooking: 0,
+                limitLastBooking: 30
+            }
         });
         await store.save({ session });
         await StoreGroupModel.updateOne(

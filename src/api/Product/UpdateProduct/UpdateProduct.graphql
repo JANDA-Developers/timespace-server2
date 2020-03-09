@@ -22,5 +22,6 @@ input UpdateProductParamInput {
     genderOption: GenderOption
     businessHours: [PeriodInput!]
     periodOption: PeriodOptionInput
+    bookingPolicy: BookingPolicyInput
     infos: [InfoInput!]
 }

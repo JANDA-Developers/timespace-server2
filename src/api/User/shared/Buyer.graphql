@@ -1,0 +1,12 @@
+type Buyer {
+    _id: ID!
+    sub: String!
+    name: String!
+    email: String!
+    email_verified: Boolean!
+    phone_number_verified: Boolean!
+    phone_number: String!
+    zoneinfo: Zoneinfo!
+    tokenExpiry: Int!
+    items: [Item!]
+}

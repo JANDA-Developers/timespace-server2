@@ -1,18 +1,14 @@
 type Query {
-    ValidateGoogleUser(
-        param: ValidateGoogleUserInput!
-    ): ValidateGoogleUserResponse!
+    ValidateGoogleUser: ValidateGoogleUserResponse!
 }
+
 type ValidateGoogleUserResponse {
     ok: Boolean!
     error: Err
     data: ValidateGoogleUserResult
 }
 
-input ValidateGoogleUserInput {
-    role: UserRole!
-}
-
 type ValidateGoogleUserResult {
+    # init 필요한 유저임(SELLER)
     isInitiated: Boolean!
 }

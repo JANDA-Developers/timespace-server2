@@ -21,4 +21,5 @@ input CreateStoreInput {
     periodOption: PeriodOptionInput!
     customFieldInput: [CustomFieldDefineInput!]
     infos: [InfoInput!]
+    bookingPolicy: BookingPolicyInput
 }

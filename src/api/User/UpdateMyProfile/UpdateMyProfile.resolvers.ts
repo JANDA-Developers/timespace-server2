@@ -2,7 +2,7 @@
 import { mongoose } from "@typegoose/typegoose";
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
-import { UpdateUserResponse, UpdateUserInput } from "GraphType";
+import { UpdateMyProfileResponse, UpdateMyProfileInput } from "GraphType";
 import {
     defaultResolver,
     privateResolver
@@ -11,11 +11,14 @@ import { UserModel } from "../../../models/User";
 import { AttributeType } from "aws-sdk/clients/cognitoidentityserviceprovider";
 import { CountryInfoModel } from "../../../models/CountryInfo";
 import CognitoIdentityServiceProvider = require("aws-sdk/clients/cognitoidentityserviceprovider");
+import { refreshToken } from "../../../utils/refreshToken";
+import { ApolloError } from "apollo-server";
+import { ERROR_CODES } from "../../../types/values";
 
-export const UpdateUserFunc = async (
+export const UpdateMyProfileFunc = async (
     { args, context: { req } },
     stack: any[]
-): Promise<UpdateUserResponse> => {
+): Promise<UpdateMyProfileResponse> => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
@@ -23,7 +26,7 @@ export const UpdateUserFunc = async (
         const { sub } = cognitoUser;
         const {
             param: { name, phoneNumber, roles, timezone }
-        }: { param: UpdateUserInput } = args;
+        }: { param: UpdateMyProfileInput } = args;
         let user = await UserModel.findOne({ sub });
         if (!user) {
             user = new UserModel({
@@ -76,13 +79,23 @@ export const UpdateUserFunc = async (
         if (cognitoUpdateResult.$response.error) {
             throw cognitoUpdateResult.$response.error;
         }
+        const refreshResult = await refreshToken(user.refreshToken);
+        if (!refreshResult.ok || !refreshResult.data) {
+            throw new ApolloError(
+                "Token Refresh 실패",
+                ERROR_CODES.TOKEN_REFRESH_FAIL
+            );
+        }
+        user.refreshToken = refreshResult.data.refreshToken;
+        user.refreshTokenLastUpdate = new Date();
         await user.save({ session });
         await session.commitTransaction();
         session.endSession();
         return {
             ok: true,
             error: null,
-            data: user as any
+            // Let's return Refreshed Token
+            data: refreshResult.data.idToken
         };
     } catch (error) {
         return await errorReturn(error, session);
@@ -91,7 +104,7 @@ export const UpdateUserFunc = async (
 
 const resolvers: Resolvers = {
     Mutation: {
-        UpdateUser: defaultResolver(privateResolver(UpdateUserFunc))
+        UpdateMyProfile: defaultResolver(privateResolver(UpdateMyProfileFunc))
     }
 };
 export default resolvers;

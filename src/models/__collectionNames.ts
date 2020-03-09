@@ -1,6 +1,7 @@
 const prefix = "";
 export enum ModelName {
     USER = "UserList",
+    BUYER = "BuyerList",
     STORE = "StoreList",
     GROUP = "GroupList",
     PRODUCT = "ProductList",

@@ -1,12 +1,14 @@
 type Mutation {
-    UpdateUser(param: UpdateUserInput!): UpdateUserResponse!
+    UpdateMyProfile(param: UpdateMyProfileInput!): UpdateMyProfileResponse!
 }
-type UpdateUserResponse {
+
+type UpdateMyProfileResponse {
     ok: Boolean!
     error: Err
-    data: User
+    data: String
 }
-input UpdateUserInput {
+
+input UpdateMyProfileInput {
     roles: [UserRole!]
     name: String
     # callingCode 제거한채로 넣기...

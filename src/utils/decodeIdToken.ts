@@ -54,7 +54,6 @@ export const decodeKey = async (
         console.log(
             "decodeKey (decoded User) ==================================================="
         );
-        console.info(user);
         return {
             ok: true,
             error: null,
@@ -69,5 +68,25 @@ export const decodeKey = async (
             },
             data: null
         };
+    }
+};
+
+export const getCognitoUser = async (token: string): Promise<any | string> => {
+    if (token) {
+        const { ok, error, data } = await decodeKey(token);
+        if (!ok && error) {
+            return error.code || "";
+        }
+        if (data) {
+            if (data["custom:_id"]) {
+                data._id = data["custom:_id"];
+                if (data.zoneinfo) {
+                    data.zoneinfo = JSON.parse(data.zoneinfo);
+                }
+                // 여기서 세팅 요망
+            }
+            // Raw Data임... DB에 있는 Cognito User 절대 아님
+        }
+        return data;
     }
 };

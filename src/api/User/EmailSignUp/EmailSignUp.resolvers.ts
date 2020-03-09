@@ -12,6 +12,24 @@ import { StoreGroupModel } from "../../../models/StoreGroup";
 import { errorReturn } from "../../../utils/utils";
 import _ from "lodash";
 
+/**
+ * Error에 대한 부분
+ *
+ * CodeDeliveryFailureException
+ * InternalErrorException
+ * InvalidEmailRoleAccessPolicyException
+ * InvalidLambdaResponseException
+ * InvalidParameterException
+ * InvalidPasswordException
+ * InvalidSmsRoleAccessPolicyException
+ * InvalidSmsRoleTrustRelationshipException
+ * NotAuthorizedException
+ * ResourceNotFoundException
+ * TooManyRequestsException
+ * UnexpectedLambdaException
+ * UserLambdaValidationException
+ * UsernameExistsException
+ */
 const resolvers: Resolvers = {
     Mutation: {
         EmailSignUp: defaultResolver(
@@ -24,8 +42,7 @@ const resolvers: Resolvers = {
                         email,
                         password,
                         phoneNumber,
-                        timezone,
-                        roles
+                        timezone
                     } = param as EmailSignUpInput;
 
                     const cognito = new CognitoIdentityServiceProvider();
@@ -85,12 +102,6 @@ const resolvers: Resolvers = {
                             Value: _id.toHexString()
                         }
                     ];
-                    if (roles.length === 0) {
-                        throw new ApolloError(
-                            "User.Roles값이 비어있습니다.",
-                            "EMPTY_USER_ROLES"
-                        );
-                    }
                     const result = await cognito
                         .signUp({
                             ClientId: process.env.COGNITO_CLIENT_ID || "",
@@ -100,18 +111,13 @@ const resolvers: Resolvers = {
                         })
                         .promise();
                     const group = StoreGroupModel.makeDefaultGroup(_id);
-                    if (roles.includes("SELLER")) {
-                        roles.push("BUYER");
-                    } else if (roles.includes("ADMIN")) {
-                        roles.push("BUYER", "SELLER");
-                    }
                     const user = new UserModel({
                         _id,
                         sub: result.UserSub,
                         zoneinfo,
                         loginInfos: [],
                         groupIds: [group._id],
-                        roles: _.uniq(roles)
+                        roles: ["SELLER"]
                     });
                     // TODO: EmailSignUp 하는 동시에 "기본 그룹"을 생성한다.
                     await user.save({ session });

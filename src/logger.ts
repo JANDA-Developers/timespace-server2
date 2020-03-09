@@ -46,7 +46,7 @@ export const fmtLog = (
             mLogger.info(data);
             break;
         case "warn":
-            mLogger.info(data);
+            mLogger.warn(data);
             break;
         case "err":
             mLogger.error(data);

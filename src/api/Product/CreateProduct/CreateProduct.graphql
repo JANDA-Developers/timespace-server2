@@ -25,4 +25,5 @@ input ProductOptionalFieldInput {
     businessHours: [PeriodInput!]
     disabledPeriod: [PeriodInput!]
     periodOption: PeriodOptionInput
+    bookingPolicy: BookingPolicyInput
 }

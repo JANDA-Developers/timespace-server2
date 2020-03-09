@@ -47,6 +47,7 @@ const resolvers: Resolvers = {
                                 ERROR_CODES.UNEXIST_STORE
                             );
                         }
+
                         const product = new ProductModel({
                             _id: productId,
                             name,
@@ -100,6 +101,9 @@ const resolvers: Resolvers = {
                                 if (param) {
                                     product[fieldName] = param;
                                 }
+                            }
+                            if (!product.bookingPolicy) {
+                                product.bookingPolicy = store.bookingPolicy;
                             }
                         }
 

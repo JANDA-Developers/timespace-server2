@@ -2,7 +2,6 @@ import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
 import {
     ValidateGoogleUserResponse,
-    ValidateGoogleUserInput,
     ValidateGoogleUserResult
 } from "GraphType";
 import {
@@ -18,9 +17,6 @@ export const ValidateGoogleUserFunc = async ({
 }): Promise<ValidateGoogleUserResponse> => {
     try {
         const { cognitoUser } = req;
-        const {
-            param: { role }
-        }: { param: ValidateGoogleUserInput } = args;
         const data: ValidateGoogleUserResult = {
             isInitiated: false
         };
@@ -42,8 +38,7 @@ export const ValidateGoogleUserFunc = async ({
 
         console.log({
             cognitoUser,
-            data,
-            role
+            data
         });
         return {
             ok: true,

@@ -10,13 +10,12 @@ type AuthorizeCodeSignInResponse {
 }
 input AuthorizeCodeSignInInput {
     authorizeCode: String!
-    role: UserRole!
+    redirectUri: String!
 }
 
 type AuthorizeCodeSignInResultData {
     token: String!
     expiresIn: DateTime!
-    refreshToken: String!
     accessToken: String!
-    role: UserRole!
+    isInitiated: Boolean!
 }
