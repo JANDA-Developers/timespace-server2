@@ -8,7 +8,7 @@ import {
 } from "GraphType";
 import {
     defaultResolver,
-    privateResolver
+    privateResolverForBuyer
 } from "../../../utils/resolverFuncWrapper";
 import { UserModel } from "../../../models/User";
 import { AttributeType } from "aws-sdk/clients/cognitoidentityserviceprovider";
@@ -28,7 +28,7 @@ export const UpdateMyProfileForBuyerFunc = async (
         const { cognitoBuyer } = req;
         const { sub } = cognitoBuyer;
         const {
-            param: { name, phoneNumber, roles, timezone }
+            param: { name, phoneNumber, timezone }
         }: { param: UpdateMyProfileForBuyerInput } = args;
         let user = await UserModel.findOne({ sub });
         if (!user) {
@@ -65,9 +65,6 @@ export const UpdateMyProfileForBuyerFunc = async (
                     Value: "false"
                 }
             );
-        }
-        if (roles && roles.length !== 0) {
-            user.roles = roles;
         }
         stack.push({ cognitoUser: cognitoBuyer });
         stack.push({ user });
@@ -108,7 +105,7 @@ export const UpdateMyProfileForBuyerFunc = async (
 const resolvers: Resolvers = {
     Mutation: {
         UpdateMyProfileForBuyer: defaultResolver(
-            privateResolver(UpdateMyProfileForBuyerFunc)
+            privateResolverForBuyer(UpdateMyProfileForBuyerFunc)
         )
     }
 };

@@ -62,6 +62,14 @@ const resolvers: Resolvers = {
             } else {
                 return product.warning;
             }
+        },
+        bookingPolicy: (store: DocumentType<ProductCls>) => {
+            return (
+                store.bookingPolicy || {
+                    limitFirstBooking: 0,
+                    limitLastBooking: 60
+                }
+            );
         }
     }
 };

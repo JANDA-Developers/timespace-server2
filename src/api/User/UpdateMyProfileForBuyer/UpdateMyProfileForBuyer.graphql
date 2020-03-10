@@ -11,7 +11,6 @@ type UpdateMyProfileForBuyerResponse {
 }
 
 input UpdateMyProfileForBuyerInput {
-    roles: [UserRole!]
     name: String
     # callingCode 제거한채로 넣기...
     phoneNumber: String

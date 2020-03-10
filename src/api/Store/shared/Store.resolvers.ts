@@ -32,6 +32,14 @@ const resolvers: Resolvers = {
                 }
             });
             return groups;
+        },
+        bookingPolicy: (store: DocumentType<StoreCls>) => {
+            return (
+                store.bookingPolicy || {
+                    limitFirstBooking: 0,
+                    limitLastBooking: 60
+                }
+            );
         }
     }
 };
