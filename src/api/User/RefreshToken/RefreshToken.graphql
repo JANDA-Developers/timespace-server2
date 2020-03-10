@@ -1,5 +1,5 @@
 type Mutation {
-    RefreshToken: RefreshTokenResponse!
+    RefreshToken(param: RefreshTokenInput!): RefreshTokenResponse!
 }
 
 # 만료된 토큰은 갱신할수 없음. 토큰 만료되면 다시 로그인하게 하긔
@@ -7,4 +7,8 @@ type RefreshTokenResponse implements BaseResponse {
     ok: Boolean!
     error: Err
     token: String
+}
+
+input RefreshTokenInput {
+    role: UserRole!
 }

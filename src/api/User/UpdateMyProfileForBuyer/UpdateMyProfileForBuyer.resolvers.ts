@@ -25,8 +25,8 @@ export const UpdateMyProfileForBuyerFunc = async (
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-        const { cognitoUser } = req;
-        const { sub } = cognitoUser;
+        const { cognitoBuyer } = req;
+        const { sub } = cognitoBuyer;
         const {
             param: { name, phoneNumber, roles, timezone }
         }: { param: UpdateMyProfileForBuyerInput } = args;
@@ -69,20 +69,20 @@ export const UpdateMyProfileForBuyerFunc = async (
         if (roles && roles.length !== 0) {
             user.roles = roles;
         }
-        stack.push({ cognitoUser });
+        stack.push({ cognitoUser: cognitoBuyer });
         stack.push({ user });
         const cognito = new CognitoIdentityServiceProvider();
         const cognitoUpdateResult = await cognito
             .adminUpdateUserAttributes({
                 UserAttributes: attributes,
                 UserPoolId: process.env.COGNITO_POOL_ID_BUYER || "",
-                Username: cognitoUser["cognito:username"] || cognitoUser.sub
+                Username: cognitoBuyer["cognito:username"] || cognitoBuyer.sub
             })
             .promise();
         if (cognitoUpdateResult.$response.error) {
             throw cognitoUpdateResult.$response.error;
         }
-        const refreshResult = await refreshToken(user.refreshToken);
+        const refreshResult = await refreshToken(user.refreshToken, "BUYER");
         if (!refreshResult.ok || !refreshResult.data) {
             throw new ApolloError(
                 "Token Refresh 실패",

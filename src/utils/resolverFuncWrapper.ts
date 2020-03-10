@@ -94,3 +94,36 @@ export const privateResolver = (resolverFunction: ResolverFunction) => async (
         return await errorReturn(error);
     }
 };
+
+export const privateResolverForBuyer = (
+    resolverFunction: ResolverFunction
+) => async (
+    { parent, args, context, info },
+    stack: any[]
+): Promise<BaseResponse & { data: any | null }> => {
+    try {
+        if (!context.req.cognitoBuyer) {
+            const token: string | undefined =
+                context.req.get("X-JWT-B") || context.req.get("x-jwt-b");
+            if (token === "TokenExpiredError") {
+                throw new ApolloError(
+                    "만료된 토큰입니다. 다시 로그인 해주세요",
+                    "TOKEN_EXPIRED_ERROR",
+                    {
+                        headers: context.req.headers
+                    }
+                );
+            }
+            throw new ApolloError(
+                "Unauthorized",
+                ERROR_CODES.UNAUTHORIZED_USER,
+                {
+                    jwt: context.req.headers.jwt
+                }
+            );
+        }
+        return await resolverFunction({ parent, args, context, info }, stack);
+    } catch (error) {
+        return await errorReturn(error);
+    }
+};

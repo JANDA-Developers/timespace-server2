@@ -4,7 +4,7 @@ import { Resolvers } from "../../../types/resolvers";
 import { GetItemsForBuyerResponse, GetItemsForBuyerInput } from "GraphType";
 import {
     defaultResolver,
-    privateResolver
+    privateResolverForBuyer
 } from "../../../utils/resolverFuncWrapper";
 import { makeFilterQuery } from "./itemFilter";
 import { UserModel } from "../../../models/User";
@@ -13,7 +13,7 @@ import { ItemModel } from "../../../models/Item/Item";
 const resolvers: Resolvers = {
     Query: {
         GetItemsForBuyer: defaultResolver(
-            privateResolver(
+            privateResolverForBuyer(
                 async (
                     { args, context: { req } },
                     stack
@@ -21,11 +21,13 @@ const resolvers: Resolvers = {
                     const session = await mongoose.startSession();
                     session.startTransaction();
                     try {
-                        const { cognitoUser } = req;
+                        const { cognitoBuyer } = req;
                         const {
                             param
                         }: { param: GetItemsForBuyerInput } = args;
-                        const user = await UserModel.findBySub(cognitoUser.sub);
+                        const user = await UserModel.findBySub(
+                            cognitoBuyer.sub
+                        );
                         console.log(user);
 
                         const query = makeFilterQuery(

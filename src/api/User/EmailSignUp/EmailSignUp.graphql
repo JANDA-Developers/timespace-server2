@@ -16,7 +16,7 @@ input EmailSignUpInput {
     username: String!
     timezone: String!
     # SELLER, BUYER
-    roles: [UserRole!]
+    role: UserRole!
 }
 
 type EmailSignUpResult {

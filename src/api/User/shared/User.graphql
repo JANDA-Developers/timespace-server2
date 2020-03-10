@@ -2,6 +2,7 @@ type User {
     # user.sub
     _id: ID!
     roles: [UserRole!]
+    role: UserRole!
     sub: String!
     name: String!
     email: String!

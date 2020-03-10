@@ -4,7 +4,7 @@ import { Resolvers } from "../../../types/resolvers";
 import { CreateItemForBuyerResponse, CreateItemForBuyerInput } from "GraphType";
 import {
     defaultResolver,
-    privateResolver
+    privateResolverForBuyer
 } from "../../../utils/resolverFuncWrapper";
 import { ItemModel } from "../../../models/Item/Item";
 import { ApolloError } from "apollo-server";
@@ -13,12 +13,12 @@ import { ProductModel } from "../../../models/Product/Product";
 import { ObjectId } from "mongodb";
 import { ONE_MINUTE, ONE_DAY } from "../../../utils/dateFuncs";
 import { DateTimeRangeCls } from "../../../utils/DateTimeRange";
-import { UserModel } from "../../../models/User";
+import { BuyerModel } from "../../../models/Buyer";
 
 const resolvers: Resolvers = {
     Mutation: {
         CreateItemForBuyer: defaultResolver(
-            privateResolver(
+            privateResolverForBuyer(
                 async (
                     { args, context: { req } },
                     stack: any[]
@@ -26,18 +26,11 @@ const resolvers: Resolvers = {
                     const session = await mongoose.startSession();
                     session.startTransaction();
                     try {
-                        const { cognitoUser } = req;
+                        const { cognitoBuyer } = req;
                         const {
                             param
                         }: { param: CreateItemForBuyerInput } = args;
-                        const user = await UserModel.findUser(cognitoUser);
-                        stack.push({ role: user.roles });
-                        if (!user.roles.includes("BUYER")) {
-                            throw new ApolloError(
-                                "상품 구매 권한이 없습니다. 먼저 Buyer 인증을 해주세요.",
-                                ERROR_CODES.ACCESS_DENY_ITEM
-                            );
-                        }
+                        const buyer = await BuyerModel.findBuyer(cognitoBuyer);
                         const now = new Date();
                         const product = await ProductModel.findByCode(
                             param.productCode
@@ -67,7 +60,7 @@ const resolvers: Resolvers = {
                         }
                         item.productId = product._id;
                         item.storeId = product.storeId;
-                        item.buyerId = new ObjectId(user._id);
+                        item.buyerId = new ObjectId(buyer._id);
                         await item.setCode(product.code, now);
 
                         // validation 필요함!

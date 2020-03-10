@@ -79,7 +79,7 @@ export const UpdateMyProfileFunc = async (
         if (cognitoUpdateResult.$response.error) {
             throw cognitoUpdateResult.$response.error;
         }
-        const refreshResult = await refreshToken(user.refreshToken);
+        const refreshResult = await refreshToken(user.refreshToken, "SELLER");
         if (!refreshResult.ok || !refreshResult.data) {
             throw new ApolloError(
                 "Token Refresh 실패",

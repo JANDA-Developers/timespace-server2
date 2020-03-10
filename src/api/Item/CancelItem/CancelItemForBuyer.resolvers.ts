@@ -4,7 +4,7 @@ import { Resolvers } from "../../../types/resolvers";
 import { CancelItemForBuyerResponse, CancelItemForBuyerInput } from "GraphType";
 import {
     defaultResolver,
-    privateResolver
+    privateResolverForBuyer
 } from "../../../utils/resolverFuncWrapper";
 import { ItemModel } from "../../../models/Item/Item";
 import { ObjectId } from "mongodb";
@@ -12,7 +12,7 @@ import { ObjectId } from "mongodb";
 const resolvers: Resolvers = {
     Mutation: {
         CancelItemForBuyer: defaultResolver(
-            privateResolver(
+            privateResolverForBuyer(
                 async (
                     { parent, info, args, context: { req } },
                     stack
@@ -20,7 +20,7 @@ const resolvers: Resolvers = {
                     const session = await mongoose.startSession();
                     session.startTransaction();
                     try {
-                        const { cognitoUser } = req;
+                        const { cognitoBuyer } = req;
                         const {
                             param
                         }: { param: CancelItemForBuyerInput } = args;
@@ -29,7 +29,7 @@ const resolvers: Resolvers = {
                         await item
                             .applyStatus("CANCELED", {
                                 comment: param.comment || undefined,
-                                workerId: new ObjectId(cognitoUser._id)
+                                workerId: new ObjectId(cognitoBuyer._id)
                             })
                             .save({ session });
                         await item.save({ session });

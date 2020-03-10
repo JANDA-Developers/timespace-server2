@@ -10,6 +10,7 @@ import {
 } from "../../../models/ItemStatusChangedHistory/ItemStatusChanged";
 import { ApolloError } from "apollo-server";
 import { ERROR_CODES } from "../../../types/values";
+import { BuyerModel } from "../../../models/Buyer";
 
 const resolvers: Resolvers = {
     Item: {
@@ -20,11 +21,11 @@ const resolvers: Resolvers = {
             return await ProductModel.findById(item.productId);
         },
         buyer: async (item: DocumentType<ItemCls>, args, { req }) => {
-            const user = await UserModel.findById(item.buyerId);
-            if (user) {
-                await user.setAttributesFromCognito();
+            const buyer = await BuyerModel.findById(item.buyerId);
+            if (buyer) {
+                await buyer.setAttributesFromCognito();
             }
-            return user;
+            return buyer;
         },
         dateTimeRange: async (item: DocumentType<ItemCls>) => {
             return item.dateTimeRange;

@@ -13,42 +13,41 @@ import { ERROR_CODES } from "../types/values";
 import { ONE_DAY } from "../utils/dateFuncs";
 import { ClientSession } from "mongoose";
 import { ItemModel } from "./Item/Item";
-import { StoreGroupModel } from "./StoreGroup";
 import { ItemStatusChangedHistoryModel } from "./ItemStatusChangedHistory/ItemStatusChanged";
 import { ObjectId } from "mongodb";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.BUYER)))
 export class BuyerCls extends BaseSchema {
     static findBySub = async (sub: string): Promise<DocumentType<BuyerCls>> => {
-        const user = await BuyerModel.findOne({
+        const buyer = await BuyerModel.findOne({
             sub
         });
-        if (!user) {
+        if (!buyer) {
             throw new ApolloError(
                 "존재하지 않는 UserSub입니다",
                 ERROR_CODES.INVALID_USER_SUB,
                 { userSub: sub }
             );
         }
-        await user.setAttributesFromCognito();
-        return user;
+        await buyer.setAttributesFromCognito();
+        return buyer;
     };
 
-    static findUser = async (
-        cognitoUser: any
+    static findBuyer = async (
+        cognitoBuyer: any
     ): Promise<DocumentType<BuyerCls>> => {
-        const user = await BuyerModel.findOne({
-            sub: cognitoUser.sub
+        const buyer = await BuyerModel.findOne({
+            sub: cognitoBuyer.sub
         });
-        if (!user) {
+        if (!buyer) {
             throw new ApolloError(
                 "존재하지 않는 UserSub입니다",
                 ERROR_CODES.INVALID_USER_SUB,
-                { user: cognitoUser }
+                { user: cognitoBuyer }
             );
         }
-        await user.setAttributesFromCognito(cognitoUser);
-        return user;
+        await buyer.setAttributesFromCognito(cognitoBuyer);
+        return buyer;
     };
 
     async setAttributesFromCognito(
@@ -60,7 +59,7 @@ export class BuyerCls extends BaseSchema {
             const cognito = new CognitoIdentityServiceProvider();
             cognitoUser = await cognito
                 .adminGetUser({
-                    UserPoolId: process.env.COGNITO_POOL_ID || "",
+                    UserPoolId: process.env.COGNITO_POOL_ID_BUYER || "",
                     Username: this.sub
                 })
                 .promise();
@@ -119,7 +118,7 @@ export class BuyerCls extends BaseSchema {
         const cognito = new CognitoIdentityServiceProvider();
         const result = await cognito
             .adminDeleteUser({
-                UserPoolId: process.env.COGNITO_POOL_ID || "",
+                UserPoolId: process.env.COGNITO_POOL_ID_BUYER || "",
                 Username: this.sub
             })
             .promise();
@@ -127,22 +126,12 @@ export class BuyerCls extends BaseSchema {
             throw result.$response.error;
         }
         const expireQuery = { $set: { expiresAt } };
-        const userId = this._id;
         await ItemModel.updateMany(
             {
                 buyerId: this._id
             },
             expireQuery,
             { session }
-        );
-        await StoreGroupModel.updateMany(
-            {
-                userId
-            },
-            expireQuery,
-            {
-                session
-            }
         );
         await ItemStatusChangedHistoryModel.updateMany(
             {

@@ -3,7 +3,7 @@ import { Resolvers } from "../../../types/resolvers";
 import { GetMyProfileForBuyerResponse } from "GraphType";
 import {
     defaultResolver,
-    privateResolver
+    privateResolverForBuyer
 } from "../../../utils/resolverFuncWrapper";
 import { BuyerModel } from "../../../models/Buyer";
 
@@ -11,9 +11,12 @@ export const GetMyProfileForBuyerFunc = async (
     { parent, info, args, context: { req } },
     stack: any[]
 ): Promise<GetMyProfileForBuyerResponse> => {
-    const { cognitoUser } = req;
+    const { cognitoBuyer } = req;
+    stack.push({ cognitoBuyer });
     try {
-        const buyer = await BuyerModel.findUser(cognitoUser);
+        const buyer = await BuyerModel.findBuyer(cognitoBuyer);
+        stack.push(buyer);
+        console.log(stack);
         return {
             ok: true,
             error: null,
@@ -29,7 +32,7 @@ export const GetMyProfileForBuyerFunc = async (
 const resolvers: Resolvers = {
     Query: {
         GetMyProfileForBuyer: defaultResolver(
-            privateResolver(GetMyProfileForBuyerFunc)
+            privateResolverForBuyer(GetMyProfileForBuyerFunc)
         )
     }
 };

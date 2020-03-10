@@ -10,10 +10,10 @@ type CreateItemForBuyerResponse {
 }
 input CreateItemForBuyerInput {
     name: String
+    phoneNumber: String
     productCode: String!
     description: String
     dateTimeRange: DateTimeRangeInput
     gender: Gender
     customFieldValues: [CustomFieldInput!]
-    phoneNumber: String
 }

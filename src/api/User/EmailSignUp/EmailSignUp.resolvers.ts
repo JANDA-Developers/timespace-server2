@@ -1,5 +1,5 @@
 import { Resolvers } from "../../../types/resolvers";
-import { EmailSignUpResponse, EmailSignUpInput } from "GraphType";
+import { EmailSignUpResponse, EmailSignUpInput, UserRole } from "GraphType";
 import { CognitoIdentityServiceProvider } from "aws-sdk";
 import { defaultResolver } from "../../../utils/resolverFuncWrapper";
 import { UserModel } from "../../../models/User";
@@ -11,6 +11,7 @@ import { mongoose } from "@typegoose/typegoose";
 import { StoreGroupModel } from "../../../models/StoreGroup";
 import { errorReturn } from "../../../utils/utils";
 import _ from "lodash";
+import { BuyerModel } from "../../../models/Buyer";
 
 /**
  * Error에 대한 부분
@@ -42,86 +43,56 @@ const resolvers: Resolvers = {
                         email,
                         password,
                         phoneNumber,
-                        timezone
+                        timezone,
+                        role
                     } = param as EmailSignUpInput;
 
-                    const cognito = new CognitoIdentityServiceProvider();
+                    const zoneinfo = await getCountryInfo(timezone);
 
-                    const countryInfo = await CountryInfoModel.findOne({
-                        "timezones.name": timezone
-                    });
-
-                    if (!countryInfo) {
-                        throw new ApolloError(
-                            "Timezone 설정이 잘못되었습니다.",
-                            "UNDEFINED_COUNTRYINFO",
-                            {
-                                timezone
-                            }
-                        );
-                    }
-
-                    const tz = countryInfo.timezones.find(
-                        tz => tz.name === timezone
-                    );
-                    if (!tz) {
-                        throw new ApolloError(
-                            `Timezone is falcy value ${tz}`,
-                            "TIMEZONE_IS_FALCY"
-                        );
-                    }
-                    const zoneinfo = {
-                        name: countryInfo.countryName,
-                        tz: tz.name,
-                        code: countryInfo.countryCode,
-                        offset: tz.offset,
-                        callingCode: countryInfo.callingCode
-                    };
                     const _id = new ObjectId();
 
-                    const userAttributes: AttributeType[] = [
-                        {
-                            Name: "name",
-                            Value: username
-                        },
-                        {
-                            Name: "email",
-                            Value: email
-                        },
-                        {
-                            Name: "phone_number",
-                            Value: `${zoneinfo.callingCode}${phoneNumber}`
-                        },
-                        {
-                            Name: "zoneinfo",
-                            // name, offset 으로 구성된 아이임 ㅎㅎ
-                            Value: JSON.stringify(zoneinfo)
-                        },
-                        {
-                            Name: "custom:_id",
-                            Value: _id.toHexString()
-                        }
-                    ];
-                    const result = await cognito
-                        .signUp({
-                            ClientId: process.env.COGNITO_CLIENT_ID || "",
-                            Username: email,
-                            Password: password,
-                            UserAttributes: userAttributes
-                        })
-                        .promise();
-                    const group = StoreGroupModel.makeDefaultGroup(_id);
-                    const user = new UserModel({
-                        _id,
-                        sub: result.UserSub,
+                    const userAttributes = makeUserAttributes(
+                        username,
+                        email,
                         zoneinfo,
-                        loginInfos: [],
-                        groupIds: [group._id],
-                        roles: ["SELLER"]
-                    });
-                    // TODO: EmailSignUp 하는 동시에 "기본 그룹"을 생성한다.
-                    await user.save({ session });
-                    await group.save({ session });
+                        _id,
+                        phoneNumber
+                    );
+
+                    const result = await emailSignUp(
+                        email,
+                        password,
+                        userAttributes,
+                        role
+                    );
+
+                    const group = StoreGroupModel.makeDefaultGroup(_id);
+                    if (role === "SELLER") {
+                        const user = new UserModel({
+                            _id,
+                            sub: result.UserSub,
+                            zoneinfo,
+                            loginInfos: [],
+                            groupIds: [group._id],
+                            roles: [role],
+                            role
+                        });
+                        // TODO: EmailSignUp 하는 동시에 "기본 그룹"을 생성한다.
+                        await user.save({ session });
+                        await group.save({ session });
+                    } else {
+                        const buyer = new BuyerModel({
+                            _id,
+                            sub: result.UserSub,
+                            zoneinfo,
+                            loginInfos: [],
+                            roles: [role],
+                            role
+                        });
+                        await buyer.save({
+                            session
+                        });
+                    }
                     await session.commitTransaction();
                     session.endSession();
                     return {
@@ -152,4 +123,92 @@ const resolvers: Resolvers = {
         )
     }
 };
+
+const getCountryInfo = async (timezone: string) => {
+    const countryInfo = await CountryInfoModel.findOne({
+        "timezones.name": timezone
+    });
+
+    if (!countryInfo) {
+        throw new ApolloError(
+            "Timezone 설정이 잘못되었습니다.",
+            "UNDEFINED_COUNTRYINFO",
+            {
+                timezone
+            }
+        );
+    }
+
+    const tz = countryInfo.timezones.find(tz => tz.name === timezone);
+    if (!tz) {
+        throw new ApolloError(
+            `Timezone is falcy value ${tz}`,
+            "TIMEZONE_IS_FALCY"
+        );
+    }
+
+    const zoneinfo = {
+        name: countryInfo.countryName,
+        tz: tz.name,
+        code: countryInfo.countryCode,
+        offset: tz.offset,
+        callingCode: countryInfo.callingCode
+    };
+    return zoneinfo;
+};
+
+const makeUserAttributes = (
+    username: string,
+    email: string,
+    zoneinfo: any,
+    _id: ObjectId,
+    phoneNumber: string
+) => {
+    const userAttributes: AttributeType[] = [
+        {
+            Name: "name",
+            Value: username
+        },
+        {
+            Name: "email",
+            Value: email
+        },
+        {
+            Name: "phone_number",
+            Value: `${zoneinfo.callingCode}${phoneNumber}`
+        },
+        {
+            Name: "zoneinfo",
+            // name, offset 으로 구성된 아이임 ㅎㅎ
+            Value: JSON.stringify(zoneinfo)
+        },
+        {
+            Name: "custom:_id",
+            Value: _id.toHexString()
+        }
+    ];
+    return userAttributes;
+};
+
+const emailSignUp = async (
+    email: string,
+    password: string,
+    userAttributes: any[],
+    role: UserRole
+) => {
+    const cognito = new CognitoIdentityServiceProvider();
+    const result = await cognito
+        .signUp({
+            ClientId:
+                (role === "SELLER"
+                    ? process.env.COGNITO_CLIENT_ID
+                    : process.env.COGNITO_CLIENT_ID_BUYER) || "",
+            Username: email,
+            Password: password,
+            UserAttributes: userAttributes
+        })
+        .promise();
+    return result;
+};
+
 export default resolvers;

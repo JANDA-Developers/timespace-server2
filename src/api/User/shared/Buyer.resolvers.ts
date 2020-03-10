@@ -3,8 +3,8 @@ import { ItemModel } from "../../../models/Item/Item";
 
 const resolvers: Resolvers = {
     Buyer: {
-        _id: cognitoUser =>
-            (cognitoUser && cognitoUser["custom:_id"]) || cognitoUser._id,
+        _id: cognitoBuyer =>
+            (cognitoBuyer && cognitoBuyer["custom:_id"]) || cognitoBuyer._id,
         tokenExpiry: buyer => buyer.exp,
         zoneinfo: buyer =>
             typeof buyer.zoneinfo === "string"

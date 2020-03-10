@@ -13,10 +13,10 @@ interface JWKFormat {
     n: string;
     us: string;
 }
-const getJsonWebKeys = async (): Promise<JWKFormat[]> => {
+const getJsonWebKeys = async (userPoolId: string): Promise<JWKFormat[]> => {
     const keys = (
         await axios.get(
-            `https://cognito-idp.${process.env.AWS_REGION}.amazonaws.com/${process.env.COGNITO_POOL_ID}/.well-known/jwks.json`
+            `https://cognito-idp.${process.env.AWS_REGION}.amazonaws.com/${userPoolId}/.well-known/jwks.json`
         )
     ).data.keys;
     return keys;
@@ -38,10 +38,48 @@ const getJsonWebKeyWithKID = async (kid: any, jsonWebKeys: JWKFormat[]) => {
     return null;
 };
 
+export const decodeKeyForBuyer = async (
+    token: string
+): Promise<BaseResponse & { data: any }> => {
+    const jsonWebKeys = await getJsonWebKeys(
+        process.env.COGNITO_POOL_ID_BUYER || ""
+    );
+    const header = decodeTokenHeader(token);
+    try {
+        const jwk = await getJsonWebKeyWithKID(header.kid, jsonWebKeys);
+        if (!jwk) {
+            throw new ApolloError("Undefined JWK", ERROR_CODES.UNDEFINED_JWK);
+        }
+        const pem = jwkToPem(jwk);
+        const buyer = jwt.verify(token, pem);
+
+        console.log(
+            "decodeKey (decoded Buyer) ==================================================="
+        );
+        console.log({
+            buyer
+        });
+        return {
+            ok: true,
+            error: null,
+            data: buyer
+        };
+    } catch (error) {
+        return {
+            ok: false,
+            error: {
+                ...error,
+                code: error.code || error.name
+            },
+            data: null
+        };
+    }
+};
+
 export const decodeKey = async (
     token: string
 ): Promise<BaseResponse & { data: any }> => {
-    const jsonWebKeys = await getJsonWebKeys();
+    const jsonWebKeys = await getJsonWebKeys(process.env.COGNITO_POOL_ID || "");
     const header = decodeTokenHeader(token);
     try {
         const jwk = await getJsonWebKeyWithKID(header.kid, jsonWebKeys);

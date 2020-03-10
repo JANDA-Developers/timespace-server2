@@ -1,8 +1,9 @@
 import { CognitoIdentityServiceProvider } from "aws-sdk";
-import { BaseResponse } from "GraphType";
+import { BaseResponse, UserRole } from "GraphType";
 
 export const refreshToken = async (
-    refreshToken: string
+    refreshToken: string,
+    role: UserRole
 ): Promise<BaseResponse & {
     data: { idToken: string; refreshToken: string } | null;
 }> => {
@@ -11,8 +12,14 @@ export const refreshToken = async (
         // AccessToken, IdToken, TokenType, ExpiresIn 포함, RefreshToken은 미포함
         const result = await cognito
             .adminInitiateAuth({
-                UserPoolId: process.env.COGNITO_POOL_ID || "",
-                ClientId: process.env.COGNITO_CLIENT_ID || "",
+                UserPoolId:
+                    (role === "SELLER"
+                        ? process.env.COGNITO_POOL_ID
+                        : process.env.COGNITO_POOL_ID_BUYER) || "",
+                ClientId:
+                    (role === "SELLER"
+                        ? process.env.COGNITO_CLIENT_ID
+                        : process.env.COGNITO_CLIENT_ID_BUYER) || "",
                 AuthFlow: "REFRESH_TOKEN_AUTH",
                 AuthParameters: {
                     REFRESH_TOKEN: refreshToken

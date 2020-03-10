@@ -53,8 +53,9 @@ export const AuthorizeCodeSignInFunc = async (
         udpateRefreshToken(user, refresh_token);
         let isInitiated =
             exists &&
-            user.zoneinfo !== undefined &&
-            user.phone_number !== undefined;
+            (cognitoUser.zoneinfo !== undefined ||
+                cognitoUser.phone_number !== undefined ||
+                cognitoUser.name !== undefined);
 
         if (user) {
             if (new ObjectId(cognitoUser["custom:_id"]).equals(user._id)) {

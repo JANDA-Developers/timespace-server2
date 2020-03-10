@@ -12,7 +12,7 @@ import { CountryInfoModel } from "../../../models/CountryInfo";
 import { ObjectId } from "mongodb";
 import { AttributeType } from "aws-sdk/clients/cognitoidentityserviceprovider";
 import { StoreGroupModel } from "../../../models/StoreGroup";
-import { UserModel } from "../../../models/User";
+import { BuyerModel } from "../../../models/Buyer";
 
 export const EmailSignUpForBuyerFunc = async (
     { parent, info, args: { param }, context: { req } },
@@ -92,12 +92,11 @@ export const EmailSignUpForBuyerFunc = async (
             })
             .promise();
         const group = StoreGroupModel.makeDefaultGroup(_id);
-        const buyer = new UserModel({
+        const buyer = new BuyerModel({
             _id,
             sub: result.UserSub,
             zoneinfo,
             loginInfos: [],
-            groupIds: [group._id],
             roles: ["BUYER"]
         });
 

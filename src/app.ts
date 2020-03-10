@@ -5,7 +5,7 @@ import schema from "./schema";
 import { ApolloServer } from "apollo-server-express";
 import express, { Express, NextFunction, Response } from "express";
 import axios from "axios";
-import { decodeKey } from "./utils/decodeIdToken";
+import { decodeKey, decodeKeyForBuyer } from "./utils/decodeIdToken";
 
 class App {
     public server: ApolloServer;
@@ -117,11 +117,11 @@ class App {
         res: Response,
         next: NextFunction
     ): Promise<void> => {
-        const token = req.get("X-JWT-BUYER") || req.get("x-jwt-buyer");
+        const token = req.get("X-JWT-B") || req.get("x-jwt-b");
         if (token) {
-            const { ok, error, data } = await decodeKey(token);
+            const { ok, error, data } = await decodeKeyForBuyer(token);
             if (!ok && error) {
-                req.headers["x-jwt-buyer"] = error.code || "";
+                req.headers["x-jwt-b"] = error.code || "";
             }
             if (data) {
                 if (data["custom:_id"]) {
@@ -132,10 +132,10 @@ class App {
                     // 여기서 세팅 요망
                 }
                 // Raw Data임... DB에 있는 Cognito User 절대 아님
-                req.buyer = data;
+                req.cognitoBuyer = data;
             }
         } else {
-            req.buyer = undefined;
+            req.cognitoBuyer = undefined;
         }
         next();
     };
