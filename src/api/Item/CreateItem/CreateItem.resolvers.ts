@@ -83,7 +83,7 @@ const resolvers: Resolvers = {
                         }
                         item.productId = product._id;
                         item.storeId = product.storeId;
-                        item.buyerId = new ObjectId(cognitoUser._id);
+                        item.userId = new ObjectId(cognitoUser._id);
                         await item
                             .applyStatus("PERMITTED", {
                                 workerId: new ObjectId(cognitoUser._id)

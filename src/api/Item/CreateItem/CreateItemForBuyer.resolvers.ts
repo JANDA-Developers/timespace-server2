@@ -1,19 +1,23 @@
-import { mongoose } from "@typegoose/typegoose";
+import { mongoose, DocumentType } from "@typegoose/typegoose";
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
-import { CreateItemForBuyerResponse, CreateItemForBuyerInput } from "GraphType";
+import {
+    CreateItemForBuyerResponse,
+    CreateItemForBuyerInput,
+    DateTimeRangeInput
+} from "GraphType";
 import {
     defaultResolver,
     privateResolverForBuyer
 } from "../../../utils/resolverFuncWrapper";
-import { ItemModel } from "../../../models/Item/Item";
+import { ItemModel, ItemCls } from "../../../models/Item/Item";
 import { ApolloError } from "apollo-server";
 import { ERROR_CODES } from "../../../types/values";
-import { ProductModel } from "../../../models/Product/Product";
+import { ProductModel, ProductCls } from "../../../models/Product/Product";
 import { ObjectId } from "mongodb";
 import { ONE_MINUTE, ONE_DAY } from "../../../utils/dateFuncs";
 import { DateTimeRangeCls } from "../../../utils/DateTimeRange";
-import { BuyerModel } from "../../../models/Buyer";
+import { BuyerModel, BuyerCls } from "../../../models/Buyer";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -45,7 +49,6 @@ const resolvers: Resolvers = {
                         }
                         if (param.dateTimeRange) {
                             const { from, to } = param.dateTimeRange;
-
                             item.dateTimeRange = {
                                 from,
                                 to,
@@ -54,10 +57,9 @@ const resolvers: Resolvers = {
                                 )
                             };
                         }
-                        for (const fieldName in param) {
-                            const element = param[fieldName];
-                            item[fieldName] = element;
-                        }
+
+                        setParamsToItem(param, item, buyer);
+
                         item.productId = product._id;
                         item.storeId = product.storeId;
                         item.buyerId = new ObjectId(buyer._id);
@@ -66,50 +68,9 @@ const resolvers: Resolvers = {
                         // validation 필요함!
                         // needConfirm
                         const dateTimeRange = param.dateTimeRange;
-                        if (dateTimeRange) {
-                            const dtRangeCls = new DateTimeRangeCls(
-                                dateTimeRange
-                            );
-                            const list = await product.getSegmentSchedules(
-                                dtRangeCls
-                            );
-                            if (list.length === 0) {
-                                throw new ApolloError(
-                                    "이용 가능한 시간이 아닙니다.",
-                                    ERROR_CODES.UNAVAILABLE_BUSINESSHOURS
-                                );
-                            }
 
-                            // TODO: 여기서 걸러내자...
-                            const now = new Date();
-                            const interval =
-                                (dtRangeCls.from.getTime() - now.getTime()) /
-                                ONE_DAY;
-                            if (
-                                product.bookingPolicy.limitFirstBooking >
-                                    interval &&
-                                product.bookingPolicy.limitLastBooking <
-                                    interval
-                            ) {
-                                throw new ApolloError(
-                                    "예약 가능범위에 포함되지 않는 날짜입니다",
-                                    ERROR_CODES.UNINCLUDED_BOOKING_DATERANGE
-                                );
-                            }
+                        await validateDateTimerange(product, dateTimeRange);
 
-                            const isAvailable = list
-                                .map(l => !l.soldOut)
-                                .filter(t => t).length;
-                            if (!isAvailable) {
-                                throw new ApolloError(
-                                    "SoldOut인 Segment가 존재합니다.",
-                                    ERROR_CODES.UNAVAILABLE_SOLD_OUT,
-                                    {
-                                        segment: list
-                                    }
-                                );
-                            }
-                        }
                         await item
                             .applyStatus(
                                 product.needToConfirm ? "PENDING" : "PERMITTED",
@@ -138,6 +99,63 @@ const resolvers: Resolvers = {
                 }
             )
         )
+    }
+};
+
+const setParamsToItem = (
+    param: any,
+    item: DocumentType<ItemCls>,
+    buyer: DocumentType<BuyerCls>
+) => {
+    for (const fieldName in param) {
+        const element = param[fieldName];
+        item[fieldName] = element;
+    }
+    if (!item.name) {
+        item.name = buyer.name;
+    }
+    if (!item.phoneNumber) {
+        item.phoneNumber = buyer.phone_number;
+    }
+};
+
+const validateDateTimerange = async (
+    product: DocumentType<ProductCls>,
+    dateTimeRange: DateTimeRangeInput
+) => {
+    if (dateTimeRange) {
+        const dtRangeCls = new DateTimeRangeCls(dateTimeRange);
+        const list = await product.getSegmentSchedules(dtRangeCls);
+        if (list.length === 0) {
+            throw new ApolloError(
+                "이용 가능한 시간이 아닙니다.",
+                ERROR_CODES.UNAVAILABLE_BUSINESSHOURS
+            );
+        }
+
+        // TODO: 여기서 걸러내자...
+        const now = new Date();
+        const interval = (dtRangeCls.from.getTime() - now.getTime()) / ONE_DAY;
+        if (
+            product.bookingPolicy.limitFirstBooking > interval &&
+            product.bookingPolicy.limitLastBooking < interval
+        ) {
+            throw new ApolloError(
+                "예약 가능범위에 포함되지 않는 날짜입니다",
+                ERROR_CODES.UNINCLUDED_BOOKING_DATERANGE
+            );
+        }
+
+        const isAvailable = list.map(l => !l.soldOut).filter(t => t).length;
+        if (!isAvailable) {
+            throw new ApolloError(
+                "SoldOut인 Segment가 존재합니다.",
+                ERROR_CODES.UNAVAILABLE_SOLD_OUT,
+                {
+                    segment: list
+                }
+            );
+        }
     }
 };
 export default resolvers;

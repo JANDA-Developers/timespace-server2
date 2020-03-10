@@ -1,7 +1,7 @@
 type Item implements BaseModel {
     _id: ID!
     store: Store
-    user: User
+    user: User!
     buyer: Buyer
     product: Product
     code: String!

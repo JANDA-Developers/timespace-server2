@@ -20,6 +20,13 @@ const resolvers: Resolvers = {
         product: async (item: DocumentType<ItemCls>) => {
             return await ProductModel.findById(item.productId);
         },
+        user: async (item: DocumentType<ItemCls>, args, { req }) => {
+            const user = await UserModel.findById(item.userId);
+            if (user) {
+                await user.setAttributesFromCognito();
+            }
+            return user;
+        },
         buyer: async (item: DocumentType<ItemCls>, args, { req }) => {
             const buyer = await BuyerModel.findById(item.buyerId);
             if (buyer) {

@@ -56,11 +56,16 @@ export class ItemCls extends BaseSchema implements ItemProps, ItemFuncs {
     productId: ObjectId;
 
     @prop({
-        required: true,
         set: id => new ObjectId(id),
         get: id => new ObjectId(id)
     })
     buyerId: ObjectId;
+
+    @prop({
+        set: id => new ObjectId(id),
+        get: id => new ObjectId(id)
+    })
+    userId: ObjectId;
 
     @prop({
         set: v => v,
