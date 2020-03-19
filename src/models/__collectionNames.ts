@@ -10,7 +10,12 @@ export enum ModelName {
     ZONE_INFO = "CountryInfoList",
     NOTIFICATION = "Notifications",
     PAYMETHOD = "PayMethodList",
-    PAYMENT_HISTORY = "PaymentHistory"
+    PAYMENT_HISTORY = "PaymentHistory",
+    SMS_TRIGGER = "SmsTriggers",
+    SMS_FORMAT = "SmsFormats",
+    SMS_SENDER = "SmsSenders",
+    SMS_SETTINGS = "SmsSettings",
+    SMS_SENT = "SmsSendHistory"
 }
 
 export const getCollectionName = (modelName: ModelName): string =>

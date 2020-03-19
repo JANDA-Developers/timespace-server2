@@ -18,6 +18,7 @@ import { ItemModel } from "./Item/Item";
 import { ProductModel } from "./Product/Product";
 import { StoreGroupModel } from "./StoreGroup";
 import { ItemStatusChangedHistoryModel } from "./ItemStatusChangedHistory/ItemStatusChanged";
+import { AttributeType } from "aws-sdk/clients/cognitoidentityserviceprovider";
 
 export type LoggedInInfo = {
     idToken: string;
@@ -105,6 +106,12 @@ export class UserCls extends BaseSchema {
     phone_number_verified: boolean;
     name: string;
     exp: number;
+
+    @prop({
+        set: (id: any) => new ObjectId(id),
+        get: (id: any) => new ObjectId(id)
+    })
+    smsKey?: ObjectId;
 
     @prop({ default: [] })
     roles: UserRole[];
@@ -206,6 +213,24 @@ export class UserCls extends BaseSchema {
             }
         );
         this.expiresAt = expiresAt;
+    }
+
+    async updateUser(
+        this: DocumentType<UserCls>,
+        attributes: AttributeType[]
+    ): Promise<boolean> {
+        const cognito = new CognitoIdentityServiceProvider();
+        const cognitoUpdateResult = await cognito
+            .adminUpdateUserAttributes({
+                UserAttributes: attributes,
+                UserPoolId: process.env.COGNITO_POOL_ID || "",
+                Username: this.sub
+            })
+            .promise();
+        if (cognitoUpdateResult.$response.error) {
+            throw cognitoUpdateResult.$response.error;
+        }
+        return true;
     }
 }
 

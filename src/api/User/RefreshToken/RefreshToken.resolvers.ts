@@ -20,7 +20,7 @@ const resolvers: Resolvers = {
                 if (role === "SELLER") {
                     const token: string | undefined = req.get("X-JWT");
                     const { cognitoUser } = req;
-                    if (token) {
+                    if (!token) {
                         throw new ApolloError(
                             "토큰값이 존재하지 않습니다.",
                             "UNDEFINED_TOKEN",
@@ -53,10 +53,11 @@ const resolvers: Resolvers = {
                         token: authResult.data.idToken || ""
                     };
                 } else {
-                    const tokenB: string | undefined = req.get("X-JWT-B");
+                    const tokenB: string | undefined =
+                        req.get("X-JWT-B") || req.headers["x-jwt-b"];
 
                     const { cognitoBuyer } = req;
-                    if (tokenB) {
+                    if (!tokenB) {
                         throw new ApolloError(
                             "토큰값이 존재하지 않습니다.",
                             "UNDEFINED_TOKEN",

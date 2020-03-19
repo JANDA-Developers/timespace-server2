@@ -285,7 +285,14 @@ export class StoreCls extends BaseSchema implements StoreProps, StoreFuncs {
     })
     customFields: CustomField[];
 
-    @prop({})
+    @prop({
+        default: (): BookingPolicy => {
+            return {
+                limitFirstBooking: 0,
+                limitLastBooking: 60
+            };
+        }
+    })
     bookingPolicy: BookingPolicy;
 
     @prop({

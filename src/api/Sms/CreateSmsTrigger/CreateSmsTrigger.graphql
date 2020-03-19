@@ -1,0 +1,17 @@
+type Mutation {
+    CreateSmsTrigger(param: CreateSmsTriggerInput!): CreateSmsTriggerResponse!
+}
+type CreateSmsTriggerResponse {
+    ok: Boolean!
+    error: Err
+    data: SmsTrigger
+}
+input CreateSmsTriggerInput {
+    # smsSenderId
+    sender: ID
+    # smsFormatId
+    smsFormat: ID
+    # 커스텀 String
+    event: String
+    isEnable: Boolean
+}

@@ -52,3 +52,19 @@ export const errorReturn = async (error: any, dbSession?: ClientSession) => {
         data: null
     };
 };
+
+export const getByteLength = (s: string): number => {
+    let b = 0;
+    let c = 0;
+    let i = 0;
+    for (b = i = 0; (c = s.charCodeAt(i++)); b += c >> 11 ? 3 : c >> 7 ? 2 : 1);
+    return b;
+};
+
+export const checkType = <T>(value: any): value is T => {
+    return value;
+};
+
+export const isExist = (v: any): v is undefined | null => {
+    return v;
+};

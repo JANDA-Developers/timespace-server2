@@ -1,0 +1,18 @@
+type Query {
+    GetProductSchedules(
+        param: GetProductSchedulesInput!
+    ): GetProductSchedulesResponse!
+}
+
+type GetProductSchedulesResponse {
+    ok: Boolean!
+    error: Err
+    data: [Product!]
+}
+
+# filter for GetProductSchedules
+input GetProductSchedulesInput {
+    # Limit interval is 7 days
+    dateRange: DateTimeRangeInput!
+    storeId: ID!
+}

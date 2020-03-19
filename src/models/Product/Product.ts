@@ -262,7 +262,14 @@ export class ProductCls extends BaseSchema
     })
     infos: Info[];
 
-    @prop()
+    @prop({
+        default: (): BookingPolicy => {
+            return {
+                limitFirstBooking: 0,
+                limitLastBooking: 60
+            };
+        }
+    })
     bookingPolicy: BookingPolicy;
 
     async segmentListWithItems(

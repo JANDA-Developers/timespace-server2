@@ -1,0 +1,29 @@
+type SmsSender implements BaseModel {
+    _id: ID!
+    keys: [ID!]!
+    name: String!
+    phoneNumber: String!
+    authInfo: SmsSenderAuthInfo!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    expiresAt: DateTime
+}
+
+type SmsSenderAuthInfo {
+    status: AuthStatus!
+    authDate: DateTime
+    evidences: [String!]!
+}
+
+enum AuthStatus {
+    PENDING
+    CONFIRMED
+    DENIED
+}
+
+input SmsSenderInput {
+    keys: [ID!]
+    name: String
+    phoneNumber: String
+    documentaryEvidences: [Upload!]
+}

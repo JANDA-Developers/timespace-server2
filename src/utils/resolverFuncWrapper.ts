@@ -5,6 +5,15 @@ import { ResolverFunction } from "../types/resolvers";
 import { BaseResponse } from "GraphType";
 import { ERROR_CODES } from "../types/values";
 
+export const hexDecode = function(str) {
+    var j;
+    var hexes = str.match(/.{1,4}/g) || [];
+    var back = "";
+    for (j = 0; j < hexes.length; j++) {
+        back += String.fromCharCode(parseInt(hexes[j], 16));
+    }
+    return back;
+};
 /**
  * 리솔버 로거... 로그 찍어주는 아이 ㅎㅎ
  * @param resolverFunction
@@ -17,16 +26,26 @@ export const defaultResolver = (resolverFunction: ResolverFunction) => async (
 ) => {
     const startTime = new Date();
     const stack: any[] = [];
-    const { headers, body, cognitoUser } = context.req;
+    const { headers, body, cognitoUser, cognitoBuyer } = context.req;
     const ips = getIP(context.req);
     let result: any;
-    result = await resolverFunction({ parent, args, context, info }, stack);
+    try {
+        result = await resolverFunction({ parent, args, context, info }, stack);
+    } catch (error) {
+        result = {
+            ok: false,
+            error: {
+                code: error.code,
+                msg: error.message,
+                origin: error
+            },
+            data: null
+        };
+    }
 
+    const user = cognitoUser || cognitoBuyer;
     const offset =
-        (cognitoUser &&
-            cognitoUser.zoneinfo &&
-            parseInt(cognitoUser.zoneinfo.offset)) ||
-        undefined;
+        (user && user.zoneinfo && parseInt(user.zoneinfo.offset)) || undefined;
 
     fmtLog(result.error ? "err" : "info", {
         when: {
@@ -34,23 +53,22 @@ export const defaultResolver = (resolverFunction: ResolverFunction) => async (
             localTime: getLocalDate(startTime, offset).toISOString()
         },
         who: {
-            headers: headers,
+            ...headers,
             ip: {
                 clientIP: ips[0],
                 proxys: ips.slice(1)
             },
             "X-JWT": headers["X-JWT"] || headers["x-jwt"],
+            "X-JWT-B": headers["X-JWT-B"] || headers["x-jwt-b"],
             "user-agent": headers["user-agent"],
-            user:
-                (cognitoUser && {
-                    sub: cognitoUser.sub,
-                    email: cognitoUser.email,
-                    // eslint-disable-next-line @typescript-eslint/camelcase
-                    phone_number: cognitoUser.phone_number,
-                    name: cognitoUser.name,
-                    exp: cognitoUser.exp
-                }) ||
-                null
+            user: user && {
+                sub: user.sub,
+                email: user.email,
+                // eslint-disable-next-line @typescript-eslint/camelcase
+                phone_number: user.phone_number,
+                name: user.name,
+                exp: user.exp
+            }
         },
         where: info.fieldName,
         data: {

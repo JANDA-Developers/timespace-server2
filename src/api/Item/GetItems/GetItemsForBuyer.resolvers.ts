@@ -7,8 +7,8 @@ import {
     privateResolverForBuyer
 } from "../../../utils/resolverFuncWrapper";
 import { makeFilterQuery } from "./itemFilter";
-import { UserModel } from "../../../models/User";
 import { ItemModel } from "../../../models/Item/Item";
+import { BuyerModel } from "../../../models/Buyer";
 
 const resolvers: Resolvers = {
     Query: {
@@ -25,7 +25,7 @@ const resolvers: Resolvers = {
                         const {
                             param
                         }: { param: GetItemsForBuyerInput } = args;
-                        const user = await UserModel.findBySub(
+                        const user = await BuyerModel.findBySub(
                             cognitoBuyer.sub
                         );
                         console.log(user);

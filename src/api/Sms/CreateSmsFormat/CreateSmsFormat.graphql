@@ -1,0 +1,12 @@
+type Mutation {
+    CreateSmsFormat(param: CreateSmsFormatInput!): CreateSmsFormatResponse!
+}
+type CreateSmsFormatResponse {
+    ok: Boolean!
+    error: Err
+    data: SmsFormat
+}
+input CreateSmsFormatInput {
+    content: String!
+    replacementSets: [String!]!
+}

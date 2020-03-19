@@ -4,7 +4,6 @@ import logger from "morgan";
 import schema from "./schema";
 import { ApolloServer } from "apollo-server-express";
 import express, { Express, NextFunction, Response } from "express";
-import axios from "axios";
 import { decodeKey, decodeKeyForBuyer } from "./utils/decodeIdToken";
 
 class App {
@@ -15,9 +14,9 @@ class App {
         const path: string = process.env.GRAPHQL_ENDPOINT || "/graphql";
         const playground = Boolean(
             process.env.ENABLE_PLAYGROUND &&
-                process.env.ENABLE_PLAYGROUND.toLowerCase() === "false"
-                ? false
-                : true
+                process.env.ENABLE_PLAYGROUND.toLowerCase() === "true"
+                ? true
+                : false
         ).valueOf();
         this.app = express();
         this.server = new ApolloServer({
@@ -31,30 +30,24 @@ class App {
         });
         this.middlewares();
 
-        this.app.get("/", async (req, res) => {
-            try {
-                req.body = {
-                    query: "query { HealthCheck { ok, error { code, msg } }}"
-                };
-                const uri = `http://${process.env.SERVER_URL}:${process.env.PORT}${path}`;
-                const result = await axios.post(uri, req.body, {
-                    headers: {
-                        "Accept-Encoding": "gzip, deflate, br",
-                        "Content-Type": "application/json",
-                        Accept: "application/json",
-                        Connection: "keep-alive"
-                    }
-                });
-                res.json(result.data);
-            } catch (error) {
-                res.json({
-                    ok: false,
-                    error: error.message,
-                    data: null
+        this.server.applyMiddleware({
+            app: this.app,
+            path,
+            cors: false,
+            onHealthCheck: req => {
+                return new Promise((resolve, reject) => {
+                    // DB상태 체크
+                    // 테스트 쿼리 동작 확인
+                    // Replace the `true` in this conditional with more specific checks!
+
+                    // if (req.get("health")) {
+                    resolve("Clear");
+                    // } else {
+                    //     reject("boooooooooooo");
+                    // }
                 });
             }
         });
-        this.server.applyMiddleware({ app: this.app, path });
     }
 
     private middlewares = (): void => {

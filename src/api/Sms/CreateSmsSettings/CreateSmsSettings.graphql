@@ -1,0 +1,13 @@
+type Mutation {
+    CreateSmsSettings(
+        param: CreateSmsSettingsInput!
+    ): CreateSmsSettingsResponse!
+}
+type CreateSmsSettingsResponse {
+    ok: Boolean!
+    error: Err
+    data: SmsSettings
+}
+input CreateSmsSettingsInput {
+    chargeOption: SmsChargeOptionInput
+}

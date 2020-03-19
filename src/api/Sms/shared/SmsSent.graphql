@@ -1,0 +1,27 @@
+type SmsSent implements BaseModel {
+    _id: ID!
+    key: ID!
+    ok: Boolean!
+    aligoMid: String!
+    format: SmsFormat
+    type: SmsType!
+    cost: Int!
+    senderNumber: String!
+    receivers: [SmsReceived!]!
+    receiver: String!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    expiresAt: DateTime
+}
+
+enum SmsType {
+    SMS
+    LMS
+    MMS
+}
+
+type SmsReceived {
+    message: String!
+    receiver: String!
+    byte: Int!
+}
