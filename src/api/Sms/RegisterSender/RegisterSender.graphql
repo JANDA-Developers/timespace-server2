@@ -1,0 +1,12 @@
+type Mutation {
+    RegisterSender(param: RegisterSenderInput!): RegisterSenderResponse!
+}
+type RegisterSenderResponse {
+    ok: Boolean!
+    error: Err
+    data: SmsSender
+}
+input RegisterSenderInput {
+    name: String!
+    phoneNumber: String!
+}

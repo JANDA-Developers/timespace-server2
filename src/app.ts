@@ -60,7 +60,7 @@ class App {
 
     private useLogger = (): void => {
         logger.token("remote-addr", req => {
-            var ffHeaderValue = req.headers["x-forwarded-for"];
+            const ffHeaderValue = req.headers["x-forwarded-for"];
             if (typeof ffHeaderValue === "string") {
                 return ffHeaderValue;
             }

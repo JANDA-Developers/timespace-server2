@@ -12,10 +12,10 @@ export const makeFilterQuery = (
     if (filter.date) {
         const nDate = new Date(filter.date.getTime() - offset * ONE_HOUR);
         query["dateTimeRange.to"] = {
-            $gt: nDate
+            $gte: nDate
         };
         query["dateTimeRange.from"] = {
-            $lt: new Date(nDate.getTime() + ONE_DAY)
+            $lte: new Date(nDate.getTime() + ONE_DAY)
         };
     }
     if (filter.dateTimeRange) {

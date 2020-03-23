@@ -8,10 +8,12 @@ type CreateSmsTriggerResponse {
 }
 input CreateSmsTriggerInput {
     # smsSenderId
-    sender: ID
+    senderId: ID
     # smsFormatId
     smsFormat: ID
     # 커스텀 String
     event: String
+    # 누구한테 보낼꺼?
+    sendTarget: SmsSendTarget
     isEnable: Boolean
 }

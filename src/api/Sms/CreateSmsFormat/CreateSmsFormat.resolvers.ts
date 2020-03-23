@@ -18,7 +18,7 @@ import { SmsFormatModel } from "../../../models/Sms/SmsFormat/SmsFormat";
 import _ from "lodash";
 
 export const CreateSmsFormatFunc = async (
-    { parent, info, args, context: { req } },
+    { args, context: { req } },
     stack: any[]
 ): Promise<CreateSmsFormatResponse> => {
     const session = await mongoose.startSession();
@@ -40,9 +40,10 @@ export const CreateSmsFormatFunc = async (
                 }
             );
         }
-        const { content, replacementSets } = param;
+        const { name, content, replacementSets } = param;
         const smsFormat = new SmsFormatModel({
             key,
+            name,
             content,
             replacementSets: _.uniq(replacementSets).map(
                 (k): ReplacementSet => {

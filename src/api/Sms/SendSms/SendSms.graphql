@@ -9,7 +9,7 @@ type SendSmsResponse {
 input SendSmsInput {
     key: ID!
     message: String!
-    sender: String!
+    sender: String
     receivers: [String!]!
 }
 

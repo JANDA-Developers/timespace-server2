@@ -4,7 +4,8 @@ type Mutation {
 type AdminUpdateUserResponse {
     ok: Boolean!
     error: Err
-    data: User
+    # IdToken => 헤더에 저장할것!
+    data: String
 }
 input AdminUpdateUserInput {
     userSub: String!
@@ -12,5 +13,8 @@ input AdminUpdateUserInput {
 }
 
 input UpdateUserParamInput {
-    roles: [UserRole!]
+    name: String
+    smsKey: ID
+    phoneNumber: String
+    timezone: String
 }

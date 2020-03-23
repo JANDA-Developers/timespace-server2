@@ -33,7 +33,15 @@ export class SmsSenderCls extends BaseSchema
     @prop()
     phoneNumber: string;
 
-    @prop()
+    @prop({
+        default: (): SmsSenderAuthInfo => {
+            return {
+                authDate: null,
+                evidences: [],
+                status: "PENDING"
+            };
+        }
+    })
     authInfo: SmsSenderAuthInfo;
 }
 

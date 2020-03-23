@@ -52,13 +52,6 @@ export const decodeKeyForBuyer = async (
         }
         const pem = jwkToPem(jwk);
         const buyer = jwt.verify(token, pem);
-
-        console.log(
-            "decodeKey (decoded Buyer) ==================================================="
-        );
-        console.log({
-            buyer
-        });
         return {
             ok: true,
             error: null,
@@ -88,10 +81,6 @@ export const decodeKey = async (
         }
         const pem = jwkToPem(jwk);
         const user = jwt.verify(token, pem);
-
-        console.log(
-            "decodeKey (decoded User) ==================================================="
-        );
         return {
             ok: true,
             error: null,

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { mongoose } from "@typegoose/typegoose";
+import { mongoose, DocumentType } from "@typegoose/typegoose";
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
 import { UpdateMyProfileResponse, UpdateMyProfileInput } from "GraphType";
@@ -7,7 +7,7 @@ import {
     defaultResolver,
     privateResolver
 } from "../../../utils/resolverFuncWrapper";
-import { UserModel } from "../../../models/User";
+import { UserModel, UserCls } from "../../../models/User";
 import { AttributeType } from "aws-sdk/clients/cognitoidentityserviceprovider";
 import { CountryInfoModel } from "../../../models/CountryInfo";
 import CognitoIdentityServiceProvider = require("aws-sdk/clients/cognitoidentityserviceprovider");
@@ -68,26 +68,13 @@ export const UpdateMyProfileFunc = async (
         }
         stack.push({ cognitoUser });
         stack.push({ user });
-        const cognito = new CognitoIdentityServiceProvider();
-        const cognitoUpdateResult = await cognito
-            .adminUpdateUserAttributes({
-                UserAttributes: attributes,
-                UserPoolId: process.env.COGNITO_POOL_ID || "",
-                Username: cognitoUser["cognito:username"] || cognitoUser.sub
-            })
-            .promise();
-        if (cognitoUpdateResult.$response.error) {
-            throw cognitoUpdateResult.$response.error;
-        }
-        const refreshResult = await refreshToken(user.refreshToken, "SELLER");
-        if (!refreshResult.ok || !refreshResult.data) {
-            throw new ApolloError(
-                "Token Refresh 실패",
-                ERROR_CODES.TOKEN_REFRESH_FAIL
-            );
-        }
-        user.refreshToken = refreshResult.data.refreshToken;
-        user.refreshTokenLastUpdate = new Date();
+
+        // Cognito 업데이트
+        await cognitoUserInfoUpdate(cognitoUser, attributes);
+
+        // 업데이트된 Cognito Token을 가져온다
+        const idToken = await refreshUserToken(user);
+
         await user.save({ session });
         await session.commitTransaction();
         session.endSession();
@@ -95,11 +82,43 @@ export const UpdateMyProfileFunc = async (
             ok: true,
             error: null,
             // Let's return Refreshed Token
-            data: refreshResult.data.idToken
+            data: idToken
         };
     } catch (error) {
         return await errorReturn(error, session);
     }
+};
+
+const cognitoUserInfoUpdate = async (
+    cognitoUser: any,
+    attributes: AttributeType[]
+) => {
+    const cognito = new CognitoIdentityServiceProvider();
+    const cognitoUpdateResult = await cognito
+        .adminUpdateUserAttributes({
+            UserAttributes: attributes,
+            UserPoolId: process.env.COGNITO_POOL_ID || "",
+            Username: cognitoUser["cognito:username"] || cognitoUser.sub
+        })
+        .promise();
+    if (cognitoUpdateResult.$response.error) {
+        throw cognitoUpdateResult.$response.error;
+    }
+};
+
+const refreshUserToken = async (
+    user: DocumentType<UserCls>
+): Promise<string> => {
+    const refreshResult = await refreshToken(user.refreshToken, "SELLER");
+    if (!refreshResult.ok || !refreshResult.data) {
+        throw new ApolloError(
+            "Token Refresh 실패",
+            ERROR_CODES.TOKEN_REFRESH_FAIL
+        );
+    }
+    user.refreshToken = refreshResult.data.refreshToken;
+    user.refreshTokenLastUpdate = new Date();
+    return refreshResult.data.idToken;
 };
 
 const resolvers: Resolvers = {

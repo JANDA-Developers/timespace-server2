@@ -15,7 +15,7 @@ import { SmsFormatModel } from "../../../models/Sms/SmsFormat/SmsFormat";
 import { SmsTriggerModel } from "../../../models/Sms/SmsTrigger/SmsTrigger";
 
 export const CreateSmsTriggerFunc = async (
-    { parent, info, args, context: { req } },
+    { args, context: { req } },
     stack: any[]
 ): Promise<CreateSmsTriggerResponse> => {
     const session = await mongoose.startSession();
@@ -35,8 +35,8 @@ export const CreateSmsTriggerFunc = async (
                 }
             );
         }
-        const { event, isEnable, sender, smsFormat } = param;
-        const senderId = sender ? new ObjectId(sender) : undefined;
+        const { event, isEnable, senderId, smsFormat, sendTarget } = param;
+        const senderObjectId = senderId ? new ObjectId(senderId) : undefined;
         if (!smsFormat || !event) {
             throw new ApolloError(
                 "Validation 실패(서버에러) => undefined smsFormat",
@@ -50,10 +50,11 @@ export const CreateSmsTriggerFunc = async (
         const formatId = new ObjectId(smsFormat);
         const smsTrigger = new SmsTriggerModel({
             key,
-            senderId,
+            senderId: senderObjectId,
             event,
             isEnable: isEnable ? true : false,
-            formatId
+            formatId,
+            sendTarget
         });
         await smsTrigger.save({ session });
         await session.commitTransaction();
@@ -87,7 +88,7 @@ const validateParams = async (
     // * 3. event가 반드시 존재햐야함. => 영어, "_"만 사용 가능
     let validateResult = true;
     const errors: Err[] = [];
-    const senderId = param.sender;
+    const senderId = param.senderId;
     if (!key) {
         throw new ApolloError(
             "SmsKey가 입력되지 않았습니다.",
@@ -96,11 +97,13 @@ const validateParams = async (
     }
     const sender = await SmsSenderModel.findById(senderId);
     if (!sender) {
-        validateResult = false;
-        errors.push({
-            code: ERROR_CODES.INVALID_PARAMETERS,
-            message: "존재하지 않는 SmsSenderId 입니다."
-        });
+        if (senderId) {
+            validateResult = false;
+            errors.push({
+                code: ERROR_CODES.INVALID_PARAMETERS,
+                message: "존재하지 않는 SmsSenderId 입니다."
+            });
+        }
     } else {
         const haveAuthForSender = sender.keys.find(key => key.equals(key));
         if (!haveAuthForSender) {

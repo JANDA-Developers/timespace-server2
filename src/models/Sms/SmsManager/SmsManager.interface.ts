@@ -7,6 +7,7 @@ import { SmsSentCls } from "../SmsSent/SmsSent";
 import { SmsSenderCls } from "../SmsSender/SmsSender";
 import { DocumentType } from "@typegoose/typegoose";
 import { BaseSchemaFunc } from "../../../abs/BaseFuncInterface.interface";
+import { SmsFormatAttribute } from "../../../types/graph";
 
 export type FormatAttribute = {
     key: string;
@@ -28,10 +29,11 @@ export interface SmsManagerFuncs extends BaseSchemaFunc {
         } | null>
     >;
 
-    sendWithTrigger(
-        input: { event: string; formatAttributes: FormatAttribute[] },
-        session: ClientSession
-    ): Promise<Response>;
+    sendWithTrigger(input: {
+        event: string;
+        formatAttributes: SmsFormatAttribute[];
+        receivers: string[];
+    }): Promise<Response>;
 
     senderAdd(
         sender: DocumentType<SmsSenderCls>,
@@ -83,11 +85,19 @@ export interface SmsManagerFuncs extends BaseSchemaFunc {
         session: ClientSession
     ): Promise<Response>;
 
-    sendHistory(input: {
-        key: string;
-        sender: string;
-    }): Promise<OffsetPageEdge<SmsSentCls>>;
+    sendHistory(input: { sender: string }): Promise<OffsetPageEdge<SmsSentCls>>;
 
     formatList(): Promise<OffsetPageEdge<SmsFormatCls>>;
-    triggerList(event?: string): Promise<OffsetPageEdge<SmsTriggerCls>>;
+    triggerList(
+        page: {
+            // 0부터 시작
+            index: number;
+            // 몇줄?
+            count: number;
+        },
+        filter: {
+            event?: string;
+            isEnable: boolean;
+        }
+    ): Promise<OffsetPageEdge<DocumentType<SmsTriggerCls>>>;
 }

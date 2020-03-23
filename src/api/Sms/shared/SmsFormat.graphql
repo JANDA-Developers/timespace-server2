@@ -3,7 +3,7 @@ type SmsFormat implements BaseModel {
     key: ID!
     name: String!
     content: String!
-    replacementSet: [ReplacementSet!]!
+    replacementSets: [ReplacementSet!]!
     description: String
     createdAt: DateTime!
     updatedAt: DateTime!

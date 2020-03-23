@@ -11,6 +11,9 @@ import { ERROR_CODES } from "../../../types/values";
 export class SmsFormatCls extends BaseSchema
     implements SmsFormatProps, SmsFormatFuncs {
     @prop()
+    name: string;
+
+    @prop()
     key: ObjectId;
 
     @prop()
@@ -45,8 +48,18 @@ export class SmsFormatCls extends BaseSchema
         throw new Error("Method not implemented.");
     }
 
-    makeMessage(attributes: SmsFormatAttribute): string {
-        throw new Error("Method not implemented.");
+    makeMessage(attributes: SmsFormatAttribute[]): string {
+        const keyValue = attributes.map(attr => {
+            return {
+                replacer: `%%${attr.key}%%`,
+                value: attr.value
+            };
+        });
+        let message = this.content;
+        keyValue.forEach(kv => {
+            message = message.replace(new RegExp(kv.replacer, "g"), kv.value);
+        });
+        return message;
     }
 }
 

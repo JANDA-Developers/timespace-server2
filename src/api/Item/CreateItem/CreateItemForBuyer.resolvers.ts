@@ -4,7 +4,8 @@ import { Resolvers } from "../../../types/resolvers";
 import {
     CreateItemForBuyerResponse,
     CreateItemForBuyerInput,
-    DateTimeRangeInput
+    DateTimeRangeInput,
+    SmsFormatAttribute
 } from "GraphType";
 import {
     defaultResolver,
@@ -15,9 +16,11 @@ import { ApolloError } from "apollo-server";
 import { ERROR_CODES } from "../../../types/values";
 import { ProductModel, ProductCls } from "../../../models/Product/Product";
 import { ObjectId } from "mongodb";
-import { ONE_MINUTE, ONE_DAY } from "../../../utils/dateFuncs";
+import { ONE_MINUTE, ONE_DAY, ONE_HOUR } from "../../../utils/dateFuncs";
 import { DateTimeRangeCls } from "../../../utils/DateTimeRange";
 import { BuyerModel, BuyerCls } from "../../../models/Buyer";
+import { SmsManager } from "../../../models/Sms/SmsManager/SmsManager";
+import { UserModel } from "../../../models/User";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -71,21 +74,74 @@ const resolvers: Resolvers = {
 
                         await validateDateTimerange(product, dateTimeRange);
 
-                        await item
-                            .applyStatus(
-                                product.needToConfirm ? "PENDING" : "PERMITTED",
-                                {
-                                    workerId: product.needToConfirm
-                                        ? item.buyerId
-                                        : product.userId
-                                    // comment
-                                }
-                            )
-                            .save({ session });
-
-                        // 해당 시간에 예약이 가능한지 확인해야됨 ㅎ
-
+                        item.applyStatus(
+                            product.needToConfirm ? "PENDING" : "PERMITTED",
+                            {
+                                workerId: product.needToConfirm
+                                    ? item.buyerId
+                                    : product.userId
+                                // comment
+                            }
+                        );
                         await item.save({ session });
+
+                        const seller = await UserModel.findById(product.userId);
+                        if (!seller) {
+                            throw new ApolloError(
+                                "존재하지 않는 UserId",
+                                ERROR_CODES.UNEXIST_USER,
+                                {
+                                    errorInfo: "Product객체에 UserId 에러임"
+                                }
+                            );
+                        }
+
+                        const smsKey = seller.smsKey;
+                        if (smsKey) {
+                            // 해당 시간에 예약이 가능한지 확인해야됨 ㅎ
+                            const f = new Date(
+                                item.dateTimeRange.from.getTime() +
+                                    buyer.zoneinfo.offset * ONE_HOUR
+                            );
+                            const t = new Date(
+                                item.dateTimeRange.to.getTime() +
+                                    buyer.zoneinfo.offset * ONE_HOUR
+                            );
+                            await sendSmsAfterCreate(
+                                smsKey,
+                                stack,
+                                [
+                                    {
+                                        key: "NAME",
+                                        value: buyer.name
+                                    },
+                                    {
+                                        key: "PRODUCT_NAME",
+                                        value: product.name
+                                    },
+                                    {
+                                        key: "FROM",
+                                        value: f
+                                            .toISOString()
+                                            .split("T")[1]
+                                            .substr(0, 5)
+                                    },
+                                    {
+                                        key: "TO",
+                                        value: t
+                                            .toISOString()
+                                            .split("T")[1]
+                                            .substr(0, 5)
+                                    },
+                                    {
+                                        key: "DATE",
+                                        value: f.toISOString().split("T")[0]
+                                    }
+                                ],
+                                [buyer.phone_number]
+                            );
+                        }
+
                         await session.commitTransaction();
                         session.endSession();
                         return {
@@ -100,6 +156,26 @@ const resolvers: Resolvers = {
             )
         )
     }
+};
+
+const sendSmsAfterCreate = async (
+    key: ObjectId,
+    stack: any[],
+    formatAttributes: SmsFormatAttribute[],
+    receivers: string[]
+) => {
+    stack.push(
+        { key },
+        {
+            formatAttributes
+        }
+    );
+    const smsManager = new SmsManager(key);
+    await smsManager.sendWithTrigger({
+        event: "ON_BOOKING_SUBMITTED",
+        formatAttributes,
+        receivers
+    });
 };
 
 const setParamsToItem = (
@@ -158,4 +234,5 @@ const validateDateTimerange = async (
         }
     }
 };
+
 export default resolvers;

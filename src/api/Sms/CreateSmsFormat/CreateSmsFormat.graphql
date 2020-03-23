@@ -7,6 +7,7 @@ type CreateSmsFormatResponse {
     data: SmsFormat
 }
 input CreateSmsFormatInput {
+    name: String!
     content: String!
     replacementSets: [String!]!
 }

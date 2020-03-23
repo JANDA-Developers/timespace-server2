@@ -40,7 +40,6 @@ export class SmsSentCls extends BaseSchema
     ok: boolean;
 
     @prop({
-        default: () => new ObjectId(),
         get: (id: string | ObjectId) => new ObjectId(id),
         set: (id: string | ObjectId) => new ObjectId(id)
     })

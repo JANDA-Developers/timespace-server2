@@ -1,9 +1,9 @@
-import { SmsManagerFuncs, FormatAttribute } from "./SmsManager.interface";
+import { SmsManagerFuncs } from "./SmsManager.interface";
 import { ClientSession } from "mongoose";
-import { SmsTriggerCls } from "../SmsTrigger/SmsTrigger";
-import { SmsFormatCls } from "../SmsFormat/SmsFormat";
+import { SmsTriggerCls, SmsTriggerModel } from "../SmsTrigger/SmsTrigger";
+import { SmsFormatCls, SmsFormatModel } from "../SmsFormat/SmsFormat";
 import { Response } from "../../../utils/Response";
-import { SmsSenderCls } from "../SmsSender/SmsSender";
+import { SmsSenderCls, SmsSenderModel } from "../SmsSender/SmsSender";
 import { OffsetPageEdge } from "../../../utils/PaginationOffset";
 import { ObjectId } from "mongodb";
 import { SmsSentCls, SmsSentModel } from "../SmsSent/SmsSent";
@@ -12,11 +12,14 @@ import { ERROR_CODES } from "../../../types/values";
 import { ApolloError } from "apollo-server";
 import { DocumentType, mongoose } from "@typegoose/typegoose";
 import { Err } from "../../../utils/Error";
+import { SmsFormatAttribute } from "../../../types/graph";
+import { mLogger } from "../../../logger";
 
 export class SmsManager implements SmsManagerFuncs {
     constructor(key?: ObjectId | string) {
         this.key = new ObjectId(key);
     }
+
     validateFields(): Err[] {
         throw new Error("Method not implemented.");
     }
@@ -28,7 +31,6 @@ export class SmsManager implements SmsManagerFuncs {
     }
 
     async sendHistory(input: {
-        key: string;
         sender: string;
     }): Promise<OffsetPageEdge<SmsSentCls>> {
         throw new Error("Method not implemented.");
@@ -39,9 +41,34 @@ export class SmsManager implements SmsManagerFuncs {
     }
 
     async triggerList(
-        event?: string | undefined
-    ): Promise<OffsetPageEdge<SmsTriggerCls>> {
-        throw new Error("Method not implemented.");
+        page: {
+            index: number;
+            count: number;
+        },
+        filter: {
+            event?: string;
+            isEnable: boolean;
+        }
+    ): Promise<OffsetPageEdge<DocumentType<SmsTriggerCls>>> {
+        const { index, count } = page;
+        const search = {
+            ...filter,
+            key: this.key
+        };
+        const triggers = await SmsTriggerModel.find(search)
+            .skip(index * count)
+            .limit(count);
+        const totalRowCount = await SmsTriggerModel.countDocuments(search);
+
+        return {
+            edgeInfo: {
+                currentPageIndex: index,
+                currentRowCount: triggers.length,
+                totalPageCount: Math.floor(totalRowCount / count),
+                totalRowCount
+            },
+            data: triggers
+        };
     }
 
     async apply(session: ClientSession): Promise<void> {
@@ -72,7 +99,12 @@ export class SmsManager implements SmsManagerFuncs {
                 msgType,
                 errorCnt,
                 msgId
-            } = await sendSms(input);
+            } = await sendSms({
+                ...input,
+                receivers: input.receivers.map(receiver =>
+                    receiver.replace("+82", "")
+                )
+            });
             const ok = resultCode === "1";
             if (!ok) {
                 errors.push(
@@ -95,7 +127,7 @@ export class SmsManager implements SmsManagerFuncs {
             console.log({
                 smsHistory
             });
-            session.commitTransaction();
+            await session.commitTransaction();
             session.endSession();
             return {
                 ok: true,
@@ -109,7 +141,7 @@ export class SmsManager implements SmsManagerFuncs {
             };
         } catch (error) {
             // 문자 전송이 실패해도 실패한 내역이 남아야함.
-            session.commitTransaction();
+            await session.commitTransaction();
             session.endSession();
             return {
                 ok: false,
@@ -119,11 +151,81 @@ export class SmsManager implements SmsManagerFuncs {
         }
     }
 
-    async sendWithTrigger(
-        input: { event: string; formatAttributes: FormatAttribute[] },
-        session: ClientSession
-    ): Promise<Response<void>> {
-        throw new Error("Method not implemented.");
+    async sendWithTrigger(input: {
+        event: string;
+        formatAttributes: SmsFormatAttribute[];
+        receivers: string[];
+    }): Promise<Response<void>> {
+        // TODO: Trigger 먼저 구하기
+        // TODO: Send With Trigger!
+        const { data: triggers } = await this.triggerList(
+            {
+                count: 10,
+                index: 0
+            },
+            {
+                isEnable: true,
+                event: input.event
+            }
+        );
+
+        const sendInput: {
+            message: string;
+            receivers: string[];
+            sender?: string;
+        }[] = await Promise.all(
+            triggers.map(
+                async (
+                    trigger
+                ): Promise<{
+                    message: string;
+                    receivers: string[];
+                    sender?: string;
+                }> => {
+                    const format = await SmsFormatModel.findById(
+                        trigger.formatId
+                    );
+                    mLogger.info(JSON.stringify({ format }));
+                    if (format) {
+                        const sender = await SmsSenderModel.findById(
+                            trigger.senderId
+                        );
+                        const result = {
+                            message: format.makeMessage(input.formatAttributes),
+                            receivers: input.receivers,
+                            sender: (sender && sender.phoneNumber) || undefined
+                            // TODO: Sender 등록 필요
+                        };
+                        mLogger.info(JSON.stringify(result));
+                        return result;
+                    } else {
+                        return {
+                            message: "",
+                            receivers: []
+                        };
+                    }
+                }
+            )
+        );
+
+        const result = await Promise.all(
+            sendInput.map(async sinput => {
+                return await this.send(sinput);
+            })
+        );
+        console.log(result);
+        mLogger.info(JSON.stringify(result));
+
+        return {
+            ok: true,
+            errors: [
+                {
+                    code: "UNDERDEVELOPMENT",
+                    message: "개발중"
+                }
+            ],
+            data: undefined
+        };
     }
 
     async senderAdd(

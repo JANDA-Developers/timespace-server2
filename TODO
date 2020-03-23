@@ -61,6 +61,12 @@ User Flow:
     ☐ @high Resend Email to SignUp User
     ☐ @high Redirect user to Login page When they do email confirm 
 
+SMS Module:
+  SmsTrigger:
+    ☐ SendTarget is not reflected. Let's do it!
+  SmsSender: 
+    ☐ Documantary Evidences submit problem. Nothing devloped. Try it.
+
 Schemas: 
   Notification: 
     ☐ Make structure about Notification. (Work Flow, Schema, Interfaces)
