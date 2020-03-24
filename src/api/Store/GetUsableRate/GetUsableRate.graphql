@@ -1,0 +1,31 @@
+type Query {
+    GetUsableRate(param: GetUsableRateInput!): GetUsableRateResponse!
+}
+type GetUsableRateResponse {
+    ok: Boolean!
+    error: Err
+    data: [UsableRateObject!]
+}
+input GetUsableRateInput {
+    storeCode: String!
+    dateRange: DateTimeRangeInput!
+    # 아직 개발중임
+    filter: GetUsableRateFilterInput
+}
+
+type UsableRateObject {
+    date: DateTime!
+    # 이용 가능여부
+    isUsable: Boolean!
+    # 이용률
+    usableRate: Float!
+    # 전체 segment 수
+    segmentCount: Int!
+    # 사용 가능한 segment 수
+    segmentUsableCount: Int!
+}
+
+input GetUsableRateFilterInput {
+    timeRange: DateTimeRangeInput
+    productCode: String
+}

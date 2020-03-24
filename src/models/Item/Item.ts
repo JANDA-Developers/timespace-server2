@@ -124,6 +124,9 @@ export class ItemCls extends BaseSchema implements ItemProps, ItemFuncs {
     })
     statusChangedHistory: ObjectId[];
 
+    @prop({ default: () => 1 })
+    orderCount: number;
+
     applyStatus(
         status: ItemStatus,
         options: {

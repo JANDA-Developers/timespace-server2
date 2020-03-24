@@ -36,6 +36,7 @@ import _ from "lodash";
 import { ProductProps, ProductFuncs } from "./Product.interface";
 import { ItemProps } from "../Item/Item.interface";
 import { removeUndefined } from "../../utils/objectFuncs";
+import { segmentWithItemsPipeline } from "./pipelineForProduct";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.PRODUCT)))
 export class ProductCls extends BaseSchema
@@ -286,117 +287,11 @@ export class ProductCls extends BaseSchema
             soldOut: boolean;
         }[]
     > {
-        const query: Stage[] = [
-            {
-                $match: {
-                    productId: this._id,
-                    "dateTimeRange.from": {
-                        $lt: dateTimeRange.to
-                    },
-                    "dateTimeRange.to": {
-                        $gt: dateTimeRange.from
-                    },
-                    status: "PERMITTED" as ItemStatus
-                }
-            },
-            {
-                $addFields: {
-                    segments: {
-                        $range: [
-                            {
-                                $divide: [
-                                    {
-                                        $toLong: "$dateTimeRange.from"
-                                    },
-                                    1000
-                                ]
-                            },
-                            {
-                                $divide: [
-                                    {
-                                        $toLong: "$dateTimeRange.to"
-                                    },
-                                    1000
-                                ]
-                            },
-                            // unit
-                            unit * 60
-                        ]
-                    }
-                }
-            },
-            {
-                $unwind: {
-                    path: "$segments",
-                    preserveNullAndEmptyArrays: true
-                }
-            },
-            {
-                $replaceRoot: {
-                    newRoot: {
-                        $mergeObjects: [
-                            {
-                                _id: "$segments"
-                            },
-                            {
-                                item: {
-                                    _id: "$_id",
-                                    name: "$name",
-                                    dateTimeRange: "$dateTimeRange",
-                                    productId: "$productId",
-                                    storeId: "$storeId",
-                                    buyerId: "$buyerId",
-                                    code: "$code",
-                                    createdAt: "$createdAt",
-                                    updatedAt: "$updatedAt"
-                                }
-                            }
-                        ]
-                    }
-                }
-            },
-            {
-                $group: {
-                    _id: "$_id",
-                    items: {
-                        $addToSet: "$item"
-                    }
-                }
-            },
-            {
-                $addFields: {
-                    segment: {
-                        from: {
-                            $toDate: {
-                                $multiply: ["$_id", 1000]
-                            }
-                        },
-                        to: {
-                            $toDate: {
-                                $multiply: [{ $add: ["$_id", unit] }, 1000]
-                            }
-                        }
-                    },
-                    count: {
-                        $size: "$items"
-                    },
-                    maxCount: this.capacity,
-                    soldOUt: {
-                        $lte: [
-                            this.capacity,
-                            {
-                                $size: "$items"
-                            }
-                        ]
-                    }
-                }
-            },
-            {
-                $sort: {
-                    "segment.from": 1
-                }
-            }
-        ];
+        const query: Stage[] = segmentWithItemsPipeline(
+            this,
+            dateTimeRange,
+            "PERMITTED"
+        );
         const productSegmentList: {
             _id: number; // * 1000 하면 segment.from 이랑 같아짐
             items: ItemProps[];
