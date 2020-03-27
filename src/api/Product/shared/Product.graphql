@@ -20,11 +20,15 @@ type Product implements BaseModel {
     schedules(date: DateTime!, soldOut: Boolean): ProductSchedules
     bookingPolicy: BookingPolicy!
 
+    # 수용 가능 예약 수. 인원수가 될수도 있고 인원수가 아닌 예약한 팀의 수가 될수도 있고...
     capacity: Int
+    # 수용 가능 성별 옵션
     genderOption: GenderOption
+    # 영업시간
     businessHours: [Period!]
     # Min, Max는 변경 가능하지만 Unit은 변경 불가
     periodOption: PeriodOption
+    # 전체 예약 아이템 수
     totalItemCount: Int!
 }
 

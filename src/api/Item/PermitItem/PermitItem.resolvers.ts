@@ -18,6 +18,7 @@ import { SmsManager } from "../../../models/Sms/SmsManager/SmsManager";
 import { ProductModel } from "../../../models/Product/Product";
 import { UserModel } from "../../../models/User";
 import { ONE_HOUR } from "../../../utils/dateFuncs";
+import { deniedItems } from "../CancelItem/CancelItem.resolvers";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -111,6 +112,31 @@ const resolvers: Resolvers = {
                             });
                         await item.save({
                             session
+                        });
+                        // 취소 로직 ㄱㄱ
+
+                        const duplItems = await ItemModel.find({
+                            "dateTimeRange.from": {
+                                $lt: item.dateTimeRange.to
+                            },
+                            "dateTimeRange.to": {
+                                $gt: item.dateTimeRange.from
+                            }
+                        });
+
+                        const itemDeniedResult = await Promise.all(
+                            duplItems.map(async i => {
+                                return await deniedItems(
+                                    {
+                                        args: { itemId: i._id },
+                                        context: { req }
+                                    },
+                                    stack
+                                );
+                            })
+                        );
+                        stack.push({
+                            itemDeniedResult
                         });
                         await session.commitTransaction();
                         session.endSession();

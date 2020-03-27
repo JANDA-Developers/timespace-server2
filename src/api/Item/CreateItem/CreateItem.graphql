@@ -1,11 +1,13 @@
 type Mutation {
     CreateItem(param: CreateItemInput!): CreateItemResponse!
 }
+
 type CreateItemResponse {
     ok: Boolean!
     error: Err
     data: Item
 }
+
 input CreateItemInput {
     storeId: ID!
     productId: ID!

@@ -37,6 +37,7 @@ import { ProductProps, ProductFuncs } from "./Product.interface";
 import { ItemProps } from "../Item/Item.interface";
 import { removeUndefined } from "../../utils/objectFuncs";
 import { segmentWithItemsPipeline } from "./pipelineForProduct";
+import { propOptPeriodOption } from "../_propValidateOptions/propOptions";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.PRODUCT)))
 export class ProductCls extends BaseSchema
@@ -226,36 +227,16 @@ export class ProductCls extends BaseSchema
     })
     businessHours: Array<PeriodWithDays>;
 
-    @prop({
-        validate: [
-            {
-                validator: (v: PeriodOption) => v.max > 0,
-                message: "PeriodOption.max 값은 0또는 음수가 될 수 없습니다."
-            },
-            {
-                validator: (v: PeriodOption) => v.min >= 0,
-                message: "PeriodOption.min 값은 음수가 될 수 없습니다."
-            },
-            {
-                validator: (v: PeriodOption) => v.max % v.unit === 0,
-                message: "PeriodOption.max 값이 unit 의 배수가 아닙니다."
-            },
-            {
-                validator: (v: PeriodOption) => v.min % v.unit === 0,
-                message: "PeriodOption.min 값이 unit 의 배수가 아닙니다."
-            },
-            {
-                validator: (v: PeriodOption) => v.unit >= 0,
-                message: "PeriodOption.unit 값은 음수가 될 수 없습니다."
-            }
-        ],
-        required: [
-            function(this: DocumentType<ProductCls>) {
-                return this.usingPeriodOption;
-            },
-            "PeriodOption가 설정되지 않았습니다."
-        ]
-    })
+    @prop(
+        propOptPeriodOption({
+            required: [
+                function(this: DocumentType<ProductCls>) {
+                    return this.usingPeriodOption;
+                },
+                "PeriodOption가 설정되지 않았습니다."
+            ]
+        })
+    )
     periodOption: PeriodOption;
 
     @prop({

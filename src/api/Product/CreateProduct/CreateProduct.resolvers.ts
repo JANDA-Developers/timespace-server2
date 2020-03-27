@@ -14,6 +14,7 @@ import { ERROR_CODES } from "../../../types/values";
 import { uploadFile } from "../../../utils/s3Funcs";
 import { PeriodWithDays } from "../../../utils/PeriodWithDays";
 import { daysToNumber } from "../../../utils/periodFuncs";
+import { s4 } from "../../../models/utils/genId";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -111,7 +112,6 @@ const resolvers: Resolvers = {
                             for (const file of images) {
                                 const syncedFile = await file;
                                 stack.push(syncedFile);
-                                // TODO: 파일 업로드 구현 ㄱㄱ
 
                                 /* 
                                     ? 파일 업로드 폴더 구조 설정하기
@@ -122,15 +122,12 @@ const resolvers: Resolvers = {
                                 const { url } = await uploadFile(syncedFile, {
                                     dir:
                                         cognitoUser.sub +
-                                        "/" +
+                                        `/${s4()}${s4()}/` +
                                         (product.code || "")
                                 });
                                 product.images.push(url);
                             }
                         }
-                        // TODO: Image Upload to S3, after that, save result in product
-
-                        // TODO: Compare BusinessHours between "Store" and "ProductInput"
                         await product.save({ session });
 
                         await StoreModel.updateOne(

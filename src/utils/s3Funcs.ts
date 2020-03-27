@@ -1,6 +1,5 @@
 import { S3 } from "aws-sdk";
 import { Upload, JdFile } from "GraphType";
-import { s4 } from "../models/utils/genId";
 
 export const bucketName = process.env.AWS_BUCKETNAME || "";
 
@@ -49,7 +48,7 @@ export const uploadFile = async (
             ACL: "public-read",
             Bucket: bucketName,
             Body: file.createReadStream(),
-            Key: `${makeDirPath(dir)}/${s4()}${s4()}/${file.filename}.${
+            Key: `${makeDirPath(dir)}/${file.filename}.${
                 file.mimetype.split("/")[1]
             }`
         },

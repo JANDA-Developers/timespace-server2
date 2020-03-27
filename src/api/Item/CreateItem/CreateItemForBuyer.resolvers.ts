@@ -5,7 +5,8 @@ import {
     CreateItemForBuyerResponse,
     CreateItemForBuyerInput,
     DateTimeRangeInput,
-    SmsFormatAttribute
+    SmsFormatAttribute,
+    CustomField
 } from "GraphType";
 import {
     defaultResolver,
@@ -21,6 +22,7 @@ import { DateTimeRangeCls } from "../../../utils/DateTimeRange";
 import { BuyerModel, BuyerCls } from "../../../models/Buyer";
 import { SmsManager } from "../../../models/Sms/SmsManager/SmsManager";
 import { UserModel } from "../../../models/User";
+import { StoreModel } from "../../../models/Store/Store";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -38,108 +40,67 @@ const resolvers: Resolvers = {
                             param
                         }: { param: CreateItemForBuyerInput } = args;
                         const buyer = await BuyerModel.findBuyer(cognitoBuyer);
-                        const now = new Date();
                         const product = await ProductModel.findByCode(
                             param.productCode
                         );
-
-                        const item = new ItemModel();
-                        if (!param.dateTimeRange) {
+                        const dateTimeRange = param.dateTimeRange;
+                        if (!dateTimeRange) {
                             throw new ApolloError(
                                 "날짜 범위를 선택해 주세요",
                                 "PARAMETER_ERROR_DATETIMERANGE"
                             );
                         }
-                        if (param.dateTimeRange) {
-                            const { from, to } = param.dateTimeRange;
-                            item.dateTimeRange = {
-                                from,
-                                to,
-                                interval: Math.floor(
-                                    (to.getTime() - from.getTime()) / ONE_MINUTE
-                                )
-                            };
-                        }
 
-                        setParamsToItem(param, item, buyer);
+                        // Item 생성
+                        const item = await createItem(product, buyer, param);
 
-                        item.productId = product._id;
-                        item.storeId = product.storeId;
-                        item.buyerId = new ObjectId(buyer._id);
-                        await item.setCode(product.code, now);
-
-                        // validation 필요함!
-                        // needConfirm
-                        const dateTimeRange = param.dateTimeRange;
-
+                        // Item Validation ㄱㄱ
                         await validateDateTimerange(product, dateTimeRange);
 
-                        item.applyStatus(
-                            product.needToConfirm ? "PENDING" : "PERMITTED",
-                            {
-                                workerId: product.needToConfirm
-                                    ? item.buyerId
-                                    : product.userId
-                                // comment
-                            }
-                        );
-                        await item.save({ session });
+                        // Item 저장하기
+                        // TODO: 동작하는지 확인 ㄱㄱ
+                        await Promise.all([
+                            item
+                                .applyStatus(
+                                    product.needToConfirm
+                                        ? "PENDING"
+                                        : "PERMITTED",
+                                    {
+                                        workerId: product.needToConfirm
+                                            ? item.buyerId
+                                            : product.userId
+                                        // comment
+                                    }
+                                )
+                                .save({ session }),
+                            item.save({ session })
+                        ]);
 
-                        const seller = await UserModel.findById(product.userId);
-                        if (!seller) {
-                            throw new ApolloError(
-                                "존재하지 않는 UserId",
-                                ERROR_CODES.UNEXIST_USER,
-                                {
-                                    errorInfo: "Product객체에 UserId 에러임"
-                                }
-                            );
-                        }
-
-                        const smsKey = seller.smsKey;
+                        // smsKey 확인
+                        // if exist => sms 전송 ㄱㄱ
+                        const smsKey = await getSmsKey(product.userId);
                         if (smsKey) {
                             // 해당 시간에 예약이 가능한지 확인해야됨 ㅎ
-                            const f = new Date(
-                                item.dateTimeRange.from.getTime() +
-                                    buyer.zoneinfo.offset * ONE_HOUR
+                            const smsAttributes: SmsFormatAttribute[] = createSmsFormatAttrs(
+                                {
+                                    buyerName: buyer.name,
+                                    prodcutName: product.name,
+                                    from: new Date(
+                                        item.dateTimeRange.from.getTime() +
+                                            buyer.zoneinfo.offset * ONE_HOUR
+                                    ),
+                                    to: new Date(
+                                        item.dateTimeRange.to.getTime() +
+                                            buyer.zoneinfo.offset * ONE_HOUR
+                                    )
+                                }
                             );
-                            const t = new Date(
-                                item.dateTimeRange.to.getTime() +
-                                    buyer.zoneinfo.offset * ONE_HOUR
-                            );
-                            await sendSmsAfterCreate(
-                                smsKey,
-                                stack,
-                                [
-                                    {
-                                        key: "NAME",
-                                        value: buyer.name
-                                    },
-                                    {
-                                        key: "PRODUCT_NAME",
-                                        value: product.name
-                                    },
-                                    {
-                                        key: "FROM",
-                                        value: f
-                                            .toISOString()
-                                            .split("T")[1]
-                                            .substr(0, 5)
-                                    },
-                                    {
-                                        key: "TO",
-                                        value: t
-                                            .toISOString()
-                                            .split("T")[1]
-                                            .substr(0, 5)
-                                    },
-                                    {
-                                        key: "DATE",
-                                        value: f.toISOString().split("T")[0]
-                                    }
-                                ],
-                                [buyer.phone_number]
-                            );
+                            await sendSmsWithTrigger({
+                                key: smsKey,
+                                formatAttributes: smsAttributes,
+                                receivers: [buyer.phone_number],
+                                stack
+                            });
                         }
 
                         await session.commitTransaction();
@@ -158,12 +119,103 @@ const resolvers: Resolvers = {
     }
 };
 
-const sendSmsAfterCreate = async (
-    key: ObjectId,
-    stack: any[],
-    formatAttributes: SmsFormatAttribute[],
-    receivers: string[]
-) => {
+const createItem = async (
+    product: DocumentType<ProductCls>,
+    buyer: DocumentType<BuyerCls>,
+    param: CreateItemForBuyerInput
+): Promise<DocumentType<ItemCls>> => {
+    const item = new ItemModel();
+    if (param.dateTimeRange) {
+        const { from, to } = param.dateTimeRange;
+        item.dateTimeRange = {
+            from,
+            to,
+            interval: Math.floor((to.getTime() - from.getTime()) / ONE_MINUTE)
+        };
+    }
+    const store = await StoreModel.findById(product.storeId);
+    if (!store) {
+        throw new ApolloError(
+            "존재하지 않는 Store입니다(내부DB 에러)",
+            ERROR_CODES.UNEXIST_STORE
+        );
+    }
+    const customFieldDef = store.customFields;
+    setParamsToItem(param, item, buyer, customFieldDef);
+
+    item.productId = product._id;
+    item.storeId = product.storeId;
+    item.buyerId = new ObjectId(buyer._id);
+    await item.setCode(product.code, new Date());
+    return item;
+};
+
+const getSmsKey = async (userId: ObjectId): Promise<ObjectId | undefined> => {
+    const seller = await UserModel.findById(userId);
+    if (!seller) {
+        throw new ApolloError(
+            "존재하지 않는 UserId",
+            ERROR_CODES.UNEXIST_USER,
+            {
+                errorInfo: "Product객체에 UserId 에러임"
+            }
+        );
+    }
+    return seller.smsKey;
+};
+
+const createSmsFormatAttrs = ({
+    buyerName,
+    from,
+    prodcutName,
+    to
+}: {
+    buyerName: string;
+    prodcutName: string;
+    from: Date;
+    to: Date;
+}) => {
+    return [
+        {
+            key: "NAME",
+            value: buyerName
+        },
+        {
+            key: "PRODUCT_NAME",
+            value: prodcutName
+        },
+        {
+            key: "FROM",
+            value: from
+                .toISOString()
+                .split("T")[1]
+                .substr(0, 5)
+        },
+        {
+            key: "TO",
+            value: to
+                .toISOString()
+                .split("T")[1]
+                .substr(0, 5)
+        },
+        {
+            key: "DATE",
+            value: from.toISOString().split("T")[0]
+        }
+    ];
+};
+
+const sendSmsWithTrigger = async ({
+    formatAttributes,
+    key,
+    receivers,
+    stack
+}: {
+    key: ObjectId;
+    stack: any[];
+    formatAttributes: SmsFormatAttribute[];
+    receivers: string[];
+}) => {
     stack.push(
         { key },
         {
@@ -178,12 +230,23 @@ const sendSmsAfterCreate = async (
     });
 };
 
-const setParamsToItem = (
-    param: any,
+const setParamsToItem = async (
+    param: CreateItemForBuyerInput,
     item: DocumentType<ItemCls>,
-    buyer: DocumentType<BuyerCls>
+    buyer: DocumentType<BuyerCls>,
+    customFieldDef: CustomField[]
 ) => {
+    // customField 확인 ㄱ
+    // const customFieldValues = param.customFieldValues;
     for (const fieldName in param) {
+        // if (fieldName === "customFieldValues") {
+        //     item[fieldName] = customFieldValues.map(f => {
+        //         return {
+        //             key: new ObjectId(f.key),
+        //             label:
+        //         }
+        //     });
+        // }
         const element = param[fieldName];
         item[fieldName] = element;
     }

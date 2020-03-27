@@ -30,6 +30,11 @@ import { BookingPolicy } from "GraphType";
 import { PeriodWithDays } from "../../utils/PeriodWithDays";
 import _ from "lodash";
 import { StoreProps, StoreFuncs } from "./Store.interface";
+import {
+    propOptPeriodOption,
+    propOptIdOption,
+    propOptIdsOption
+} from "../_propValidateOptions/propOptions";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.STORE)))
 export class StoreCls extends BaseSchema implements StoreProps, StoreFuncs {
@@ -54,15 +59,15 @@ export class StoreCls extends BaseSchema implements StoreProps, StoreFuncs {
         return store;
     };
 
-    @prop({
-        required: true,
-        validate: {
-            validator: user => user,
-            message: "Store.user 정보가 존재하지 않습니다."
-        },
-        get: id => new ObjectId(id),
-        set: id => new ObjectId(id)
-    })
+    @prop(
+        propOptIdOption({
+            required: true,
+            validate: {
+                validator: user => user,
+                message: "Store.user 정보가 존재하지 않습니다."
+            }
+        })
+    )
     userId: ObjectId;
 
     @prop({
@@ -195,30 +200,7 @@ export class StoreCls extends BaseSchema implements StoreProps, StoreFuncs {
     })
     businessHours: Array<PeriodWithDays>;
 
-    @prop({
-        validate: [
-            {
-                validator: (v: PeriodOption) => v.max > 0,
-                message: "PeriodOption.max 값은 0또는 음수가 될 수 없습니다."
-            },
-            {
-                validator: (v: PeriodOption) => v.min >= 0,
-                message: "PeriodOption.min 값은 음수가 될 수 없습니다."
-            },
-            {
-                validator: (v: PeriodOption) => v.max % v.unit === 0,
-                message: "PeriodOption.max 값이 unit 의 배수가 아닙니다."
-            },
-            {
-                validator: (v: PeriodOption) => v.min % v.unit === 0,
-                message: "PeriodOption.min 값이 unit 의 배수가 아닙니다."
-            },
-            {
-                validator: (v: PeriodOption) => v.unit >= 0,
-                message: "PeriodOption.unit 값은 음수가 될 수 없습니다."
-            }
-        ]
-    })
+    @prop(propOptPeriodOption())
     periodOption: PeriodOption;
 
     // getBussinessHoursToString(
@@ -235,11 +217,7 @@ export class StoreCls extends BaseSchema implements StoreProps, StoreFuncs {
     //     });
     // }
 
-    @prop({
-        default: [],
-        get: (ids: any[]) => ids.map(id => new ObjectId(id)),
-        set: (ids: any[]) => ids.map(id => new ObjectId(id))
-    })
+    @prop(propOptIdsOption({ defualt: [] }))
     groupIds: ObjectId[];
 
     @prop()
@@ -259,7 +237,12 @@ export class StoreCls extends BaseSchema implements StoreProps, StoreFuncs {
             });
         },
         get(this: DocumentType<StoreCls>, cf: CustomField[]) {
-            return cf;
+            return cf.map(cf1 => {
+                return {
+                    key: new ObjectId(cf1.key),
+                    ...cf1
+                };
+            });
         },
         validate: [
             {
