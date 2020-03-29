@@ -83,6 +83,10 @@ class App {
         next: NextFunction
     ): Promise<void> => {
         const token = req.get("X-JWT") || req.get("x-jwt");
+        const accessToken = req.get("X-ACCESS-JWT") || req.get("x-access-jwt");
+        if (accessToken) {
+            req.accessToken = accessToken;
+        }
         if (token) {
             const { ok, error, data } = await decodeKey(token);
             if (!ok && error) {

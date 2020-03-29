@@ -17,6 +17,7 @@ input EmailSignInInput {
 
 type EmailSignInResult {
     token: String!
+    accessToken: String!
     expiresIn: DateTime!
     role: UserRole!
 }

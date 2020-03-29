@@ -6,9 +6,15 @@ type Mutation {
 type RefreshTokenResponse implements BaseResponse {
     ok: Boolean!
     error: Err
-    token: String
+    data: RefreshTokenResultData
 }
 
 input RefreshTokenInput {
     role: UserRole!
+}
+
+type RefreshTokenResultData {
+    idToken: String!
+    accessToken: String!
+    expDate: DateTime!
 }

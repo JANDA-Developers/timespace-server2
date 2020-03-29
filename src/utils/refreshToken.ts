@@ -5,7 +5,12 @@ export const refreshToken = async (
     refreshToken: string,
     role: UserRole
 ): Promise<BaseResponse & {
-    data: { idToken: string; refreshToken: string } | null;
+    data: {
+        idToken: string;
+        refreshToken: string;
+        accessToken: string;
+        expDate?: Date;
+    } | null;
 }> => {
     try {
         const cognito = new CognitoIdentityServiceProvider();
@@ -35,7 +40,14 @@ export const refreshToken = async (
             error: null,
             data: {
                 idToken: authResult.IdToken || "",
-                refreshToken: authResult.RefreshToken || ""
+                accessToken: authResult.AccessToken || "",
+                refreshToken: authResult.RefreshToken || "",
+                expDate:
+                    (authResult.ExpiresIn &&
+                        new Date(
+                            authResult.ExpiresIn * 1000 + new Date().getTime()
+                        )) ||
+                    undefined
             }
         };
     } catch (error) {

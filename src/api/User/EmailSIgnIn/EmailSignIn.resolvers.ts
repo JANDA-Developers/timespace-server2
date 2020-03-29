@@ -112,6 +112,7 @@ const resolvers: Resolvers = {
                                 (authResult.ExpiresIn || 0) * 1000 +
                                     new Date().getTime()
                             ),
+                            accessToken: authResult.AccessToken || "",
                             role
                         }
                     };

@@ -71,7 +71,7 @@ export const AdminUpdateUserFunc = async ({
         await cognitoUserInfoUpdate(user.sub, attributes);
 
         // 업데이트된 Cognito Token을 가져온다
-        const idToken = await refreshUserToken(user);
+        const { idToken } = await refreshUserToken(user);
         await user.save({
             session
         });
@@ -104,9 +104,7 @@ const cognitoUserInfoUpdate = async (
     }
 };
 
-const refreshUserToken = async (
-    user: DocumentType<UserCls>
-): Promise<string> => {
+const refreshUserToken = async (user: DocumentType<UserCls>) => {
     const refreshResult = await refreshToken(user.refreshToken, "SELLER");
     if (!refreshResult.ok || !refreshResult.data) {
         throw new ApolloError(
@@ -116,7 +114,7 @@ const refreshUserToken = async (
     }
     user.refreshToken = refreshResult.data.refreshToken;
     user.refreshTokenLastUpdate = new Date();
-    return refreshResult.data.idToken;
+    return refreshResult.data;
 };
 
 const resolvers: Resolvers = {

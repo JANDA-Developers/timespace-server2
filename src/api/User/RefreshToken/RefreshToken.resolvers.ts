@@ -50,7 +50,10 @@ const resolvers: Resolvers = {
                     return {
                         ok: true,
                         error: null,
-                        token: authResult.data.idToken || ""
+                        data: {
+                            ...authResult.data,
+                            expDate: authResult.data.expDate || null
+                        }
                     };
                 } else {
                     const tokenB: string | undefined =
@@ -87,7 +90,10 @@ const resolvers: Resolvers = {
                     return {
                         ok: true,
                         error: null,
-                        token: authResult.data.idToken || ""
+                        data: {
+                            ...authResult.data,
+                            expDate: authResult.data.expDate || null
+                        }
                     };
                 }
             }
