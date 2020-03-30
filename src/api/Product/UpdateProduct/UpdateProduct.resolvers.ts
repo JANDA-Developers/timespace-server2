@@ -86,7 +86,10 @@ const resolvers: Resolvers = {
                                 img => !deleteImages.includes(img)
                             );
                         }
-                        stack.push({ afterDeleteImage: product.images });
+                        stack.push({
+                            [new Date().toISOString().split(".")[0]]:
+                                product.images
+                        });
                         if (addImages) {
                             stack.push(addImages);
                             for (const file of addImages) {

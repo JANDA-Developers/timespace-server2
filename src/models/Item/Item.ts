@@ -10,7 +10,7 @@ import { ObjectId } from "mongodb";
 import { genItemCode } from "../utils/genId";
 import { ProductModel } from "../Product/Product";
 import { DateTimeRangeCls } from "../../utils/DateTimeRange";
-import { DateTimeRange, CustomFieldValue, ItemStatus } from "GraphType";
+import { DateTimeRange, ItemStatus } from "GraphType";
 import { ItemProps, ItemFuncs } from "./Item.interface";
 import {
     ItemStatusChangedCls,
@@ -19,6 +19,7 @@ import {
 import { ItemStatusHistoryProps } from "../ItemStatusChangedHistory/ItemStatusChanged.interface";
 import { ApolloError } from "apollo-server";
 import { ERROR_CODES } from "../../types/values";
+import { CustomFieldValueCls } from "../../types/types";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.ITEM)))
 export class ItemCls extends BaseSchema implements ItemProps, ItemFuncs {
@@ -109,7 +110,7 @@ export class ItemCls extends BaseSchema implements ItemProps, ItemFuncs {
             });
         }
     })
-    customFieldValues: CustomFieldValue[];
+    customFieldValues: CustomFieldValueCls[];
 
     @prop()
     phoneNumber: string;

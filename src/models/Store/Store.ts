@@ -35,6 +35,7 @@ import {
     propOptIdOption,
     propOptIdsOption
 } from "../_propValidateOptions/propOptions";
+import { CustomFieldCls } from "../../types/types";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.STORE)))
 export class StoreCls extends BaseSchema implements StoreProps, StoreFuncs {
@@ -266,7 +267,7 @@ export class StoreCls extends BaseSchema implements StoreProps, StoreFuncs {
             }
         ]
     })
-    customFields: CustomField[];
+    customFields: CustomFieldCls[];
 
     @prop({
         default: (): BookingPolicy => {

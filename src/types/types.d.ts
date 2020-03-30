@@ -10,3 +10,10 @@ export type CustomFieldCls = {
     fileUrl: string | null;
     isMandatory: boolean;
 };
+
+export type CustomFieldValueCls = {
+    key: ObjectId;
+    label: string;
+    type: "STRING" | "LIST" | "FILE" | null;
+    value: string;
+};

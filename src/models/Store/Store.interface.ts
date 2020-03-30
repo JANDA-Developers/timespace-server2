@@ -6,10 +6,10 @@ import {
     Manager,
     PeriodOption,
     Location,
-    CustomField,
     Info
 } from "GraphType";
 import { PeriodWithDays } from "../../utils/PeriodWithDays";
+import { CustomFieldCls } from "../../types/types";
 
 export interface StoreProps extends BaseSchema {
     userId: ObjectId;
@@ -29,7 +29,7 @@ export interface StoreProps extends BaseSchema {
     groupIds: ObjectId[];
     warning: string;
     intro: string;
-    customFields: CustomField[];
+    customFields: CustomFieldCls[];
     infos: Info[];
 }
 

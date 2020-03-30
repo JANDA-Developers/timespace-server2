@@ -5,8 +5,7 @@ import {
     CreateItemForBuyerResponse,
     CreateItemForBuyerInput,
     DateTimeRangeInput,
-    SmsFormatAttribute,
-    CustomField
+    SmsFormatAttribute
 } from "GraphType";
 import {
     defaultResolver,
@@ -23,6 +22,7 @@ import { BuyerModel, BuyerCls } from "../../../models/Buyer";
 import { SmsManager } from "../../../models/Sms/SmsManager/SmsManager";
 import { UserModel } from "../../../models/User";
 import { StoreModel } from "../../../models/Store/Store";
+import { CustomFieldCls } from "../../../types/types";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -234,19 +234,34 @@ const setParamsToItem = async (
     param: CreateItemForBuyerInput,
     item: DocumentType<ItemCls>,
     buyer: DocumentType<BuyerCls>,
-    customFieldDef: CustomField[]
+    customFieldDef: CustomFieldCls[]
 ) => {
     // customField 확인 ㄱ
-    // const customFieldValues = param.customFieldValues;
+    const customFieldValues = param.customFieldValues;
+
+    const findField = (
+        fields: CustomFieldCls[],
+        key: ObjectId
+    ): CustomFieldCls | undefined => {
+        return fields.find(f => f.key.equals(key));
+    };
     for (const fieldName in param) {
-        // if (fieldName === "customFieldValues") {
-        //     item[fieldName] = customFieldValues.map(f => {
-        //         return {
-        //             key: new ObjectId(f.key),
-        //             label:
-        //         }
-        //     });
-        // }
+        if (fieldName === "customFieldValues") {
+            item[fieldName] = customFieldValues
+                .map(f => {
+                    const ff = findField(customFieldDef, new ObjectId(f.key));
+                    if (!ff) {
+                        return undefined;
+                    }
+                    return {
+                        key: new ObjectId(f.key),
+                        label: ff.label,
+                        type: ff.type,
+                        value: f.value
+                    };
+                })
+                .filter(t => t) as any;
+        }
         const element = param[fieldName];
         item[fieldName] = element;
     }

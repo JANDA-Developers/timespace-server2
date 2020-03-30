@@ -9,6 +9,8 @@ type UpdateStoreResponse {
 input UpdateStoreInput {
     storeId: ID!
     updateParam: StoreUpdateParamInput!
+    # 하위의 Product들도 같이 Update 돌릴것인지 선택
+    withProduct: Boolean
 }
 
 input StoreUpdateParamInput {

@@ -1,14 +1,20 @@
 import { ApolloError } from "apollo-server";
-import { mongoose } from "@typegoose/typegoose";
+import { mongoose, DocumentType } from "@typegoose/typegoose";
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
-import { UpdateStoreResponse, UpdateStoreInput } from "GraphType";
+import {
+    UpdateStoreResponse,
+    UpdateStoreInput,
+    StoreUpdateParamInput
+} from "GraphType";
 import {
     defaultResolver,
     privateResolver
 } from "../../../utils/resolverFuncWrapper";
-import { StoreModel } from "../../../models/Store/Store";
+import { StoreModel, StoreCls } from "../../../models/Store/Store";
 import { ERROR_CODES } from "../../../types/values";
+import { ClientSession } from "mongoose";
+import { ProductModel } from "../../../models/Product/Product";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -24,7 +30,8 @@ const resolvers: Resolvers = {
                         const { cognitoUser } = req;
                         const {
                             storeId,
-                            updateParam
+                            updateParam,
+                            withProduct
                         } = param as UpdateStoreInput;
                         const store = await StoreModel.findById(storeId);
                         if (!store) {
@@ -45,6 +52,16 @@ const resolvers: Resolvers = {
                             store[field] = value;
                         }
                         await store.save({ session });
+                        if (withProduct) {
+                            stack.push({ withProduct });
+                            const result = await productUpdate(
+                                store,
+                                updateParam,
+                                session,
+                                stack
+                            );
+                            stack.push({ result });
+                        }
                         await session.commitTransaction();
                         session.endSession();
                         return {
@@ -60,4 +77,39 @@ const resolvers: Resolvers = {
         )
     }
 };
+
+const productUpdate = async (
+    store: DocumentType<StoreCls>,
+    updateParam: StoreUpdateParamInput,
+    session: ClientSession,
+    stack: any[]
+) => {
+    // businessHours
+    // infos
+    // intro
+    // warning
+    // customFields
+    // bookingPolicy
+
+    const products = await ProductModel.find({
+        storeId: store._id
+    });
+
+    products.forEach(product => {
+        for (const key in updateParam) {
+            const element = updateParam[key];
+            stack.push({ key, element });
+            if (element) {
+                product[key] = element;
+            }
+        }
+    });
+
+    const result = await Promise.all(
+        products.map(async p => await p.save({ session }))
+    );
+
+    return result;
+};
+
 export default resolvers;
