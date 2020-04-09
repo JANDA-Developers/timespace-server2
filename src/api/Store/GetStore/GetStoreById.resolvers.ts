@@ -9,7 +9,6 @@ import {
 } from "../../../utils/resolverFuncWrapper";
 import { ERROR_CODES } from "../../../types/values";
 import { StoreModel } from "../../../models/Store/Store";
-import { ObjectId } from "mongodb";
 
 const resolvers: Resolvers = {
     Query: {
@@ -24,12 +23,19 @@ const resolvers: Resolvers = {
                     try {
                         const { cognitoUser } = req;
                         const { storeId } = param as GetStoreByIdInput;
-                        const store = await StoreModel.findById(storeId);
+                        const store = await StoreModel.findOne(storeId);
 
                         if (!store) {
                             throw new ApolloError(
                                 "존재하지 않는 Store",
                                 ERROR_CODES.UNEXIST_STORE
+                            );
+                        }
+
+                        if (store.expiresAt) {
+                            throw new ApolloError(
+                                "삭제된 상점입니다.",
+                                ERROR_CODES.DELETED_STORE
                             );
                         }
                         if (!store.userId.equals(cognitoUser._id)) {

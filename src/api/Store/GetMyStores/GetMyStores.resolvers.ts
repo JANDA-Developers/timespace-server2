@@ -36,7 +36,9 @@ const resolvers: Resolvers = {
                         return {
                             ok: true,
                             error: null,
-                            data: stores as any
+                            data: stores.filter(
+                                store => !store.expiresAt
+                            ) as any
                         };
                     } catch (error) {
                         return {
