@@ -50,7 +50,12 @@ const resolvers: Resolvers = {
                         }
 
                         // Item 생성
-                        const item = await createItem(product, buyer, param);
+                        const item = await createItem(
+                            product,
+                            buyer,
+                            param,
+                            stack
+                        );
 
                         // Item Validation ㄱㄱ
                         await validateDateTimerange(product, dateTimeRange);
@@ -120,7 +125,8 @@ const resolvers: Resolvers = {
 const createItem = async (
     product: DocumentType<ProductCls>,
     buyer: DocumentType<BuyerCls>,
-    param: CreateItemForBuyerInput
+    param: CreateItemForBuyerInput,
+    stack: any[]
 ): Promise<DocumentType<ItemCls>> => {
     const item = new ItemModel();
     if (param.dateTimeRange) {
@@ -138,6 +144,25 @@ const createItem = async (
             ERROR_CODES.UNEXIST_STORE
         );
     }
+
+    const { max, min } = store.periodOption;
+    // mLogger.info(
+    //     JSON.stringify({
+    //         method: "CreateItemForBuyer",
+    //         max,
+    //         min,
+    //         range: item.dateTimeRange
+    //     })
+    // );
+    const overMax = item.dateTimeRange.interval > max;
+    const lowerMin = item.dateTimeRange.interval < min;
+    if (overMax || lowerMin) {
+        throw new ApolloError(
+            `${min}~${max}분 이내의 시간을 선택해 주세요`,
+            ERROR_CODES.ITEM_VALIDATION_ERROR
+        );
+    }
+
     item.productId = product._id;
     item.storeId = product.storeId;
     item.buyerId = new ObjectId(buyer._id);

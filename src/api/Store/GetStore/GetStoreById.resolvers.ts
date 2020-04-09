@@ -23,7 +23,7 @@ const resolvers: Resolvers = {
                     try {
                         const { cognitoUser } = req;
                         const { storeId } = param as GetStoreByIdInput;
-                        const store = await StoreModel.findOne(storeId);
+                        const store = await StoreModel.findById(storeId);
 
                         if (!store) {
                             throw new ApolloError(
