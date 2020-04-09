@@ -431,7 +431,10 @@ export class ProductCls extends BaseSchema
                 return {
                     ...o,
                     items: ((await ItemModel.find({
-                        _id: { $in: o.items }
+                        _id: { $in: o.items },
+                        expiresAt: {
+                            $exists: false
+                        }
                     })) as unknown) as Item[]
                 };
             })

@@ -4,8 +4,7 @@ import { Resolvers } from "../../../types/resolvers";
 import {
     CreateItemForBuyerResponse,
     CreateItemForBuyerInput,
-    DateTimeRangeInput,
-    SmsFormatAttribute
+    DateTimeRangeInput
 } from "GraphType";
 import {
     defaultResolver,
@@ -16,13 +15,12 @@ import { ApolloError } from "apollo-server";
 import { ERROR_CODES } from "../../../types/values";
 import { ProductModel, ProductCls } from "../../../models/Product/Product";
 import { ObjectId } from "mongodb";
-import { ONE_MINUTE, ONE_DAY, ONE_HOUR } from "../../../utils/dateFuncs";
+import { ONE_MINUTE, ONE_DAY } from "../../../utils/dateFuncs";
 import { DateTimeRangeCls } from "../../../utils/DateTimeRange";
 import { BuyerModel, BuyerCls } from "../../../models/Buyer";
-import { SmsManager } from "../../../models/Sms/SmsManager/SmsManager";
-import { UserModel } from "../../../models/User";
 import { StoreModel } from "../../../models/Store/Store";
 import { CustomFieldCls } from "../../../types/types";
+import { uploadFile } from "../../../utils/s3Funcs";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -76,32 +74,32 @@ const resolvers: Resolvers = {
                             item.save({ session })
                         ]);
 
-                        // smsKey 확인
-                        // if exist => sms 전송 ㄱㄱ
-                        const smsKey = await getSmsKey(product.userId);
-                        if (smsKey) {
-                            // 해당 시간에 예약이 가능한지 확인해야됨 ㅎ
-                            const smsAttributes: SmsFormatAttribute[] = createSmsFormatAttrs(
-                                {
-                                    buyerName: buyer.name,
-                                    prodcutName: product.name,
-                                    from: new Date(
-                                        item.dateTimeRange.from.getTime() +
-                                            buyer.zoneinfo.offset * ONE_HOUR
-                                    ),
-                                    to: new Date(
-                                        item.dateTimeRange.to.getTime() +
-                                            buyer.zoneinfo.offset * ONE_HOUR
-                                    )
-                                }
-                            );
-                            await sendSmsWithTrigger({
-                                key: smsKey,
-                                formatAttributes: smsAttributes,
-                                receivers: [buyer.phone_number],
-                                stack
-                            });
-                        }
+                        // // smsKey 확인
+                        // // if exist => sms 전송 ㄱㄱ
+                        // const smsKey = await getSmsKey(product.userId);
+                        // if (smsKey) {
+                        //     // 해당 시간에 예약이 가능한지 확인해야됨 ㅎ
+                        //     const smsAttributes: SmsFormatAttribute[] = createSmsFormatAttrs(
+                        //         {
+                        //             buyerName: buyer.name,
+                        //             prodcutName: product.name,
+                        //             from: new Date(
+                        //                 item.dateTimeRange.from.getTime() +
+                        //                     buyer.zoneinfo.offset * ONE_HOUR
+                        //             ),
+                        //             to: new Date(
+                        //                 item.dateTimeRange.to.getTime() +
+                        //                     buyer.zoneinfo.offset * ONE_HOUR
+                        //             )
+                        //         }
+                        //     );
+                        //     await sendSmsWithTrigger({
+                        //         key: smsKey,
+                        //         formatAttributes: smsAttributes,
+                        //         receivers: [buyer.phone_number],
+                        //         stack
+                        //     });
+                        // }
 
                         await session.commitTransaction();
                         session.endSession();
@@ -140,95 +138,96 @@ const createItem = async (
             ERROR_CODES.UNEXIST_STORE
         );
     }
-    const customFieldDef = store.customFields;
-    setParamsToItem(param, item, buyer, customFieldDef);
-
     item.productId = product._id;
     item.storeId = product.storeId;
     item.buyerId = new ObjectId(buyer._id);
     await item.setCode(product.code, new Date());
+
+    const customFieldDef = store.customFields;
+    await setParamsToItem(param, item, buyer, customFieldDef);
+
     return item;
 };
 
-const getSmsKey = async (userId: ObjectId): Promise<ObjectId | undefined> => {
-    const seller = await UserModel.findById(userId);
-    if (!seller) {
-        throw new ApolloError(
-            "존재하지 않는 UserId",
-            ERROR_CODES.UNEXIST_USER,
-            {
-                errorInfo: "Product객체에 UserId 에러임"
-            }
-        );
-    }
-    return seller.smsKey;
-};
+// const getSmsKey = async (userId: ObjectId): Promise<ObjectId | undefined> => {
+//     const seller = await UserModel.findById(userId);
+//     if (!seller) {
+//         throw new ApolloError(
+//             "존재하지 않는 UserId",
+//             ERROR_CODES.UNEXIST_USER,
+//             {
+//                 errorInfo: "Product객체에 UserId 에러임"
+//             }
+//         );
+//     }
+//     return seller.smsKey;
+// };
 
-const createSmsFormatAttrs = ({
-    buyerName,
-    from,
-    prodcutName,
-    to
-}: {
-    buyerName: string;
-    prodcutName: string;
-    from: Date;
-    to: Date;
-}) => {
-    return [
-        {
-            key: "NAME",
-            value: buyerName
-        },
-        {
-            key: "PRODUCT_NAME",
-            value: prodcutName
-        },
-        {
-            key: "FROM",
-            value: from
-                .toISOString()
-                .split("T")[1]
-                .substr(0, 5)
-        },
-        {
-            key: "TO",
-            value: to
-                .toISOString()
-                .split("T")[1]
-                .substr(0, 5)
-        },
-        {
-            key: "DATE",
-            value: from.toISOString().split("T")[0]
-        }
-    ];
-};
+// const createSmsFormatAttrs = ({
+//     buyerName,
+//     from,
+//     prodcutName,
+//     to
+// }: {
+//     buyerName: string;
+//     prodcutName: string;
+//     from: Date;
+//     to: Date;
+// }) => {
+//     return [
+//         {
+//             key: "NAME",
+//             value: buyerName
+//         },
+//         {
+//             key: "PRODUCT_NAME",
+//             value: prodcutName
+//         },
+//         {
+//             key: "FROM",
+//             value: from
+//                 .toISOString()
+//                 .split("T")[1]
+//                 .substr(0, 5)
+//         },
+//         {
+//             key: "TO",
+//             value: to
+//                 .toISOString()
+//                 .split("T")[1]
+//                 .substr(0, 5)
+//         },
+//         {
+//             key: "DATE",
+//             value: from.toISOString().split("T")[0]
+//         }
+//     ];
+// };
 
-const sendSmsWithTrigger = async ({
-    formatAttributes,
-    key,
-    receivers,
-    stack
-}: {
-    key: ObjectId;
-    stack: any[];
-    formatAttributes: SmsFormatAttribute[];
-    receivers: string[];
-}) => {
-    stack.push(
-        { key },
-        {
-            formatAttributes
-        }
-    );
-    const smsManager = new SmsManager(key);
-    await smsManager.sendWithTrigger({
-        event: "ON_BOOKING_SUBMITTED",
-        formatAttributes,
-        receivers
-    });
-};
+// const sendSmsWithTrigger = async ({
+//     formatAttributes,
+//     key,
+//     receivers,
+//     stack
+// }: {
+//     key: ObjectId;
+//     stack: any[];
+//     formatAttributes: SmsFormatAttribute[];
+//     receivers: string[];
+// }) => {
+//     stack.push(
+//         { key },
+//         {
+//             formatAttributes
+//         }
+//     );
+//     const smsManager = new SmsManager(key);
+//     await smsManager.sendWithTrigger({
+//         event: "ON_BOOKING_SUBMITTED",
+//         formatAttributes,
+//         receivers
+//     });
+// };
 
 const setParamsToItem = async (
     param: CreateItemForBuyerInput,
@@ -247,23 +246,38 @@ const setParamsToItem = async (
     };
     for (const fieldName in param) {
         if (fieldName === "customFieldValues") {
-            item[fieldName] = customFieldValues
-                .map(f => {
-                    const ff = findField(customFieldDef, new ObjectId(f.key));
-                    if (!ff) {
-                        return undefined;
-                    }
-                    return {
-                        key: new ObjectId(f.key),
-                        label: ff.label,
-                        type: ff.type,
-                        value: f.value
-                    };
-                })
-                .filter(t => t) as any;
+            item[fieldName] = (
+                await Promise.all(
+                    customFieldValues.map(async f => {
+                        const ff = findField(
+                            customFieldDef,
+                            new ObjectId(f.key)
+                        );
+                        if (!ff) {
+                            return undefined;
+                        }
+                        let url: string = "";
+                        if (f.file) {
+                            const file = await f.file;
+                            url = (
+                                await uploadFile(file, {
+                                    dir: `buyer/${item.code}`
+                                })
+                            ).url;
+                        }
+                        return {
+                            key: new ObjectId(f.key),
+                            label: ff.label,
+                            type: ff.type,
+                            value: f.value || url
+                        };
+                    })
+                )
+            ).filter(t => t) as any;
+        } else {
+            const element = param[fieldName];
+            item[fieldName] = element;
         }
-        const element = param[fieldName];
-        item[fieldName] = element;
     }
     if (!item.name) {
         item.name = buyer.name;

@@ -15,6 +15,7 @@ import { StoreModel, StoreCls } from "../../../models/Store/Store";
 import { ERROR_CODES } from "../../../types/values";
 import { ClientSession } from "mongoose";
 import { ProductModel } from "../../../models/Product/Product";
+import { saveFilesForCustomField } from "../CreateStore/SaveFileForCustomField";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -50,6 +51,13 @@ const resolvers: Resolvers = {
                         for (const field in updateParam) {
                             const value = updateParam[field];
                             store[field] = value;
+                        }
+                        const customFields = updateParam.customFields;
+                        if (customFields) {
+                            store.customFields = await saveFilesForCustomField(
+                                cognitoUser.sub,
+                                customFields
+                            );
                         }
                         await store.save({ session });
                         if (withProduct) {

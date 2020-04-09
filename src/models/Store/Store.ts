@@ -233,7 +233,8 @@ export class StoreCls extends BaseSchema implements StoreProps, StoreFuncs {
             return cf.map(c => {
                 return {
                     key: new ObjectId(c.key || undefined),
-                    ...c
+                    ...c,
+                    isMandatory: c.isMandatory || false
                 };
             });
         },
@@ -241,7 +242,8 @@ export class StoreCls extends BaseSchema implements StoreProps, StoreFuncs {
             return cf.map(cf1 => {
                 return {
                     key: new ObjectId(cf1.key),
-                    ...cf1
+                    ...cf1,
+                    isMandatory: cf1.isMandatory || false
                 };
             });
         },

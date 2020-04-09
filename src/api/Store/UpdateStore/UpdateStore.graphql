@@ -20,7 +20,6 @@ input StoreUpdateParamInput {
     customFields: [CustomFieldDefineInput!]
     warning: String
     intro: String
-    customFieldInput: [CustomFieldDefineInput!]
     manager: ManagerInput
     infos: [InfoInput!]
     bookingPolicy: BookingPolicyInput

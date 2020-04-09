@@ -11,7 +11,10 @@ const resolvers: Resolvers = {
                 ? JSON.parse(buyer.zoneinfo)
                 : buyer.zoneinfo,
         items: async buyer =>
-            await ItemModel.find({ _id: { $in: buyer.items } })
+            await ItemModel.find({
+                _id: { $in: buyer.items },
+                expiresAt: { $exists: false }
+            })
     }
 };
 export default resolvers;

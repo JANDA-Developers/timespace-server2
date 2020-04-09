@@ -42,7 +42,8 @@ const resolvers: Resolvers = {
                         console.info(query);
                         const items = await ItemModel.find({
                             storeId: store._id,
-                            ...query
+                            ...query,
+                            expiresAt: { $exists: false }
                         }).sort({ createdAt: -1 });
 
                         return {

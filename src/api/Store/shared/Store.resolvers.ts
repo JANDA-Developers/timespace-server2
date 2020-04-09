@@ -40,6 +40,14 @@ const resolvers: Resolvers = {
                     limitLastBooking: 60
                 }
             );
+        },
+        customFields: async (store: DocumentType<StoreCls>) => {
+            return store.customFields.map(c => {
+                return {
+                    ...c,
+                    isMandatory: c.isMandatory || false
+                };
+            });
         }
     }
 };

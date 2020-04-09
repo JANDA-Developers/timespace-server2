@@ -121,6 +121,9 @@ const resolvers: Resolvers = {
                             },
                             "dateTimeRange.to": {
                                 $gt: item.dateTimeRange.from
+                            },
+                            expiresAt: {
+                                $exists: false
                             }
                         });
 

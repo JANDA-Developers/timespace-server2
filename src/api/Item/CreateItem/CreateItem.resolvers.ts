@@ -20,6 +20,8 @@ import { DateTimeRangeCls } from "../../../utils/DateTimeRange";
 import { StoreModel } from "../../../models/Store/Store";
 import { UserModel } from "../../../models/User";
 import { SmsManager } from "../../../models/Sms/SmsManager/SmsManager";
+import { uploadFile } from "../../../utils/s3Funcs";
+import { CustomFieldCls } from "../../../types/types";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -67,26 +69,7 @@ const resolvers: Resolvers = {
                                 ERROR_CODES.UNEXIST_STORE
                             );
                         }
-                        for (const fieldName in param) {
-                            let element = param[fieldName];
-                            if (fieldName === "customFieldValues") {
-                                const field = store.customFields;
-                                element = param.customFieldValues.map(
-                                    cstField => {
-                                        const key = new ObjectId(cstField.key);
-                                        const label = field.find(f =>
-                                            key.equals(f.key)
-                                        )?.label;
-                                        return {
-                                            key,
-                                            label,
-                                            value: cstField.value
-                                        };
-                                    }
-                                );
-                            }
-                            item[fieldName] = element;
-                        }
+
                         item.productId = product._id;
                         item.storeId = product.storeId;
                         item.userId = new ObjectId(cognitoUser._id);
@@ -96,6 +79,50 @@ const resolvers: Resolvers = {
                             })
                             .save({ session });
                         await item.setCode(product.code, now);
+
+                        const customFieldDef = store.customFields;
+                        const customFieldValues = param.customFieldValues;
+                        const findField = (
+                            fields: CustomFieldCls[],
+                            key: ObjectId
+                        ): CustomFieldCls | undefined => {
+                            return fields.find(f => f.key.equals(key));
+                        };
+                        for (const fieldName in param) {
+                            if (fieldName === "customFieldValues") {
+                                item[fieldName] = (
+                                    await Promise.all(
+                                        customFieldValues.map(async f => {
+                                            const ff = findField(
+                                                customFieldDef,
+                                                new ObjectId(f.key)
+                                            );
+                                            if (!ff) {
+                                                return undefined;
+                                            }
+                                            let url: string | null = null;
+                                            if (f.file && ff.type === "FILE") {
+                                                const file = await f.file;
+                                                url = (
+                                                    await uploadFile(file, {
+                                                        dir: `buyer/${item.code}`
+                                                    })
+                                                ).url;
+                                            }
+                                            return {
+                                                key: new ObjectId(f.key),
+                                                label: ff.label,
+                                                type: ff.type,
+                                                value: f.value || url
+                                            };
+                                        })
+                                    )
+                                ).filter(t => t) as any;
+                            } else {
+                                const element = param[fieldName];
+                                item[fieldName] = element;
+                            }
+                        }
 
                         // validation 필요함!
                         // needConfirm

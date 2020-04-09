@@ -12,6 +12,7 @@ import { ApolloError } from "apollo-server";
 import { uploadFile } from "../../../utils/s3Funcs";
 import _ from "lodash";
 import { S3 } from "aws-sdk";
+import { UserModel } from "../../../models/User";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -29,10 +30,11 @@ const resolvers: Resolvers = {
                             updateProductParamInput
                         } = param as UpdateProductInput;
                         const { cognitoUser } = req;
+                        const user = await UserModel.findUser(cognitoUser);
                         const product = await ProductModel.findByCode(
                             productCode
                         );
-                        if (!product.userId.equals(cognitoUser._id)) {
+                        if (!product.userId.equals(user._id)) {
                             throw new ApolloError(
                                 "Product 접근 권한이 없습니다.",
                                 ERROR_CODES.ACCESS_DENY_PRODUCT
@@ -53,9 +55,6 @@ const resolvers: Resolvers = {
                             addImages,
                             deleteImages
                         } = updateProductParamInput;
-                        stack.push({
-                            deleteImages
-                        });
                         if (deleteImages) {
                             const s3 = new S3();
                             const deleteResult = await s3
@@ -86,26 +85,10 @@ const resolvers: Resolvers = {
                                 img => !deleteImages.includes(img)
                             );
                         }
-                        stack.push({
-                            [new Date().toISOString().split(".")[0]]:
-                                product.images
-                        });
                         if (addImages) {
                             stack.push(addImages);
                             for (const file of addImages) {
                                 const syncedFile = await file;
-                                stack.push({ syncedFile });
-                                stack.push({
-                                    file: {
-                                        name: file.filename,
-                                        mimetype: file.mimetype
-                                    }
-                                });
-
-                                /* 
-                                    ? 파일 업로드 폴더 구조 설정하기
-                                    * ${userId}/${houseId}/~~
-                                */
                                 // 해당 경로에 폴더 존재여부 확인 & 생성
                                 const { url } = await uploadFile(syncedFile, {
                                     dir:

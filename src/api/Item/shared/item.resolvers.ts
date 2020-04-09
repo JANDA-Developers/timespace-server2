@@ -42,6 +42,14 @@ const resolvers: Resolvers = {
                 _id: { $in: item.statusChangedHistory }
             }).sort({ createdAt: -1 });
             return history;
+        },
+        customFieldValues: async (item: DocumentType<ItemCls>) => {
+            return item.customFieldValues.map(f => {
+                return {
+                    ...f,
+                    value: f.value || ""
+                };
+            });
         }
     },
     ItemStatusChanged: {

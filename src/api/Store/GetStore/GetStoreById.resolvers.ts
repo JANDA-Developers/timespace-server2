@@ -9,6 +9,7 @@ import {
 } from "../../../utils/resolverFuncWrapper";
 import { ERROR_CODES } from "../../../types/values";
 import { StoreModel } from "../../../models/Store/Store";
+import { ObjectId } from "mongodb";
 
 const resolvers: Resolvers = {
     Query: {

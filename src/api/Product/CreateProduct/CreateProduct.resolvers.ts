@@ -111,8 +111,6 @@ const resolvers: Resolvers = {
                         if (images) {
                             for (const file of images) {
                                 const syncedFile = await file;
-                                stack.push(syncedFile);
-
                                 /* 
                                     ? 파일 업로드 폴더 구조 설정하기
                                     * ${userId}/${houseId}/~~

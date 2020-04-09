@@ -1,9 +1,5 @@
 import { StoreModel } from "../../../models/Store/Store";
-import {
-    CreateStoreInput,
-    CreateStoreResponse,
-    CustomFieldDefineInput
-} from "GraphType";
+import { CreateStoreInput, CreateStoreResponse } from "GraphType";
 import { errorReturn } from "../../../utils/utils";
 import { mongoose } from "@typegoose/typegoose";
 import { UserModel } from "../../../models/User";
@@ -12,8 +8,7 @@ import { CountryInfoModel } from "../../../models/CountryInfo";
 import { ApolloError } from "apollo-server";
 import { StoreGroupModel } from "../../../models/StoreGroup";
 import { ResolverFunction } from "../../../types/resolvers";
-import { uploadFile } from "../../../utils/s3Funcs";
-import { CustomFieldCls } from "../../../types/types";
+import { saveFilesForCustomField } from "./SaveFileForCustomField";
 
 export const createStoreFunc: ResolverFunction = async (
     { args: { param }, context: { req } },
@@ -122,7 +117,7 @@ export const createStoreFunc: ResolverFunction = async (
                 isVerifiedPhoneNumber: false
             },
             groupIds: [group._id],
-            customFields: customFields,
+            customFields,
             bookingPolicy: bookingPolicy || {
                 limitFirstBooking: 0,
                 limitLastBooking: 30
@@ -165,32 +160,4 @@ export const createStoreFunc: ResolverFunction = async (
     } catch (error) {
         return await errorReturn(error, session);
     }
-};
-
-const saveFilesForCustomField = async (
-    userSub: string,
-    customFields: CustomFieldDefineInput[]
-): Promise<CustomFieldCls[]> => {
-    const baseDir = `${userSub}/cf/`;
-    const result: CustomFieldCls[] = await Promise.all(
-        customFields.map(
-            async (cf): Promise<CustomFieldCls> => {
-                const field: CustomFieldCls = {
-                    ...cf,
-                    fileUrl: null,
-                    key: new ObjectId(),
-                    isMandatory: cf.isMandatory || false
-                };
-                if (cf.file && cf.type === "FILE") {
-                    const { url } = await uploadFile(cf.file, {
-                        dir: baseDir
-                    });
-                    field.fileUrl = url;
-                }
-
-                return field;
-            }
-        )
-    );
-    return result;
 };

@@ -48,9 +48,7 @@ export const uploadFile = async (
             ACL: "public-read",
             Bucket: bucketName,
             Body: file.createReadStream(),
-            Key: `${makeDirPath(dir)}/${file.filename}.${
-                file.mimetype.split("/")[1]
-            }`
+            Key: `${makeDirPath(dir)}/${file.filename}`
         },
         tags
     }).promise();
