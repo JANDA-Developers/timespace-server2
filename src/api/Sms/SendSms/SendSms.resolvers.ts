@@ -27,8 +27,6 @@ export const SendSmsFunc = async (
             sender: param.sender || undefined
         });
 
-        stack.push({ errors });
-
         return {
             ok,
             error:

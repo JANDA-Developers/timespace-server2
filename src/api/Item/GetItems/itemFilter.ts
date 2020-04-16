@@ -34,8 +34,9 @@ export const makeFilterQuery = (
     if (filter.productId) {
         query.productId = new ObjectId(filter.productId);
     }
+    console.log(filter.status);
     if (filter.status) {
-        query.status = status;
+        query["status"] = filter.status;
     }
     return query;
 };

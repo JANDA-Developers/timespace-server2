@@ -39,7 +39,6 @@ const resolvers: Resolvers = {
                             param.filter,
                             store.periodOption.offset
                         );
-                        console.info(query);
                         const items = await ItemModel.find({
                             storeId: store._id,
                             ...query,

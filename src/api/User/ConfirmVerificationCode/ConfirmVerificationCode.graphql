@@ -1,0 +1,14 @@
+type Mutation {
+    ConfirmVerificationCode(
+        param: ConfirmVerificationCodeInput!
+    ): ConfirmVerificationCodeResponse!
+}
+type ConfirmVerificationCodeResponse {
+    ok: Boolean!
+    error: Err
+    data: EmailSignInBuyerResult
+}
+input ConfirmVerificationCodeInput {
+    userSub: String!
+    code: String!
+}
