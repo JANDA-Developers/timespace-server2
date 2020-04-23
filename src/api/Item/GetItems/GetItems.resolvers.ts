@@ -8,8 +8,12 @@ import {
 } from "../../../utils/resolverFuncWrapper";
 import { ERROR_CODES } from "../../../types/values";
 import { StoreModel } from "../../../models/Store/Store";
-import { ItemModel } from "../../../models/Item/Item";
+import { ItemModel, ItemCls } from "../../../models/Item/Item";
 import { makeFilterQuery } from "./itemFilter";
+import { GetItemsSortInput } from "GraphType";
+import { DocumentType } from "@typegoose/typegoose";
+import { ObjectId } from "mongodb";
+import { UserModel } from "../../../models/User";
 
 const resolvers: Resolvers = {
     Query: {
@@ -21,8 +25,13 @@ const resolvers: Resolvers = {
                 ): Promise<GetItemsResponse> => {
                     try {
                         const { cognitoUser } = req;
+                        const user = await UserModel.findUser(cognitoUser);
                         const { param }: { param: GetItemsInput } = args;
-                        const store = await StoreModel.findById(param.storeId);
+                        const storeIds = param.storeId
+                            ? [new ObjectId(param.storeId)]
+                            : user.stores;
+
+                        const store = await StoreModel.findById(storeIds[0]);
                         if (!store) {
                             throw new ApolloError(
                                 "존재하지 않는 StoreId",
@@ -35,20 +44,51 @@ const resolvers: Resolvers = {
                                 ERROR_CODES.ACCESS_DENY_STORE
                             );
                         }
+                        const sortQuery = param.sort;
                         const query = makeFilterQuery(
                             param.filter,
                             store.periodOption.offset
                         );
-                        const items = await ItemModel.find({
-                            storeId: store._id,
-                            ...query,
-                            expiresAt: { $exists: false }
-                        }).sort({ createdAt: -1 });
+                        const itemsPromise = () => {
+                            const func = ItemModel.find({
+                                storeId: { $in: storeIds },
+                                ...query,
+                                expiresAt: { $exists: false }
+                            });
+
+                            return (sortInput: GetItemsSortInput) => {
+                                return func.sort({
+                                    [sortInput.sortKey]: sortInput.sort
+                                });
+                            };
+                        };
+                        const itemsGetFunc = itemsPromise();
+                        const result: DocumentType<ItemCls>[] = [];
+                        if (sortQuery && sortQuery.length !== 0) {
+                            let r: any;
+                            for (const s of sortQuery) {
+                                r = itemsGetFunc(s);
+                            }
+                            result.push(...(await r.exec()));
+                        } else {
+                            result.push(
+                                ...(await itemsGetFunc({
+                                    sortKey: "dateTimeRange.from",
+                                    sort: -1
+                                }).exec())
+                            );
+                        }
+
+                        // const items = await ItemModel.find({
+                        //     storeId: store._id,
+                        //     ...query,
+                        //     expiresAt: { $exists: false }
+                        // }).sort({ "dateTimeRange.from": -1 });
 
                         return {
                             ok: true,
                             error: null,
-                            data: items as any
+                            data: result as any
                         };
                     } catch (error) {
                         const result = await errorReturn(error);

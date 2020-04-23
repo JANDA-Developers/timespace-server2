@@ -21,6 +21,10 @@ class App {
         this.app = express();
         this.server = new ApolloServer({
             schema,
+            uploads: {
+                // 20MB
+                maxFieldSize: 20480000
+            },
             context: (ctx): any => {
                 return {
                     req: ctx.req

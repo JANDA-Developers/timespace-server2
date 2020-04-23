@@ -28,6 +28,14 @@ export const makeFilterQuery = (
             $lt: dateTimeRangeCls.to
         };
     }
+    if (filter.createdAtRange) {
+        const rangeCls = new DateTimeRangeCls(filter.createdAtRange);
+
+        query["createdAt"] = {
+            $gte: rangeCls.from,
+            $lt: rangeCls.to
+        };
+    }
     if (filter.name) {
         query.name = new RegExp(filter.name);
     }
@@ -36,7 +44,7 @@ export const makeFilterQuery = (
     }
     console.log(filter.status);
     if (filter.status) {
-        query["status"] = filter.status;
+        query.status = filter.status;
     }
     return query;
 };

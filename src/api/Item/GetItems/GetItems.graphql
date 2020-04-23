@@ -7,8 +7,9 @@ type GetItemsResponse {
     data: [Item!]
 }
 input GetItemsInput {
-    storeId: ID!
+    storeId: ID
     filter: GetItemsFilterInput!
+    sort: [GetItemsSortInput]
 }
 
 input GetItemsFilterInput {
@@ -18,4 +19,10 @@ input GetItemsFilterInput {
     dateTimeRange: DateTimeRangeInput
     name: String
     status: ItemStatus
+    createdAtRange: DateTimeRangeInput
+}
+
+input GetItemsSortInput {
+    sortKey: String!
+    sort: Int!
 }
