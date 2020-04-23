@@ -63,9 +63,9 @@ User Flow:
 
 SMS Module:
   SmsTrigger:
-    ☐ SendTarget is not reflected. Let's do it!
+    ✔ SendTarget is not reflected. Let's do it! @done(20-04-23 14:52)
   SmsSender: 
-    ☐ Documantary Evidences submit problem. Nothing devloped. Try it.
+    ✔ Documantary Evidences submit problem. Nothing devloped. Try it. @done(20-04-23 14:53)
 
 Schemas: 
   Notification: 

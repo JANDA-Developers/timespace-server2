@@ -107,11 +107,8 @@ export class UserCls extends BaseSchema {
     name: string;
     exp: number;
 
-    @prop({
-        set: (id: any) => new ObjectId(id),
-        get: (id: any) => new ObjectId(id)
-    })
-    smsKey?: ObjectId;
+    @prop()
+    smsKey?: string;
 
     @prop({ default: [] })
     roles: UserRole[];

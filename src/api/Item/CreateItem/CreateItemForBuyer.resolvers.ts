@@ -79,33 +79,6 @@ const resolvers: Resolvers = {
                             item.save({ session })
                         ]);
 
-                        // // smsKey 확인
-                        // // if exist => sms 전송 ㄱㄱ
-                        // const smsKey = await getSmsKey(product.userId);
-                        // if (smsKey) {
-                        //     // 해당 시간에 예약이 가능한지 확인해야됨 ㅎ
-                        //     const smsAttributes: SmsFormatAttribute[] = createSmsFormatAttrs(
-                        //         {
-                        //             buyerName: buyer.name,
-                        //             prodcutName: product.name,
-                        //             from: new Date(
-                        //                 item.dateTimeRange.from.getTime() +
-                        //                     buyer.zoneinfo.offset * ONE_HOUR
-                        //             ),
-                        //             to: new Date(
-                        //                 item.dateTimeRange.to.getTime() +
-                        //                     buyer.zoneinfo.offset * ONE_HOUR
-                        //             )
-                        //         }
-                        //     );
-                        //     await sendSmsWithTrigger({
-                        //         key: smsKey,
-                        //         formatAttributes: smsAttributes,
-                        //         receivers: [buyer.phone_number],
-                        //         stack
-                        //     });
-                        // }
-
                         await session.commitTransaction();
                         session.endSession();
                         return {
@@ -146,14 +119,6 @@ const createItem = async (
     }
 
     const { max, min } = store.periodOption;
-    // mLogger.info(
-    //     JSON.stringify({
-    //         method: "CreateItemForBuyer",
-    //         max,
-    //         min,
-    //         range: item.dateTimeRange
-    //     })
-    // );
     const overMax = item.dateTimeRange.interval > max;
     const lowerMin = item.dateTimeRange.interval < min;
     if (overMax || lowerMin) {
@@ -173,86 +138,6 @@ const createItem = async (
 
     return item;
 };
-
-// const getSmsKey = async (userId: ObjectId): Promise<ObjectId | undefined> => {
-//     const seller = await UserModel.findById(userId);
-//     if (!seller) {
-//         throw new ApolloError(
-//             "존재하지 않는 UserId",
-//             ERROR_CODES.UNEXIST_USER,
-//             {
-//                 errorInfo: "Product객체에 UserId 에러임"
-//             }
-//         );
-//     }
-//     return seller.smsKey;
-// };
-
-// const createSmsFormatAttrs = ({
-//     buyerName,
-//     from,
-//     prodcutName,
-//     to
-// }: {
-//     buyerName: string;
-//     prodcutName: string;
-//     from: Date;
-//     to: Date;
-// }) => {
-//     return [
-//         {
-//             key: "NAME",
-//             value: buyerName
-//         },
-//         {
-//             key: "PRODUCT_NAME",
-//             value: prodcutName
-//         },
-//         {
-//             key: "FROM",
-//             value: from
-//                 .toISOString()
-//                 .split("T")[1]
-//                 .substr(0, 5)
-//         },
-//         {
-//             key: "TO",
-//             value: to
-//                 .toISOString()
-//                 .split("T")[1]
-//                 .substr(0, 5)
-//         },
-//         {
-//             key: "DATE",
-//             value: from.toISOString().split("T")[0]
-//         }
-//     ];
-// };
-
-// const sendSmsWithTrigger = async ({
-//     formatAttributes,
-//     key,
-//     receivers,
-//     stack
-// }: {
-//     key: ObjectId;
-//     stack: any[];
-//     formatAttributes: SmsFormatAttribute[];
-//     receivers: string[];
-// }) => {
-//     stack.push(
-//         { key },
-//         {
-//             formatAttributes
-//         }
-//     );
-//     const smsManager = new SmsManager(key);
-//     await smsManager.sendWithTrigger({
-//         event: "ON_BOOKING_SUBMITTED",
-//         formatAttributes,
-//         receivers
-//     });
-// };
 
 const setParamsToItem = async (
     param: CreateItemForBuyerInput,
