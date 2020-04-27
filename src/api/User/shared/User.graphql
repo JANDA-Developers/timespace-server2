@@ -15,7 +15,7 @@ type User {
     disabledStores: [Store!]
     groups: [StoreGroup!]
     groupCount: Int!
-    smsKey: ID
+    smsKey: String
 }
 
 type Zoneinfo {

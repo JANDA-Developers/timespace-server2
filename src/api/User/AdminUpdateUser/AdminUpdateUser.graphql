@@ -14,7 +14,7 @@ input AdminUpdateUserInput {
 
 input UpdateUserParamInput {
     name: String
-    smsKey: ID
+    smsKey: String
     phoneNumber: String
     timezone: String
 }

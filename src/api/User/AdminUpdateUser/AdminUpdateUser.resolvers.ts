@@ -15,7 +15,6 @@ import CognitoIdentityServiceProvider, {
 } from "aws-sdk/clients/cognitoidentityserviceprovider";
 import { CountryInfoModel } from "../../../models/CountryInfo";
 import { refreshToken } from "../../../utils/refreshToken";
-import { ObjectId } from "mongodb";
 
 export const AdminUpdateUserFunc = async ({
     args
@@ -61,7 +60,7 @@ export const AdminUpdateUserFunc = async ({
             });
         }
         if (smsKey) {
-            user.smsKey = new ObjectId(smsKey);
+            user.smsKey = smsKey;
             attributes.push({
                 Name: "custom:smsKey",
                 Value: smsKey
