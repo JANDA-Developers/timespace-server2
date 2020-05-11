@@ -96,7 +96,7 @@ const resolvers: Resolvers = {
                             },
                             {
                                 $pullAll: {
-                                    list: store._id
+                                    list: [store._id]
                                 }
                             },
                             {

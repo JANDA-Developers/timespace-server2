@@ -3,7 +3,7 @@
         "baseUrl": ".",
         "module": "CommonJS",
         "target": "ES6",
-        "lib": ["ES7", "DOM", "ESNext.AsyncIterable"],
+        "lib": ["ES7", "ESNext.AsyncIterable"],
         "sourceMap": true,
         "allowJs": true,
         "moduleResolution": "Node",

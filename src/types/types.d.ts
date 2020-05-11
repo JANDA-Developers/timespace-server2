@@ -1,4 +1,5 @@
 import { ObjectId } from "mongodb";
+import { SmsTemplateKeyForItemUpsert } from "./graph";
 
 export type CustomFieldCls = {
     key: ObjectId;
@@ -16,4 +17,13 @@ export type CustomFieldValueCls = {
     label: string;
     type: "STRING" | "LIST" | "FILE" | null;
     value: string;
+};
+
+export type Replacements = {
+    [K in SmsTemplateKeyForItemUpsert]?: string;
+};
+
+export type ReplacementSets = {
+    key: String;
+    value: String;
 };

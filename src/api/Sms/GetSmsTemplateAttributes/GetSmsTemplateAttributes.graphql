@@ -1,0 +1,8 @@
+type Query {
+    GetSmsTemplateAttributes(itemId: ID!): GetSmsTemplateAttributesResponse!
+}
+type GetSmsTemplateAttributesResponse {
+    ok: Boolean!
+    error: Err
+    data: [SmsTemplateAttributeSets!]
+}
