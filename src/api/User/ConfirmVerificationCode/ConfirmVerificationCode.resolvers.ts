@@ -6,6 +6,7 @@ import {
     ConfirmVerificationCodeInput
 } from "GraphType";
 import { defaultResolver } from "../../../utils/resolverFuncWrapper";
+import { CognitoIdentityServiceProvider } from "aws-sdk";
 
 export const ConfirmVerificationCodeFunc = async (
     { parent, info, args, context: { req } },
@@ -18,14 +19,10 @@ export const ConfirmVerificationCodeFunc = async (
         const { code } = param;
 
         console.log(JSON.stringify({ code }));
+        const cognito = new CognitoIdentityServiceProvider();
+        // TODO: Sms Code로 가입 인증 변경 코드 작성
+        // 참고자료: https://m.blog.naver.com/oksk0302/220986019426
 
-        /**
-         * ============================================================
-         *
-         * Your Code Here~!
-         *
-         * ============================================================
-         */
         await session.commitTransaction();
         session.endSession();
         return {
