@@ -23,6 +23,8 @@ export const ConfirmVerificationCodeFunc = async (
         // TODO: Sms Code로 가입 인증 변경 코드 작성
         // 참고자료: https://m.blog.naver.com/oksk0302/220986019426
 
+        console.log(cognito);
+
         await session.commitTransaction();
         session.endSession();
         return {

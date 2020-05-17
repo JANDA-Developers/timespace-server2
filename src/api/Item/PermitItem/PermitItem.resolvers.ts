@@ -2,7 +2,11 @@ import { ApolloError } from "apollo-server";
 import { mongoose } from "@typegoose/typegoose";
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
-import { PermitItemResponse, PermitItemInput } from "GraphType";
+import {
+    PermitItemResponse,
+    PermitItemInput,
+    SmsTriggerEvent
+} from "GraphType";
 import {
     defaultResolver,
     privateResolver
@@ -12,6 +16,11 @@ import { ItemModel } from "../../../models/Item/Item";
 import { ObjectId } from "mongodb";
 import { ProductModel } from "../../../models/Product/Product";
 import { deniedItems } from "../CancelItem/CancelItem.resolvers";
+import { UserModel } from "../../../models/User";
+import {
+    SendSmsWithTriggerEvent,
+    getReplacementSetsForItem
+} from "../../../models/Item/ItemFunctions";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -87,6 +96,38 @@ const resolvers: Resolvers = {
                         stack.push({
                             itemDeniedResult
                         });
+
+                        const smsKey = (
+                            await UserModel.findById(cognitoUser._id).session(
+                                session
+                            )
+                        )?.smsKey;
+                        // trigger검색: Event & tags 검색(storeId)
+                        if (smsKey && item.phoneNumber) {
+                            // Send for buyer
+                            const tags = [
+                                {
+                                    key: "storeId",
+                                    value: item.storeId.toHexString()
+                                }
+                            ];
+                            const event: SmsTriggerEvent = "ITEM_PERMITTED";
+
+                            // SMS 전송
+                            await SendSmsWithTriggerEvent({
+                                smsKey,
+                                event,
+                                tags,
+                                recWithReplSets: [
+                                    {
+                                        receivers: [item.phoneNumber],
+                                        replacementSets: await getReplacementSetsForItem(
+                                            item
+                                        )
+                                    }
+                                ]
+                            });
+                        }
                         await session.commitTransaction();
                         session.endSession();
                         return {

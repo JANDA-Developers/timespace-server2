@@ -2,7 +2,11 @@ import { ApolloError } from "apollo-server";
 import { mongoose } from "@typegoose/typegoose";
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
-import { CancelItemResponse, CancelItemMutationArgs } from "GraphType";
+import {
+    CancelItemResponse,
+    CancelItemMutationArgs,
+    SmsTriggerEvent
+} from "GraphType";
 import {
     defaultResolver,
     privateResolver
@@ -11,6 +15,11 @@ import { ERROR_CODES } from "../../../types/values";
 import { ItemModel } from "../../../models/Item/Item";
 import { StoreModel } from "../../../models/Store/Store";
 import { ProductModel } from "../../../models/Product/Product";
+import { UserModel } from "../../../models/User";
+import {
+    SendSmsWithTriggerEvent,
+    getReplacementSetsForItem
+} from "../../../models/Item/ItemFunctions";
 
 export const deniedItems = async (
     { args, context: { req } },
@@ -61,6 +70,34 @@ export const deniedItems = async (
                 "존재하지 않을리 없는 ProductId",
                 ERROR_CODES.UNEXIST_PRODUCT
             );
+        }
+
+        const smsKey = (
+            await UserModel.findById(cognitoUser._id).session(session)
+        )?.smsKey;
+        // trigger검색: Event & tags 검색(storeId)
+        if (smsKey && item.phoneNumber) {
+            // Send for buyer
+            const tags = [
+                {
+                    key: "storeId",
+                    value: item.storeId.toHexString()
+                }
+            ];
+            const event: SmsTriggerEvent = "ITEM_CANCELED";
+
+            // SMS 전송
+            await SendSmsWithTriggerEvent({
+                smsKey,
+                event,
+                tags,
+                recWithReplSets: [
+                    {
+                        receivers: [item.phoneNumber],
+                        replacementSets: await getReplacementSetsForItem(item)
+                    }
+                ]
+            });
         }
         await session.commitTransaction();
         session.endSession();

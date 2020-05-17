@@ -1,7 +1,11 @@
 import { mongoose } from "@typegoose/typegoose";
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
-import { CancelItemForBuyerResponse, CancelItemForBuyerInput } from "GraphType";
+import {
+    CancelItemForBuyerResponse,
+    CancelItemForBuyerInput,
+    SmsTriggerEvent
+} from "GraphType";
 import {
     defaultResolver,
     privateResolverForBuyer
@@ -12,6 +16,10 @@ import { UserModel } from "../../../models/User";
 import { ApolloError } from "apollo-server";
 import { ERROR_CODES } from "../../../types/values";
 import { ProductModel } from "../../../models/Product/Product";
+import {
+    SendSmsWithTriggerEvent,
+    getReplacementSetsForItem
+} from "../../../models/Item/ItemFunctions";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -53,6 +61,38 @@ const resolvers: Resolvers = {
                                 "존재하지 않는 Seller",
                                 ERROR_CODES.UNAUTHORIZED_USER
                             );
+                        }
+
+                        const smsKey = (
+                            await UserModel.findById(product.userId).session(
+                                session
+                            )
+                        )?.smsKey;
+                        // trigger검색: Event & tags 검색(storeId)
+                        if (smsKey && item.phoneNumber) {
+                            // Send for buyer
+                            const tags = [
+                                {
+                                    key: "storeId",
+                                    value: item.storeId.toHexString()
+                                }
+                            ];
+                            const event: SmsTriggerEvent = "ITEM_CANCELED";
+
+                            // SMS 전송
+                            await SendSmsWithTriggerEvent({
+                                smsKey,
+                                event,
+                                tags,
+                                recWithReplSets: [
+                                    {
+                                        receivers: [item.phoneNumber],
+                                        replacementSets: await getReplacementSetsForItem(
+                                            item
+                                        )
+                                    }
+                                ]
+                            });
                         }
 
                         await session.commitTransaction();

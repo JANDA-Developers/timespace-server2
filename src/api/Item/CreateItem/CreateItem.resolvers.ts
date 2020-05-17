@@ -158,7 +158,9 @@ const resolvers: Resolvers = {
                             );
                         }
 
-                        // 해당 시간에 예약이 가능한지 확인해야됨 ㅎ
+                        // TODO 2020-05-17: 해당 시간에 예약이 가능한지 확인해야됨 ㅎ
+
+                        // TODO 2020-05-17: Trigger를 이용한 문자 전송
 
                         await item.save({ session });
                         await session.commitTransaction();

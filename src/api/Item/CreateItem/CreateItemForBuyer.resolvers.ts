@@ -4,7 +4,8 @@ import { Resolvers } from "../../../types/resolvers";
 import {
     CreateItemForBuyerResponse,
     CreateItemForBuyerInput,
-    DateTimeRangeInput
+    DateTimeRangeInput,
+    SmsTriggerEvent
 } from "GraphType";
 import {
     defaultResolver,
@@ -21,6 +22,11 @@ import { BuyerModel, BuyerCls } from "../../../models/Buyer";
 import { StoreModel } from "../../../models/Store/Store";
 import { CustomFieldCls } from "../../../types/types";
 import { uploadFile } from "../../../utils/s3Funcs";
+import {
+    getReplacementSetsForItem,
+    SendSmsWithTriggerEvent
+} from "../../../models/Item/ItemFunctions";
+import { UserModel } from "../../../models/User";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -63,7 +69,8 @@ const resolvers: Resolvers = {
                         // Item 저장하기
                         // TODO: 동작하는지 확인 ㄱㄱ
                         await Promise.all([
-                            item
+                            // ChangeHistory 저장하는거임. Item저장 아님.
+                            await item
                                 .applyStatus(
                                     product.needToConfirm
                                         ? "PENDING"
@@ -76,8 +83,41 @@ const resolvers: Resolvers = {
                                     }
                                 )
                                 .save({ session }),
-                            item.save({ session })
+                            await item.save({ session })
                         ]);
+
+                        const smsKey = (
+                            await UserModel.findById(product.userId).session(
+                                session
+                            )
+                        )?.smsKey;
+                        // trigger검색: Event & tags 검색(storeId)
+                        if (smsKey && item.phoneNumber) {
+                            // Send for buyer
+                            const tags = [
+                                {
+                                    key: "storeId",
+                                    value: item.storeId.toHexString()
+                                }
+                            ];
+                            const event: SmsTriggerEvent =
+                                "ITEM_CREATED_PENDING";
+
+                            // SMS 전송
+                            await SendSmsWithTriggerEvent({
+                                smsKey,
+                                event,
+                                tags,
+                                recWithReplSets: [
+                                    {
+                                        receivers: [item.phoneNumber],
+                                        replacementSets: await getReplacementSetsForItem(
+                                            item
+                                        )
+                                    }
+                                ]
+                            });
+                        }
 
                         await session.commitTransaction();
                         session.endSession();

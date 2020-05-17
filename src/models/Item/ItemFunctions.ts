@@ -3,13 +3,16 @@ import { ItemCls } from "./Item";
 import { Replacements } from "../../types/types";
 import {
     SmsTemplateAttributeSets,
-    SmsTemplateKeyForItemUpsert
+    SmsTemplateKeyForItemUpsert,
+    SmsTriggerEvent
 } from "../../types/graph";
 import { ProductModel } from "../Product/Product";
-import { ApolloError } from "apollo-server";
+import { ApolloError, gql } from "apollo-server";
 import { ERROR_CODES } from "../../types/values";
-import { ONE_MINUTE, ONE_DAY } from "../../utils/dateFuncs";
+import { ONE_DAY, ONE_HOUR } from "../../utils/dateFuncs";
 import _ from "lodash";
+import { requestApi } from "../../utils/requestSmsApi";
+import { print } from "graphql";
 
 export const getReplacementSetsForItem = async (
     item: DocumentType<ItemCls>
@@ -56,8 +59,8 @@ const getStartEnd = (
     to: any,
     offset: number
 ): { start: string; end: string; dateTimeRange: string } => {
-    const start = new Date(from.getTime() + offset * ONE_MINUTE);
-    const end = new Date(to.getTime() + offset * ONE_MINUTE);
+    const start = new Date(from.getTime() + offset * ONE_HOUR);
+    const end = new Date(to.getTime() + offset * ONE_HOUR);
     const isSameDate = start.getTime() - end.getTime() < ONE_DAY;
 
     return {
@@ -74,4 +77,62 @@ const dateStrFormat = (date: Date) => {
         .toISOString()
         .substr(0, 16)
         .replace("T", " ");
+};
+
+export const SendSmsWithTriggerEvent = async ({
+    event,
+    recWithReplSets,
+    smsKey,
+    tags
+}: {
+    smsKey: string;
+    event: SmsTriggerEvent;
+    tags: { key: string; value: string }[];
+    recWithReplSets: {
+        receivers: string[];
+        replacementSets: SmsTemplateAttributeSets[];
+    }[];
+}) => {
+    const sendResult =
+        // const queryResult =
+        await requestApi(
+            process.env.SMS_API_EDGE || "",
+            print(gql`
+                mutation SendWithEvent(
+                    $event: String!
+                    $tags: [TagInput!]!
+                    $recWithReplSets: [ReceiverWithReplacementSetsInput!]!
+                ) {
+                    SendWithEvent(
+                        event: $event
+                        tags: $tags
+                        receiverWithReplacementSets: $recWithReplSets
+                    ) {
+                        ok
+                        errors
+                        data {
+                            _id
+                            amount
+                            description
+                            isRefunded
+                            itemType
+                            aligoMid
+                            type
+                            receivers
+                            successCount
+                            errorCount
+                        }
+                    }
+                }
+            `),
+            {
+                event,
+                tags,
+                recWithReplSets
+            },
+            {
+                smsKey
+            }
+        );
+    return sendResult;
 };
