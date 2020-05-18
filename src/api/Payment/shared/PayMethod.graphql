@@ -1,7 +1,9 @@
-type PayMethod {
+type PayHistoryItem {
     type: PayMethodType!
-    info: PayMethodInfo!
+    info: PayMethod!
 }
+
+union PayMethod = BillInfo | BankTransferInfo
 
 type BillInfo {
     no: String!
@@ -10,8 +12,6 @@ type BillInfo {
     createdAt: DateTime!
     updatedAt: DateTime
 }
-
-union PayMethodInfo = BillInfo | BankTransferInfo
 
 type BankTransferInfo {
     account: String!

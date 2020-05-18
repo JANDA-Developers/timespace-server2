@@ -71,6 +71,7 @@ const resolvers: Resolvers = {
                         const user = new UserModel({
                             _id,
                             sub: result.UserSub,
+                            email,
                             zoneinfo,
                             loginInfos: [],
                             groupIds: [group._id],
@@ -84,6 +85,7 @@ const resolvers: Resolvers = {
                         const buyer = new BuyerModel({
                             _id,
                             sub: result.UserSub,
+                            email,
                             zoneinfo,
                             loginInfos: [],
                             roles: [role],

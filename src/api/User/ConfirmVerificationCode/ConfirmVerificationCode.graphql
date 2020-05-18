@@ -9,6 +9,6 @@ type ConfirmVerificationCodeResponse {
     data: EmailSignInBuyerResult
 }
 input ConfirmVerificationCodeInput {
-    userSub: String!
+    email: String!
     code: String!
 }

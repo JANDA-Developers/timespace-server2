@@ -1,7 +1,7 @@
 import { Resolvers } from "../../../types/resolvers";
 
 const resolvers: Resolvers = {
-    PayMethodInfo: {
+    PayMethod: {
         __resolveType: value => {
             return value;
         }

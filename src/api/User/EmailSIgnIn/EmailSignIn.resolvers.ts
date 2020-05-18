@@ -130,31 +130,26 @@ const cognitoSignIn = async (
     role: UserRole
 ) => {
     const cognito = new CognitoIdentityServiceProvider();
-    if (role === "BUYER") {
-        return await cognito
-            .adminInitiateAuth({
-                UserPoolId: process.env.COGNITO_POOL_ID_BUYER || "",
-                ClientId: process.env.COGNITO_CLIENT_ID_BUYER || "",
-                AuthFlow: "ADMIN_USER_PASSWORD_AUTH",
-                AuthParameters: {
-                    USERNAME: email,
-                    PASSWORD: password
-                }
-            })
-            .promise();
-    } else {
-        return await cognito
-            .adminInitiateAuth({
-                UserPoolId: process.env.COGNITO_POOL_ID || "",
-                ClientId: process.env.COGNITO_CLIENT_ID || "",
-                AuthFlow: "ADMIN_USER_PASSWORD_AUTH",
-                AuthParameters: {
-                    USERNAME: email,
-                    PASSWORD: password
-                }
-            })
-            .promise();
-    }
+    const UserPoolId =
+        (role === "BUYER" && process.env.COGNITO_POOL_ID_BUYER) ||
+        process.env.COGNITO_POOL_ID ||
+        "";
+    const ClientId =
+        (role === "BUYER" && process.env.COGNITO_CLIENT_ID_BUYER) ||
+        process.env.COGNITO_CLIENT_ID ||
+        "";
+
+    return await cognito
+        .adminInitiateAuth({
+            UserPoolId,
+            ClientId,
+            AuthFlow: "ADMIN_USER_PASSWORD_AUTH",
+            AuthParameters: {
+                USERNAME: email,
+                PASSWORD: password
+            }
+        })
+        .promise();
 };
 
 export default resolvers;
