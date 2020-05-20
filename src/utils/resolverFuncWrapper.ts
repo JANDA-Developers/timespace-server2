@@ -89,7 +89,10 @@ export const privateResolver = (resolverFunction: ResolverFunction) => async (
     try {
         if (!context.req.cognitoUser) {
             const token: string | undefined =
-                context.req.get("X-JWT") || context.req.get("x-jwt");
+                context.req.session.seller?.idToken;
+            console.log({
+                token
+            });
             if (token === "TokenExpiredError") {
                 throw new ApolloError(
                     "만료된 토큰입니다. 다시 로그인 해주세요",
@@ -122,7 +125,7 @@ export const privateResolverForBuyer = (
     try {
         if (!context.req.cognitoBuyer) {
             const token: string | undefined =
-                context.req.get("X-JWT-B") || context.req.get("x-jwt-b");
+                context.req.session.buyer?.idToken;
             if (token === "TokenExpiredError") {
                 throw new ApolloError(
                     "만료된 토큰입니다. 다시 로그인 해주세요",

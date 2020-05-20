@@ -11,6 +11,7 @@ import { ERROR_CODES } from "../types/values";
 import { BaseGroup } from "../abs/BaseGroup";
 import { StoreCls, StoreModel } from "./Store/Store";
 import { ObjectId } from "mongodb";
+import { StoreGroupConfig } from "GraphType";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.GROUP)))
 export class StoreGroupCls extends BaseGroup<StoreCls> {
@@ -57,6 +58,16 @@ export class StoreGroupCls extends BaseGroup<StoreCls> {
 
     @prop()
     isDefault: boolean;
+
+    @prop({
+        default: {
+            design: {
+                color: "#32297d",
+                logo: null
+            }
+        } as StoreGroupConfig
+    })
+    config: StoreGroupConfig;
 }
 
 export const StoreGroupModel = getModelForClass(StoreGroupCls);

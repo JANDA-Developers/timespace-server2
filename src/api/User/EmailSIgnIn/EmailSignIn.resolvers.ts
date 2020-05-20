@@ -6,13 +6,13 @@ import {
 } from "GraphType";
 import { CognitoIdentityServiceProvider } from "aws-sdk";
 import { defaultResolver } from "../../../utils/resolverFuncWrapper";
-import { UserModel, LoggedInInfo } from "../../../models/User";
+import { UserModel } from "../../../models/User";
 import { decodeKey, decodeKeyForBuyer } from "../../../utils/decodeIdToken";
 import { ObjectId } from "mongodb";
 import { ApolloError } from "apollo-server";
-import { getIP, errorReturn } from "../../../utils/utils";
+import { errorReturn } from "../../../utils/utils";
 import { mongoose } from "@typegoose/typegoose";
-import { ERROR_CODES } from "../../../types/values";
+import { BuyerModel } from "../../../models/Buyer";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -58,63 +58,60 @@ const resolvers: Resolvers = {
                             }
                         );
                     }
-                    let existingUser = await UserModel.findOne({
-                        sub: cognitoUser.data.sub
-                    });
-                    const tokenInfos: LoggedInInfo = {
-                        accessToken: authResult.AccessToken || "",
-                        idToken: authResult.IdToken || "",
-                        expiryDate: authResult.ExpiresIn || 3600,
-                        ip: getIP(req)[0],
-                        os: req.headers["user-agent"]
+                    const signInInfo = {
+                        idToken: authResult.IdToken,
+                        expiresIn:
+                            ((authResult.ExpiresIn as number) || 0) * 1000 +
+                            Date.now(),
+                        accessToken: authResult.AccessToken
                     };
-                    if (!existingUser) {
-                        // DB에 User가 존재하지 않는다면
-                        // => DB에 해당 User를 저장함
-                        existingUser = new UserModel({
-                            _id: new ObjectId(),
-                            sub: cognitoUser.data.sub,
-                            refreshToken: authResult.RefreshToken || "",
-                            refreshTokenLastUpdate: new Date(),
-                            loginInfos: [tokenInfos],
-                            zoneinfo: JSON.parse(cognitoUser.data.zoneinfo),
-                            roles: [role]
+                    if (role === "SELLER") {
+                        const user = await UserModel.findOne({
+                            sub: cognitoUser.data.sub
                         });
-                    } else {
-                        existingUser.refreshToken =
-                            authResult.RefreshToken || "";
-                        existingUser.refreshTokenLastUpdate = new Date();
-                    }
+                        if (!user) {
+                            new UserModel({
+                                _id: new ObjectId(),
+                                sub: cognitoUser.data.sub,
+                                refreshToken: authResult.RefreshToken || "",
+                                refreshTokenLastUpdate: new Date(),
+                                zoneinfo: JSON.parse(cognitoUser.data.zoneinfo),
+                                roles: [role]
+                            }).save({ session });
+                        } else {
+                            user.refreshToken = authResult.RefreshToken || "";
+                            user.refreshTokenLastUpdate = new Date();
 
-                    if (!existingUser.roles.includes(role)) {
-                        throw new ApolloError(
-                            `접근 권한이 없습니다. (MyUserRoles: ${existingUser.roles.join(
-                                ","
-                            )})`,
-                            ERROR_CODES.ACCESS_DENY_USER,
-                            {
-                                user: existingUser,
-                                toAccess: role
-                            }
-                        );
+                            await user.save({ session });
+                        }
+                        req.session.seller = signInInfo;
+                    } else {
+                        const user = await BuyerModel.findOne({
+                            sub: cognitoUser.data.sub
+                        });
+                        if (!user) {
+                            new BuyerModel({
+                                _id: new ObjectId(),
+                                sub: cognitoUser.data.sub,
+                                refreshToken: authResult.RefreshToken || "",
+                                refreshTokenLastUpdate: new Date(),
+                                zoneinfo: JSON.parse(cognitoUser.data.zoneinfo)
+                            }).save({ session });
+                        } else {
+                            user.refreshToken = authResult.RefreshToken || "";
+                            user.refreshTokenLastUpdate = new Date();
+
+                            await user.save({ session });
+                        }
+                        req.session.buyer = signInInfo;
                     }
-                    await existingUser.save({ session });
 
                     await session.commitTransaction();
                     session.endSession();
 
                     return {
                         ok: true,
-                        error: null,
-                        data: {
-                            token: authResult.IdToken || "",
-                            expiresIn: new Date(
-                                (authResult.ExpiresIn || 0) * 1000 +
-                                    new Date().getTime()
-                            ),
-                            accessToken: authResult.AccessToken || "",
-                            role
-                        }
+                        error: null
                     };
                 } catch (error) {
                     return await errorReturn(error, session);

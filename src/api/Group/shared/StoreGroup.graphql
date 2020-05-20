@@ -8,6 +8,7 @@ type StoreGroup implements BaseGroup {
     description: String
     tags: [String!]
     list: [Store!]
+    config: StoreGroupConfig!
     createdAt: DateTime!
     updatedAt: DateTime!
     expiresAt: DateTime

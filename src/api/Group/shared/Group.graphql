@@ -16,3 +16,12 @@ enum GroupType {
     STORE_GROUP
     PRODUCT_GROUP
 }
+
+type StoreGroupConfig {
+    design: StoreDesignConfig!
+}
+
+type StoreDesignConfig {
+    logo: String
+    color: String
+}

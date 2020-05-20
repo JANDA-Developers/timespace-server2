@@ -2,6 +2,7 @@ import { Resolvers } from "../../../types/resolvers";
 import { UserModel } from "../../../models/User";
 import { StoreModel } from "../../../models/Store/Store";
 import { ProductModel } from "../../../models/Product/Product";
+import { StoreGroupConfig } from "../../../types/graph";
 const resolvers: Resolvers = {
     BaseGroup: {
         __resolveType: (group: any) => {
@@ -37,6 +38,20 @@ const resolvers: Resolvers = {
                     $in: group.list
                 }
             });
+        },
+        config: async (group: any) => {
+            if (group.config) {
+                return group.config;
+            }
+            const config = {
+                design: {
+                    color: "#32297d",
+                    logo: null
+                }
+            } as StoreGroupConfig;
+            group.config = config;
+            await group.save();
+            return config;
         }
     },
     ProductGroup: {

@@ -6,18 +6,10 @@ type Mutation {
 type EmailSignInResponse implements BaseResponse {
     ok: Boolean!
     error: Err
-    data: EmailSignInResult
 }
 
 input EmailSignInInput {
     email: EmailAddress!
     password: String!
-    role: UserRole!
-}
-
-type EmailSignInResult {
-    token: String!
-    accessToken: String!
-    expiresIn: DateTime!
     role: UserRole!
 }

@@ -1,5 +1,8 @@
 type Mutation {
-    UpdateStoreGroup(param: UpdateStoreGroupInput!): UpdateStoreGroupResponse!
+    UpdateStoreGroup(
+        groupCode: String!
+        param: UpdateStoreGroupInput!
+    ): UpdateStoreGroupResponse!
 }
 type UpdateStoreGroupResponse {
     ok: Boolean!
@@ -9,5 +12,10 @@ type UpdateStoreGroupResponse {
 input UpdateStoreGroupInput {
     name: String
     description: String
-    list: [ID]
+    designConfig: StoreDesignConfigInput
+}
+
+input StoreDesignConfigInput {
+    logo: String
+    color: String
 }

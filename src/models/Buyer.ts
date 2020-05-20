@@ -88,7 +88,9 @@ export class BuyerCls extends BaseSchema {
         }
     }
 
+    @prop()
     email: string;
+
     phone_number: string;
     email_verified: boolean;
     phone_number_verified: boolean;

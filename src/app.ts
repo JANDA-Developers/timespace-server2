@@ -5,6 +5,13 @@ import schema from "./schema";
 import { ApolloServer } from "apollo-server-express";
 import express, { Express, NextFunction, Response } from "express";
 import { decodeKey, decodeKeyForBuyer } from "./utils/decodeIdToken";
+import session from "express-session";
+import { mongoose } from "@typegoose/typegoose";
+import { ONE_MINUTE } from "./utils/dateFuncs";
+import { refreshToken } from "./utils/refreshToken";
+import { UserModel } from "./models/User";
+
+const MongoStore = require("connect-mongo")(session);
 
 class App {
     public server: ApolloServer;
@@ -57,6 +64,18 @@ class App {
     private middlewares = (): void => {
         this.app.use(cors());
         this.app.use(helmet());
+        // MongoDB for Session Storage
+        this.app.use(
+            session({
+                name: "qid",
+                secret: process.env.JD_TIMESPACE_SECRET || "",
+                resave: false,
+                saveUninitialized: false,
+                store: new MongoStore({
+                    mongooseConnection: mongoose.connection
+                })
+            })
+        );
         this.useLogger();
         this.app.use(this.jwt);
         this.app.use(this.jwtForBuyer);
@@ -86,17 +105,19 @@ class App {
         res: Response,
         next: NextFunction
     ): Promise<void> => {
-        const token = req.get("X-JWT") || req.get("x-jwt");
-        const accessToken = req.get("X-ACCESS-JWT") || req.get("x-access-jwt");
-        if (accessToken) {
-            req.accessToken = accessToken;
-        }
+        const seller = req.session.seller;
+        console.log({ seller });
+        const token = seller?.idToken;
         if (token) {
+            const expiresAt = parseInt(req.session.expiresIn);
+            const now = Date.now();
+            // TODO: Refresh Token...
             const { ok, error, data } = await decodeKey(token);
             if (!ok && error) {
                 req.headers["x-jwt"] = error.code || "";
             }
             if (data) {
+                // set "_id", "zoneinfo"
                 if (data["custom:_id"]) {
                     data._id = data["custom:_id"];
                     if (data.zoneinfo) {
@@ -106,6 +127,29 @@ class App {
                 }
                 // Raw Data임... DB에 있는 Cognito User 절대 아님
                 req.cognitoUser = data;
+
+                if (expiresAt - now <= 10 * ONE_MINUTE) {
+                    console.log({
+                        expIsin: true
+                    });
+                    const rToken = (await UserModel.findUser(data))
+                        .refreshToken;
+                    const { ok, data: result } = await refreshToken(
+                        rToken,
+                        "SELLER"
+                    );
+                    console.log({ rToken });
+                    if (ok && result) {
+                        console.log({
+                            result
+                        });
+                        req.session.seller = {
+                            idToken: result.idToken,
+                            expiresIn: result.expDate?.getTime(),
+                            accessToken: result.accessToken
+                        };
+                    }
+                }
             }
         } else {
             req.cognitoUser = undefined;
@@ -118,8 +162,12 @@ class App {
         res: Response,
         next: NextFunction
     ): Promise<void> => {
-        const token = req.get("X-JWT-B") || req.get("x-jwt-b");
+        const buyer = req.session.buyer;
+        const token = buyer?.idToken;
         if (token) {
+            const expiresAt = parseInt(req.session.expiresIn);
+            const now = Date.now();
+            // TODO: Refresh Token...
             const { ok, error, data } = await decodeKeyForBuyer(token);
             if (!ok && error) {
                 req.headers["x-jwt-b"] = error.code || "";
@@ -134,6 +182,22 @@ class App {
                 }
                 // Raw Data임... DB에 있는 Cognito User 절대 아님
                 req.cognitoBuyer = data;
+
+                if (expiresAt - now <= 10 * ONE_MINUTE) {
+                    const rToken = (await UserModel.findUser(data))
+                        .refreshToken;
+                    const { ok, data: result } = await refreshToken(
+                        rToken,
+                        "SELLER"
+                    );
+                    if (ok && result) {
+                        req.session.seller = {
+                            idToken: result.idToken,
+                            expiresIn: result.expDate?.getTime(),
+                            accessToken: result.accessToken
+                        };
+                    }
+                }
             }
         } else {
             req.cognitoBuyer = undefined;

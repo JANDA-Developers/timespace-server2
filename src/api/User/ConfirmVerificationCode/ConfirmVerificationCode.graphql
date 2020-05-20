@@ -11,4 +11,5 @@ type ConfirmVerificationCodeResponse {
 input ConfirmVerificationCodeInput {
     email: String!
     code: String!
+    role: UserRole!
 }
