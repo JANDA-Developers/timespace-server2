@@ -18,4 +18,5 @@ input UpdateStoreGroupInput {
 input StoreDesignConfigInput {
     logo: String
     color: String
+    link: String
 }

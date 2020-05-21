@@ -7,7 +7,7 @@ import {
 } from "@typegoose/typegoose";
 import { getCollectionName, ModelName } from "./__collectionNames";
 import { ApolloError } from "apollo-server";
-import { ERROR_CODES } from "../types/values";
+import { ERROR_CODES, DEFAULT_STORE_COLOR } from "../types/values";
 import { BaseGroup } from "../abs/BaseGroup";
 import { StoreCls, StoreModel } from "./Store/Store";
 import { ObjectId } from "mongodb";
@@ -62,8 +62,9 @@ export class StoreGroupCls extends BaseGroup<StoreCls> {
     @prop({
         default: {
             design: {
-                color: "#32297d",
-                logo: null
+                color: DEFAULT_STORE_COLOR,
+                logo: null,
+                link: null
             }
         } as StoreGroupConfig
     })

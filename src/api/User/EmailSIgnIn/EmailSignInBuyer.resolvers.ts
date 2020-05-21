@@ -82,13 +82,7 @@ export const EmailSignInBuyerFunc = async (
 
         return {
             ok: true,
-            error: null,
-            data: {
-                token: authResult.IdToken || "",
-                expiresIn: new Date(
-                    (authResult.ExpiresIn || 0) * 1000 + new Date().getTime()
-                )
-            }
+            error: null
         };
     } catch (error) {
         return await errorReturn(error, session);

@@ -6,7 +6,6 @@ type Mutation {
 type ConfirmVerificationCodeResponse {
     ok: Boolean!
     error: Err
-    data: EmailSignInBuyerResult
 }
 input ConfirmVerificationCodeInput {
     email: String!

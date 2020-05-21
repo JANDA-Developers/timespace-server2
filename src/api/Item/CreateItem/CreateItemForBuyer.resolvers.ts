@@ -100,11 +100,26 @@ const resolvers: Resolvers = {
                                     value: item.storeId.toHexString()
                                 }
                             ];
+                            const store = await StoreModel.findById(
+                                item.storeId
+                            );
+                            if (!store) {
+                                throw new ApolloError(
+                                    "존재하지 않는 StoreId입니다...",
+                                    ERROR_CODES.UNEXIST_STORE
+                                );
+                            }
+                            const itemStatus = item.status;
                             const event: SmsTriggerEvent =
-                                "ITEM_CREATED_PENDING";
+                                itemStatus === "PENDING"
+                                    ? "ITEM_CREATED_PENDING"
+                                    : "ITEM_CREATED";
 
-                            // SMS 전송
-                            await SendSmsWithTriggerEvent({
+                            const eventForSeller: SmsTriggerEvent =
+                                "ITEM_CREATED_FOR_SELLER";
+
+                            // SMS 전송 => Buyer에게 전송
+                            SendSmsWithTriggerEvent({
                                 smsKey,
                                 event,
                                 tags,
@@ -117,6 +132,24 @@ const resolvers: Resolvers = {
                                     }
                                 ]
                             });
+
+                            if (store.manager.phoneNumber) {
+                                SendSmsWithTriggerEvent({
+                                    smsKey,
+                                    event: eventForSeller,
+                                    tags,
+                                    recWithReplSets: [
+                                        {
+                                            receivers: [
+                                                store.manager.phoneNumber
+                                            ],
+                                            replacementSets: await getReplacementSetsForItem(
+                                                item
+                                            )
+                                        }
+                                    ]
+                                });
+                            }
                         }
 
                         await session.commitTransaction();

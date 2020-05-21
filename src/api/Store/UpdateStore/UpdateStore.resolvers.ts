@@ -105,7 +105,7 @@ const productUpdate = async (
 
     products.forEach(product => {
         for (const key in updateParam) {
-            if (key === "name" || key === "description") {
+            if (key !== "name" && key !== "description") {
                 const element = updateParam[key];
                 stack.push({ key, element });
                 if (element) {

@@ -24,4 +24,5 @@ type StoreGroupConfig {
 type StoreDesignConfig {
     logo: String
     color: String
+    link: String
 }

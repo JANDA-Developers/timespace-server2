@@ -3,13 +3,14 @@ import helmet from "helmet";
 import logger from "morgan";
 import schema from "./schema";
 import { ApolloServer } from "apollo-server-express";
-import express, { Express, NextFunction, Response } from "express";
+import express, { Express, NextFunction, Response, Request } from "express";
 import { decodeKey, decodeKeyForBuyer } from "./utils/decodeIdToken";
 import session from "express-session";
 import { mongoose } from "@typegoose/typegoose";
 import { ONE_MINUTE } from "./utils/dateFuncs";
 import { refreshToken } from "./utils/refreshToken";
 import { UserModel } from "./models/User";
+import { BuyerModel } from "./models/Buyer";
 
 const MongoStore = require("connect-mongo")(session);
 
@@ -43,8 +44,15 @@ class App {
 
         this.server.applyMiddleware({
             app: this.app,
+            cors: {
+                credentials: true,
+                origin: [
+                    "http://localhost:3000",
+                    "https://dev-ticket-yeulbep6p.stayjanda.cloud",
+                    "https://space.stayjanda.cloud"
+                ]
+            },
             path,
-            cors: false,
             onHealthCheck: req => {
                 return new Promise((resolve, reject) => {
                     // DB상태 체크
@@ -62,7 +70,16 @@ class App {
     }
 
     private middlewares = (): void => {
-        this.app.use(cors());
+        this.app.use(
+            cors({
+                credentials: true,
+                origin: [
+                    "http://localhost:3000",
+                    "https://dev-ticket-yeulbep6p.stayjanda.cloud",
+                    "https://space.stayjanda.cloud"
+                ]
+            })
+        );
         this.app.use(helmet());
         // MongoDB for Session Storage
         this.app.use(
@@ -101,21 +118,18 @@ class App {
     };
 
     private jwt = async (
-        req: any,
+        req: Request,
         res: Response,
         next: NextFunction
     ): Promise<void> => {
-        const seller = req.session.seller;
+        const seller = req.session?.seller;
         console.log({ seller });
         const token = seller?.idToken;
         if (token) {
-            const expiresAt = parseInt(req.session.expiresIn);
+            const expiresAt = parseInt(req.session?.seller?.expiresIn);
             const now = Date.now();
             // TODO: Refresh Token...
-            const { ok, error, data } = await decodeKey(token);
-            if (!ok && error) {
-                req.headers["x-jwt"] = error.code || "";
-            }
+            const { data } = await decodeKey(token);
             if (data) {
                 // set "_id", "zoneinfo"
                 if (data["custom:_id"]) {
@@ -125,10 +139,11 @@ class App {
                     }
                     // 여기서 세팅 요망
                 }
+                // res.cookie("seller");
                 // Raw Data임... DB에 있는 Cognito User 절대 아님
-                req.cognitoUser = data;
+                req["cognitoUser"] = data;
 
-                if (expiresAt - now <= 10 * ONE_MINUTE) {
+                if (expiresAt - now <= 15 * ONE_MINUTE) {
                     console.log({
                         expIsin: true
                     });
@@ -138,40 +153,42 @@ class App {
                         rToken,
                         "SELLER"
                     );
-                    console.log({ rToken });
                     if (ok && result) {
                         console.log({
                             result
                         });
-                        req.session.seller = {
-                            idToken: result.idToken,
-                            expiresIn: result.expDate?.getTime(),
-                            accessToken: result.accessToken
-                        };
+                        if (req.session) {
+                            req.session.seller = {
+                                idToken: result.idToken,
+                                expiresIn: result.expDate?.getTime(),
+                                accessToken: result.accessToken
+                            };
+                            req.session.save(err => {
+                                console.log("Session Saved!!");
+                            });
+                        }
                     }
                 }
             }
         } else {
-            req.cognitoUser = undefined;
+            req["cognitoUser"] = undefined;
         }
         next();
     };
 
     private jwtForBuyer = async (
-        req: any,
+        req: Request,
         res: Response,
         next: NextFunction
     ): Promise<void> => {
-        const buyer = req.session.buyer;
+        const buyer = req.session?.buyer;
         const token = buyer?.idToken;
         if (token) {
-            const expiresAt = parseInt(req.session.expiresIn);
+            const expiresAt = parseInt(req.session?.buyer?.expiresIn);
             const now = Date.now();
             // TODO: Refresh Token...
-            const { ok, error, data } = await decodeKeyForBuyer(token);
-            if (!ok && error) {
-                req.headers["x-jwt-b"] = error.code || "";
-            }
+            const { data } = await decodeKeyForBuyer(token);
+
             if (data) {
                 if (data["custom:_id"]) {
                     data._id = data["custom:_id"];
@@ -181,26 +198,31 @@ class App {
                     // 여기서 세팅 요망
                 }
                 // Raw Data임... DB에 있는 Cognito User 절대 아님
-                req.cognitoBuyer = data;
+                req["cognitoBuyer"] = data;
 
-                if (expiresAt - now <= 10 * ONE_MINUTE) {
-                    const rToken = (await UserModel.findUser(data))
+                if (expiresAt - now <= 15 * ONE_MINUTE) {
+                    const rToken = (await BuyerModel.findBuyer(data))
                         .refreshToken;
                     const { ok, data: result } = await refreshToken(
                         rToken,
-                        "SELLER"
+                        "BUYER"
                     );
                     if (ok && result) {
-                        req.session.seller = {
-                            idToken: result.idToken,
-                            expiresIn: result.expDate?.getTime(),
-                            accessToken: result.accessToken
-                        };
+                        if (req.session) {
+                            req.session.buyer = {
+                                idToken: result.idToken,
+                                expiresIn: result.expDate?.getTime(),
+                                accessToken: result.accessToken
+                            };
+                            req.session.save(err => {
+                                console.log("Session Saved!!");
+                            });
+                        }
                     }
                 }
             }
         } else {
-            req.cognitoBuyer = undefined;
+            req["cognitoBuyer"] = undefined;
         }
         next();
     };

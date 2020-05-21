@@ -37,7 +37,8 @@ export enum ERROR_CODES {
     DELETED_STORE = "DELETED_STORE",
     ITEM_VALIDATION_ERROR = "ITEM_VALIDATION_ERROR",
     UNEXIST_SMS_KEY = "UNEXIST_SMS_KEY",
-    ACCESS_DENY_STORE_GROUP = "ACCESS_DENY_STORE_GROUP"
+    ACCESS_DENY_STORE_GROUP = "ACCESS_DENY_STORE_GROUP",
+    FAIL_TO_SIGNOUT = "FAIL_TO_SIGNOUT"
 }
 
 export enum DayEnum {
@@ -51,3 +52,5 @@ export enum DayEnum {
 }
 
 export const DB_URI = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_CLUSTER}.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
+
+export const DEFAULT_STORE_COLOR = "#32297d";

@@ -34,9 +34,9 @@ enum SmsTriggerEvent {
     ITEM_CANCELED
     # 아이템 생성시 상점 주인에게 전송
     ITEM_CREATED_FOR_SELLER
-    # 아이템 업데이트시 전송
+    # (Deprecated) 아이템 업데이트시 전송
     ITEM_UPDATED
-    # 예약 상태 변경시 전송
+    # (Deprecated)예약 상태 변경시 전송
     ITEM_STATUS_CHANGED
 }
 

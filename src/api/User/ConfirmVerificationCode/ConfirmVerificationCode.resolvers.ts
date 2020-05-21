@@ -61,8 +61,7 @@ export const ConfirmVerificationCodeFunc = async (
 
         return {
             ok: true,
-            error: null,
-            data: null
+            error: null
         };
     } catch (error) {
         return await errorReturn(error);
