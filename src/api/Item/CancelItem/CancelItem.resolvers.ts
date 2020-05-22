@@ -93,7 +93,7 @@ export const deniedItems = async (
                 tags,
                 recWithReplSets: [
                     {
-                        receivers: [item.phoneNumber],
+                        receivers: [item.phoneNumber.replace("+82", "")],
                         replacementSets: await getReplacementSetsForItem(item)
                     }
                 ]

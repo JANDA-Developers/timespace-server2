@@ -109,43 +109,45 @@ const resolvers: Resolvers = {
                                     ERROR_CODES.UNEXIST_STORE
                                 );
                             }
-                            const itemStatus = item.status;
-                            const event: SmsTriggerEvent =
-                                itemStatus === "PENDING"
-                                    ? "ITEM_CREATED_PENDING"
-                                    : "ITEM_CREATED";
+                            const event: SmsTriggerEvent = "ITEM_CREATED";
 
                             const eventForSeller: SmsTriggerEvent =
                                 "ITEM_CREATED_FOR_SELLER";
 
+                            const myObject = await getReplacementSetsForItem(
+                                item
+                            );
+
                             // SMS 전송 => Buyer에게 전송
-                            SendSmsWithTriggerEvent({
+                            await SendSmsWithTriggerEvent({
                                 smsKey,
                                 event,
                                 tags,
                                 recWithReplSets: [
                                     {
-                                        receivers: [item.phoneNumber],
-                                        replacementSets: await getReplacementSetsForItem(
-                                            item
-                                        )
+                                        receivers: [
+                                            // 국가코드 제거하자 ㅜㅜ
+                                            item.phoneNumber.replace("+82", "")
+                                        ],
+                                        replacementSets: myObject
                                     }
                                 ]
                             });
 
                             if (store.manager.phoneNumber) {
-                                SendSmsWithTriggerEvent({
+                                await SendSmsWithTriggerEvent({
                                     smsKey,
                                     event: eventForSeller,
                                     tags,
                                     recWithReplSets: [
                                         {
                                             receivers: [
-                                                store.manager.phoneNumber
+                                                store.manager.phoneNumber.replace(
+                                                    "+82",
+                                                    ""
+                                                )
                                             ],
-                                            replacementSets: await getReplacementSetsForItem(
-                                                item
-                                            )
+                                            replacementSets: myObject
                                         }
                                     ]
                                 });

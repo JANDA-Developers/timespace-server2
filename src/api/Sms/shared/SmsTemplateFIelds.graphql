@@ -24,20 +24,14 @@ enum SmsTemplateKeyForItemUpsert {
 }
 
 enum SmsTriggerEvent {
-    # 아이템 생성시 전송
+    # [고객 - 예약] 고객에게 전송
     ITEM_CREATED
-    # 아이템 생성시 전송(Pending 상태인 경우)
-    ITEM_CREATED_PENDING
-    # 아이템이 허가되었을 때
-    ITEM_PERMITTED
-    # 아이템 취소시
-    ITEM_CANCELED
-    # 아이템 생성시 상점 주인에게 전송
+    # [고객 - 예약] 관리자에게 전송
     ITEM_CREATED_FOR_SELLER
-    # (Deprecated) 아이템 업데이트시 전송
-    ITEM_UPDATED
-    # (Deprecated)예약 상태 변경시 전송
-    ITEM_STATUS_CHANGED
+    # [관리자 - 예약 승인] 고객에게 전송
+    ITEM_PERMITTED
+    # [관리자 - 예약 거절] 고객에게 전송
+    ITEM_CANCELED
 }
 
 type SmsTemplateAttributeSets {

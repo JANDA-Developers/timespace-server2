@@ -82,6 +82,7 @@ const resolvers: Resolvers = {
                             }
                         });
 
+                        // 이게 무슨코드니 ㅜㅜ 과거의 나는 왜 이런코드를 짰는가...
                         const itemDeniedResult = await Promise.all(
                             duplItems.map(async i => {
                                 return await deniedItems(
@@ -120,7 +121,9 @@ const resolvers: Resolvers = {
                                 tags,
                                 recWithReplSets: [
                                     {
-                                        receivers: [item.phoneNumber],
+                                        receivers: [
+                                            item.phoneNumber.replace("+82", "")
+                                        ],
                                         replacementSets: await getReplacementSetsForItem(
                                             item
                                         )
