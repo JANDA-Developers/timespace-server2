@@ -40,9 +40,6 @@ const resolvers: Resolvers = {
             product: DocumentType<ProductCls>,
             { date, soldOut }
         ): Promise<ProductSchedules | null> => {
-            console.log({
-                dateFromSchedules: date
-            });
             const result = await product.getSchedulesByDate(
                 date,
                 soldOut === null ? undefined : soldOut

@@ -43,13 +43,18 @@ type ProductSegment {
 }
 
 type ProductScheduleInfo {
+    # 검색하고자 하는 일자가 영업하는날인지 true, false
     isOpenDate: Boolean!
+    # 검색 범위
     dateTimeRange: DateTimeRange!
+    # 단위. (Segment의 최소 interval을 말함.)
     unit: Int!
 }
 
 type ProductSchedules {
+    # 검색 정보
     info: ProductScheduleInfo!
+    # 검색 결과
     list: [ProductSegment!]
 }
 
