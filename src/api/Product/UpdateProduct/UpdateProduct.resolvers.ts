@@ -55,6 +55,7 @@ const resolvers: Resolvers = {
                             addImages,
                             deleteImages
                         } = updateProductParamInput;
+
                         if (deleteImages) {
                             const s3 = new S3();
                             const deleteResult = await s3
@@ -86,7 +87,6 @@ const resolvers: Resolvers = {
                             );
                         }
                         if (addImages) {
-                            stack.push(addImages);
                             for (const file of addImages) {
                                 const syncedFile = await file;
                                 // 해당 경로에 폴더 존재여부 확인 & 생성
@@ -99,7 +99,6 @@ const resolvers: Resolvers = {
                                 product.images.push(url);
                             }
                         }
-                        stack.push("after addImages..........................");
                         await product.save({
                             session
                         });

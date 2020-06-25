@@ -95,6 +95,7 @@ export class ItemCls extends BaseSchema implements ItemProps, ItemFuncs {
                 const key = new ObjectId(c.key);
                 return {
                     key,
+                    type: c.type,
                     label: c.label || "",
                     value: c.value
                 };
@@ -104,6 +105,7 @@ export class ItemCls extends BaseSchema implements ItemProps, ItemFuncs {
             return cf.map(c => {
                 return {
                     key: new ObjectId(c.key),
+                    type: c.type,
                     label: c.label || "",
                     value: c.value
                 };

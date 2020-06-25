@@ -1,6 +1,6 @@
 import { ONE_MINUTE, ONE_HOUR } from "./dateFuncs";
 import { ClientSession } from "mongoose";
-import { MongoError } from "mongodb";
+import { MongoError, ObjectId } from "mongodb";
 import { mongoose } from "@typegoose/typegoose";
 import { ApolloError } from "apollo-server";
 
@@ -67,4 +67,13 @@ export const checkType = <T>(value: any): value is T => {
 
 export const isExist = (v: any): v is undefined | null => {
     return v;
+};
+
+export const toObjectId = (v: any): v is ObjectId => {
+    try {
+        const temp = new ObjectId(v);
+        return !!temp;
+    } catch (error) {
+        return false;
+    }
 };

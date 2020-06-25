@@ -19,10 +19,10 @@ const resolvers: Resolvers = {
     Query: {
         GetItems: defaultResolver(
             privateResolver(
-                async (
-                    { parent, info, args, context: { req } },
-                    stack
-                ): Promise<GetItemsResponse> => {
+                async ({
+                    args,
+                    context: { req }
+                }): Promise<GetItemsResponse> => {
                     try {
                         const { cognitoUser } = req;
                         const user = await UserModel.findUser(cognitoUser);

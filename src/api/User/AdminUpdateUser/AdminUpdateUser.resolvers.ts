@@ -1,20 +1,22 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { ApolloError } from "apollo-server";
-import { mongoose, DocumentType } from "@typegoose/typegoose";
+import { mongoose } from "@typegoose/typegoose";
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
-import { AdminUpdateUserResponse, AdminUpdateUserInput } from "GraphType";
+import {
+    AdminUpdateUserResponse,
+    AdminUpdateUserInput,
+    UserRole
+} from "GraphType";
 import {
     defaultResolver,
     privateResolver
 } from "../../../utils/resolverFuncWrapper";
-import { ERROR_CODES } from "../../../types/values";
-import { UserModel, UserCls } from "../../../models/User";
+import { UserModel } from "../../../models/User";
 import CognitoIdentityServiceProvider, {
     AttributeType
 } from "aws-sdk/clients/cognitoidentityserviceprovider";
 import { CountryInfoModel } from "../../../models/CountryInfo";
-import { refreshToken } from "../../../utils/refreshToken";
+import { BuyerModel } from "../../../models/Buyer";
 
 export const AdminUpdateUserFunc = async ({
     args
@@ -25,10 +27,14 @@ export const AdminUpdateUserFunc = async ({
         // TODO: 참고...
         // https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_AdminUpdateUserAttributes.html
         const { param }: { param: AdminUpdateUserInput } = args;
-        const user = await UserModel.findBySub(param.userSub);
         const {
+            role,
             updateParam: { smsKey, phoneNumber, timezone, name }
         } = param;
+        const user: any =
+            role === "SELLER"
+                ? await UserModel.findBySub(param.userSub)
+                : await BuyerModel.findBySub(param.userSub);
         const attributes: AttributeType[] = [];
         if (phoneNumber) {
             const phoneNum = `${user.zoneinfo.callingCode}${phoneNumber}`;
@@ -59,7 +65,7 @@ export const AdminUpdateUserFunc = async ({
                 Value: name
             });
         }
-        if (smsKey) {
+        if (smsKey && role === "SELLER") {
             user.smsKey = smsKey;
             attributes.push({
                 Name: "custom:smsKey",
@@ -67,10 +73,10 @@ export const AdminUpdateUserFunc = async ({
             });
         }
         // Cognito 업데이트
-        await cognitoUserInfoUpdate(user.sub, attributes);
+        await cognitoUserInfoUpdate(user.sub, role, attributes);
 
         // 업데이트된 Cognito Token을 가져온다
-        const { idToken } = await refreshUserToken(user);
+        // const { idToken } = await refreshUserToken(user);
         await user.save({
             session
         });
@@ -79,7 +85,7 @@ export const AdminUpdateUserFunc = async ({
         return {
             ok: true,
             error: null,
-            data: idToken
+            data: ""
         };
     } catch (error) {
         return await errorReturn(error, session);
@@ -88,13 +94,17 @@ export const AdminUpdateUserFunc = async ({
 
 const cognitoUserInfoUpdate = async (
     sub: string,
+    role: UserRole,
     attributes: AttributeType[]
 ) => {
     const cognito = new CognitoIdentityServiceProvider();
     const cognitoUpdateResult = await cognito
         .adminUpdateUserAttributes({
             UserAttributes: attributes,
-            UserPoolId: process.env.COGNITO_POOL_ID || "",
+            UserPoolId:
+                (role === "SELLER"
+                    ? process.env.COGNITO_POOL_ID
+                    : process.env.COGNITO_POOL_ID_BUYER) || "",
             Username: sub
         })
         .promise();
@@ -103,18 +113,18 @@ const cognitoUserInfoUpdate = async (
     }
 };
 
-const refreshUserToken = async (user: DocumentType<UserCls>) => {
-    const refreshResult = await refreshToken(user.refreshToken, "SELLER");
-    if (!refreshResult.ok || !refreshResult.data) {
-        throw new ApolloError(
-            "Token Refresh 실패",
-            ERROR_CODES.TOKEN_REFRESH_FAIL
-        );
-    }
-    user.refreshToken = refreshResult.data.refreshToken;
-    user.refreshTokenLastUpdate = new Date();
-    return refreshResult.data;
-};
+// const refreshUserToken = async (user: DocumentType<UserCls>) => {
+//     const refreshResult = await refreshToken(user.refreshToken, "SELLER");
+//     if (!refreshResult.ok || !refreshResult.data) {
+//         throw new ApolloError(
+//             "Token Refresh 실패",
+//             ERROR_CODES.TOKEN_REFRESH_FAIL
+//         );
+//     }
+//     user.refreshToken = refreshResult.data.refreshToken;
+//     user.refreshTokenLastUpdate = new Date();
+//     return refreshResult.data;
+// };
 
 const resolvers: Resolvers = {
     Mutation: {
