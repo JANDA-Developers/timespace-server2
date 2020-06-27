@@ -1,0 +1,7 @@
+type Mutation {
+    StoreSignIn(email: String!, password: String!): StoreSignInResponse!
+}
+type StoreSignInResponse {
+    ok: Boolean!
+    error: Err
+}

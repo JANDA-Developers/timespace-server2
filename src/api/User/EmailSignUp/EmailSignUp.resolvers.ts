@@ -4,12 +4,10 @@ import { CognitoIdentityServiceProvider } from "aws-sdk";
 import { defaultResolver } from "../../../utils/resolverFuncWrapper";
 import { UserModel } from "../../../models/User";
 import { ObjectId } from "mongodb";
-import { CountryInfoModel } from "../../../models/CountryInfo";
-import { ApolloError } from "apollo-server";
 import { AttributeType } from "aws-sdk/clients/cognitoidentityserviceprovider";
 import { mongoose } from "@typegoose/typegoose";
 import { StoreGroupModel } from "../../../models/StoreGroup";
-import { errorReturn } from "../../../utils/utils";
+import { errorReturn, getCountryInfo } from "../../../utils/utils";
 import _ from "lodash";
 import { BuyerModel } from "../../../models/Buyer";
 
@@ -124,39 +122,6 @@ const resolvers: Resolvers = {
             }
         )
     }
-};
-
-const getCountryInfo = async (timezone: string) => {
-    const countryInfo = await CountryInfoModel.findOne({
-        "timezones.name": timezone
-    });
-
-    if (!countryInfo) {
-        throw new ApolloError(
-            "Timezone 설정이 잘못되었습니다.",
-            "UNDEFINED_COUNTRYINFO",
-            {
-                timezone
-            }
-        );
-    }
-
-    const tz = countryInfo.timezones.find(tz => tz.name === timezone);
-    if (!tz) {
-        throw new ApolloError(
-            `Timezone is falcy value ${tz}`,
-            "TIMEZONE_IS_FALCY"
-        );
-    }
-
-    const zoneinfo = {
-        name: countryInfo.countryName,
-        tz: tz.name,
-        code: countryInfo.countryCode,
-        offset: tz.offset,
-        callingCode: countryInfo.callingCode
-    };
-    return zoneinfo;
 };
 
 const makeUserAttributes = (

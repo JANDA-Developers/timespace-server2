@@ -48,6 +48,7 @@ class App {
                 credentials: true,
                 origin: [
                     "http://localhost:3000",
+                    "http://localhost:80",
                     "https://dev-ticket-yeulbep6p.stayjanda.cloud",
                     "https://space.stayjanda.cloud"
                 ]
@@ -75,6 +76,7 @@ class App {
                 credentials: true,
                 origin: [
                     "http://localhost:3000",
+                    "http://localhost",
                     "https://dev-ticket-yeulbep6p.stayjanda.cloud",
                     "https://space.stayjanda.cloud"
                 ]
@@ -90,12 +92,16 @@ class App {
                 saveUninitialized: false,
                 store: new MongoStore({
                     mongooseConnection: mongoose.connection
-                })
+                }),
+                cookie: {
+                    httpOnly: false
+                }
             })
         );
         this.useLogger();
         this.app.use(this.jwt);
         this.app.use(this.jwtForBuyer);
+        this.app.use(this.parseStoreCode);
     };
 
     private useLogger = (): void => {
@@ -123,7 +129,6 @@ class App {
         next: NextFunction
     ): Promise<void> => {
         const seller = req.session?.seller;
-        console.log({ seller });
         const token = seller?.idToken;
         if (token) {
             const expiresAt = parseInt(req.session?.seller?.expiresIn);
@@ -187,6 +192,7 @@ class App {
             const expiresAt = parseInt(req.session?.buyer?.expiresIn);
             const now = Date.now();
             // TODO: Refresh Token...
+            console.log({ buyer });
             const { data } = await decodeKeyForBuyer(token);
 
             if (data) {
@@ -224,6 +230,15 @@ class App {
         } else {
             req["cognitoBuyer"] = undefined;
         }
+        next();
+    };
+
+    private parseStoreCode = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ) => {
+        req["storeCode"] = req.get("storeCode");
         next();
     };
 }

@@ -1,0 +1,12 @@
+type StoreUser implements BaseModel {
+    _id: ID!
+    name: String!
+    password: String
+    email: String!
+    zoneinfo: Zoneinfo!
+    phoneNumber: String!
+    store: Store!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    expiresAt: DateTime
+}

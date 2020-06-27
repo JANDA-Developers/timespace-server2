@@ -1,0 +1,8 @@
+type Query {
+    StoreUserGetProfile: StoreUserGetProfileResponse!
+}
+type StoreUserGetProfileResponse {
+    ok: Boolean!
+    error: Err
+    data: StoreUser
+}

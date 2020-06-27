@@ -10,7 +10,8 @@ export enum ModelName {
     ZONE_INFO = "CountryInfoList",
     NOTIFICATION = "Notifications",
     PAYMETHOD = "PayMethodList",
-    PAYMENT_HISTORY = "PaymentHistory"
+    PAYMENT_HISTORY = "PaymentHistory",
+    STORE_USER = "StoreUser"
 }
 
 export const getCollectionName = (modelName: ModelName): string =>

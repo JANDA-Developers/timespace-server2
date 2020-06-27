@@ -4,6 +4,7 @@ import { StoreCls } from "../../../models/Store/Store";
 import { ProductModel } from "../../../models/Product/Product";
 import { UserModel } from "../../../models/User";
 import { StoreGroupModel } from "../../../models/StoreGroup";
+import { StoreUserModel } from "../../../models/StoreUser";
 
 const resolvers: Resolvers = {
     Store: {
@@ -47,6 +48,13 @@ const resolvers: Resolvers = {
                     ...c,
                     isMandatory: c.isMandatory || false
                 };
+            });
+        },
+        storeUsers: async (store: DocumentType<StoreCls>) => {
+            return StoreUserModel.find({
+                storeId: {
+                    $in: store._id
+                }
             });
         }
     }

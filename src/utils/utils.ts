@@ -3,6 +3,7 @@ import { ClientSession } from "mongoose";
 import { MongoError, ObjectId } from "mongodb";
 import { mongoose } from "@typegoose/typegoose";
 import { ApolloError } from "apollo-server";
+import { CountryInfoModel } from "../models/CountryInfo";
 
 export const getIP = (req: any): string[] => {
     const ips: string[] = (
@@ -76,4 +77,37 @@ export const toObjectId = (v: any): v is ObjectId => {
     } catch (error) {
         return false;
     }
+};
+
+export const getCountryInfo = async (timezone: string) => {
+    const countryInfo = await CountryInfoModel.findOne({
+        "timezones.name": timezone
+    });
+
+    if (!countryInfo) {
+        throw new ApolloError(
+            "Timezone 설정이 잘못되었습니다.",
+            "UNDEFINED_COUNTRYINFO",
+            {
+                timezone
+            }
+        );
+    }
+
+    const tz = countryInfo.timezones.find(tz => tz.name === timezone);
+    if (!tz) {
+        throw new ApolloError(
+            `Timezone is falcy value ${tz}`,
+            "TIMEZONE_IS_FALCY"
+        );
+    }
+
+    const zoneinfo = {
+        name: countryInfo.countryName,
+        tz: tz.name,
+        code: countryInfo.countryCode,
+        offset: tz.offset,
+        callingCode: countryInfo.callingCode
+    };
+    return zoneinfo;
 };

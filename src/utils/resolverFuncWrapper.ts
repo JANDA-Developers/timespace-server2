@@ -4,6 +4,7 @@ import { getIP, getLocalDate, errorReturn } from "./utils";
 import { ResolverFunction } from "../types/resolvers";
 import { BaseResponse } from "GraphType";
 import { ERROR_CODES } from "../types/values";
+import { StoreModel } from "../models/Store/Store";
 
 export const hexDecode = function(str) {
     var j;
@@ -143,6 +144,55 @@ export const privateResolverForBuyer = (
                 }
             );
         }
+        return await resolverFunction({ parent, args, context, info }, stack);
+    } catch (error) {
+        return await errorReturn(error);
+    }
+};
+
+export const privateResolverForStore = (
+    resolverFunction: ResolverFunction
+) => async (
+    { parent, args, context, info },
+    stack: any[]
+): Promise<BaseResponse & { data: any | null }> => {
+    try {
+        const storeCode: string | undefined = context.req.storeCode;
+        if (!storeCode) {
+            throw new ApolloError(
+                "존재하지 않는 StoreCode 입니다.",
+                ERROR_CODES.UNEXIST_STORE_CODE
+            );
+        }
+        const store = await StoreModel.findByCode(storeCode);
+        context.req.store = store;
+        return await resolverFunction({ parent, args, context, info }, stack);
+    } catch (error) {
+        return await errorReturn(error);
+    }
+};
+
+export const privateResolverForStoreUser = (
+    resolverFunction: ResolverFunction
+) => async (
+    { parent, args, context, info },
+    stack: any[]
+): Promise<BaseResponse & { data: any | null }> => {
+    try {
+        const storeCode: string | undefined = context.req.storeCode;
+        if (!storeCode) {
+            throw new ApolloError(
+                "존재하지 않는 StoreCode 입니다.",
+                ERROR_CODES.UNEXIST_STORE_CODE
+            );
+        }
+        console.log("privateResolverForStoreUser - ");
+        console.log({ storeCode });
+        console.log({
+            session: context.req.session?.storeUsers
+        });
+        const storeUser = context.req.session?.storeUsers?.[storeCode];
+        context.req.storeUser = storeUser;
         return await resolverFunction({ parent, args, context, info }, stack);
     } catch (error) {
         return await errorReturn(error);

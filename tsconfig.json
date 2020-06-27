@@ -2,8 +2,8 @@
     "compilerOptions": {
         "baseUrl": ".",
         "module": "CommonJS",
-        "target": "ES6",
-        "lib": ["ES7", "ESNext.AsyncIterable"],
+        "target": "ES2018",
+        "lib": ["ES2018", "ES6", "DOM", "ESNext.AsyncIterable"],
         "sourceMap": true,
         "allowJs": true,
         "moduleResolution": "Node",

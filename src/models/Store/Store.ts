@@ -241,8 +241,8 @@ export class StoreCls extends BaseSchema implements StoreProps, StoreFuncs {
         get(this: DocumentType<StoreCls>, cf: CustomField[]) {
             return cf.map(cf1 => {
                 return {
-                    key: new ObjectId(cf1.key),
                     ...cf1,
+                    key: new ObjectId(cf1.key),
                     isMandatory: cf1.isMandatory || false
                 };
             });

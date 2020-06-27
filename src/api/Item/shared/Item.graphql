@@ -1,8 +1,12 @@
 type Item implements BaseModel {
     _id: ID!
     store: Store
+    # 관리자 ID임..
     user: User!
+    # deprecated
     buyer: Buyer
+    # store에 종속된 User
+    storeUser: StoreUser
     product: Product
     code: String!
     name: String!
