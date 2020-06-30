@@ -4,7 +4,7 @@ import { ObjectId } from "mongodb";
 
 /**
  * YYYYMMDD-"HouseCode(6)"-"RandomCode(8)" => Legarcy
- * "ProductCode(11)"-"YM(3)Time(4)RandomCode32(2).toUpperCase()"
+ * "ProductCode(7)"-"YM(3)Time(4)RandomCode32(2).toUpperCase()"
  * @param productCode => houseNumGen을 통해 생성된 값임
  */
 export const genItemCode = (productCode: string, date = new Date()): string => {

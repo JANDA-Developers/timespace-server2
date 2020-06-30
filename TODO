@@ -1,89 +1,14 @@
-DevOps: 
-  Test Scenario:
-    User:
-      ✔ SignUp @done(20-02-27 04:45)
-      ☐ Verification
-      ✔ SignIn @done(20-02-27 04:45)
-      ✔ DeleteUser @done(20-02-27 04:45)
-    Group:
-      ☐ CreateStoreGroup
-      ☐ DeleteStoreGroup
-      ☐ UpdateStoreGroup
-      ☐ CreateProductGroup
-      ☐ DeleteProductGroup
-      ☐ UpdateProductGroup
-    Store:
-      ✔ CreateStore @done(20-02-27 04:45)
-      ☐ UpdateStore
-      ☐ DeleteStore
-    Product:
-      ☐ CreateProduct
-        # 힝 ㅜㅜ
-      ☐ UpdateProduct
-      ☐ DeleteProduct
-    Item:
-      ☐ CreateItem
-      ☐ CreateItemForBuyer
-      ☐ UpdateItem
-      ☐ CancelItem
-      ☐ CancelItemForBuyer
-      ☐ PermitItem
-      ☐ DeleteItem
-      ☐ GetItemsForBuyer
-      ☐ GetItems
-      ☐ GetItemById
-      ☐ GetItemForBuyer
-
-User Flow:
-  User Funcs: 
-    ☐ @today AuthorizeCodeSignIn => axios로 ~/oauth2/token 요청 ㄱㄱ 
-      # https://docs.aws.amazon.com/ko_kr/cognito/latest/developerguide/token-endpoint.html
-      # Client 에서 RefreshToken을 가지고 있다가 UpdateUser메서드에 추가해줘야함. 
-    ✔ AdminUpdateUser & UpdateUser @started(20-03-02 00:45) @done(20-03-02 02:11) @lasted(1h26m13s)
-      # https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_AdminUpdateUserAttributes.html
-    ☐ ChangePassword
-      # https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_ChangePassword.html
-    ☐ After Google Auth, Must set mandatory datas
-      # @file:///C:\dev\jd-ticket-api\src\app.ts#99:38
-  Commons:
-    Pagination:
-      ☐ Read articles about Cursor Base Pagination
-        # https://graphql.org/learn/global-object-identification/
-      ☐ Make it!
-  
-  Google Sign In:
-    ✔ Apply Custom Domain. @done(20-03-01 13:02)
-      # If use google login, the user redirect to our custom sementicURL with some variables. 
-      # So, We intercept that values and add them in Cognito UserPool or make Error
-    ✔ [CustomDomain] Email Auth URL @done(20-03-01 13:02)
-    ✔ [CustomDomain] Google Login Problem @done(20-03-01 13:02)
-  Email Problems:
-    ☐ @high Resend Email to SignUp User
-    ☐ @high Redirect user to Login page When they do email confirm 
-
-SMS Module:
-  SmsTrigger:
-    ✔ SendTarget is not reflected. Let's do it! @done(20-04-23 14:52)
-  SmsSender: 
-    ✔ Documantary Evidences submit problem. Nothing devloped. Try it. @done(20-04-23 14:53)
-
-Schemas: 
-  Notification: 
-    ☐ Make structure about Notification. (Work Flow, Schema, Interfaces)
-  
-Archive:
-  ✔ Let's study about cognito @done(20-02-15 19:20) @project(User Flow.About Cognito)
-  ✔ SignUp @done(20-02-15 19:20) @project(User Flow.Sign Up / In)
-  ✔ SignIn @done(20-02-15 19:20) @project(User Flow.Sign Up / In)
-  ✔ Testing @done(20-02-15 19:20) @project(User Flow.Sign Up / In)
-  ✔ Intergrate with google @done(20-02-25 17:55) @project(User Flow.Google Sign In)
-  ✔ BusinessHours, PeriodOption Validation @done(20-02-21 18:58) @project(Schemas.Product)
-    # Validation
-  ✔ Need Interface For ItemIsAbleToBuy @done(20-02-21 18:58) @project(Schemas.Product)
-    # Validate with PeriodOption & DateRange
-  ✔ total item count @done(20-02-25 15:06) @project(Schemas.Product)
-    # 총 이용 수 및 총 판매 금액
-  ✔ PermitItem @high @started(20-02-24 12:13) @done(20-02-24 16:14) @lasted(4h1m15s) @project(Schemas.Item)
-    # Write Permit `Date` and `User` to Item DB
-  ✔ CancelItem @high @started(20-02-24 12:12) @done(20-02-24 16:13) @lasted(4h1m57s) @project(Schemas.Item)
-    # Change Item.status to `CANCELED`
+MyTodos: 
+  Migrate buyer to storeUser:
+    ☐ GetItemForBuyer
+    ☐ GetItemsForBuyer
+    ☐ GetProductsForBuyer
+    ☐ GetStoreForBuyer
+    ☐ AuthorizeCodeSignInForBuyer
+    ☐ GetMyProfileForBuyer
+    ☐ CancelItemForBuyer
+    ☐ CreateItemForBuyer
+    ☐ ChangePasswordForBuyer
+    ☐ EmailSignInBuyer
+    ☐ EmailSignUpForBuyer
+    ☐ UpdateMyProfileForBuyer

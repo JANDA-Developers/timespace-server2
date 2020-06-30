@@ -61,7 +61,7 @@ const validateParam = (param: ChangePasswordInput) => {
     if (newPw !== newPwRe) {
         throw new ApolloError(
             "새 패스워드가 서로 일치하지 않습니다.",
-            ERROR_CODES.NEW_PASSWORD_COMPARE_ERROR
+            ERROR_CODES.PASSWORD_COMPARE_ERROR
         );
     }
 };

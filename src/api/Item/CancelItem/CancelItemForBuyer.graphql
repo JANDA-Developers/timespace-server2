@@ -1,4 +1,5 @@
 type Mutation {
+    # deprecated
     CancelItemForBuyer(
         param: CancelItemForBuyerInput!
     ): CancelItemForBuyerResponse!

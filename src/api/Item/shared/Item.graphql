@@ -17,7 +17,7 @@ type Item implements BaseModel {
     dateTimeRange: DateTimeRange
     permissionInfo: ItemPermissionInfo
     customFieldValues: [CustomFieldValue!]
-    agreeWithPrivacyPolicy: AgreeWithPrivacyPolicy!
+    # agreeWithPrivacyPolicy: AgreeWithPrivacyPolicy!
     orderCount: Int!
     createdAt: DateTime!
     updatedAt: DateTime!

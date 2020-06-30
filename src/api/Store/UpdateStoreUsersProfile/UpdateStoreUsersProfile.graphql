@@ -1,0 +1,14 @@
+type Mutation {
+    UpdateStoreUsersProfile(
+        password: String!
+        param: UpdateStoreUsersProfileInput!
+    ): UpdateStoreUsersProfileResponse!
+}
+type UpdateStoreUsersProfileResponse {
+    ok: Boolean!
+    error: Err
+}
+input UpdateStoreUsersProfileInput {
+    name: String
+    timezone: String
+}

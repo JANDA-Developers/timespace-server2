@@ -1,7 +1,7 @@
 import { mongoose, DocumentType } from "@typegoose/typegoose";
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
-import { StoreSignUpResponse, StoreSignUpMutationArgs } from "GraphType";
+import { SignUpStoreResponse, SignUpStoreMutationArgs } from "GraphType";
 import {
     defaultResolver,
     privateResolverForStore
@@ -9,17 +9,17 @@ import {
 import { StoreCls } from "../../../models/Store/Store";
 import { StoreUserModel } from "../../../models/StoreUser";
 
-export const StoreSignUpFunc = async ({
+export const SignUpStoreFunc = async ({
     args,
     context: { req }
-}): Promise<StoreSignUpResponse> => {
+}): Promise<SignUpStoreResponse> => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
         const { store }: { store: DocumentType<StoreCls> } = req;
         const {
             param: { timezone, phoneNumber, email, ...param }
-        } = args as StoreSignUpMutationArgs;
+        } = args as SignUpStoreMutationArgs;
         const storeUser = new StoreUserModel(param);
         storeUser.setPhoneNumber(phoneNumber);
         storeUser.setEmail(email);
@@ -43,7 +43,7 @@ export const StoreSignUpFunc = async ({
 
 const resolvers: Resolvers = {
     Mutation: {
-        StoreSignUp: defaultResolver(privateResolverForStore(StoreSignUpFunc))
+        SignUpStore: defaultResolver(privateResolverForStore(SignUpStoreFunc))
     }
 };
 export default resolvers;

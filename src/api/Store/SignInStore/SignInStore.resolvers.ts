@@ -2,7 +2,7 @@ import { ApolloError } from "apollo-server";
 import { DocumentType } from "@typegoose/typegoose";
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
-import { StoreSignInResponse, StoreSignInMutationArgs } from "GraphType";
+import { SignInStoreResponse, SignInStoreMutationArgs } from "GraphType";
 import {
     defaultResolver,
     privateResolverForStore
@@ -15,15 +15,15 @@ import { ObjectId } from "mongodb";
 import { decodeKeyForBuyer } from "../../../utils/decodeIdToken";
 import { BuyerModel, BuyerCls } from "../../../models/Buyer";
 
-export const StoreSignInMainFunc = async ({
+export const SignInStoreMainFunc = async ({
     args,
     context: { req }
-}): Promise<StoreSignInResponse> => {
+}): Promise<SignInStoreResponse> => {
     try {
         const { store }: { store: DocumentType<StoreCls> } = req;
         const storeId = store._id;
         const storeCode = store.code;
-        const { email, password } = args as StoreSignInMutationArgs;
+        const { email, password } = args as SignInStoreMutationArgs;
 
         const storeUser = await StoreUserModel.findOne({
             storeId,
@@ -132,11 +132,12 @@ const migrateBuyerToStoreUser = async (
         ...storeInfo,
         ...accountInfo
     });
+    storeUser.buyerSub = buyer.sub;
     const zoneinfo = buyer.zoneinfo;
     if (typeof zoneinfo === "string") {
-        storeUser.setZoneinfo(JSON.parse(zoneinfo).tz);
+        await storeUser.setZoneinfo(JSON.parse(zoneinfo).tz);
     } else {
-        storeUser.setZoneinfo(zoneinfo.tz);
+        await storeUser.setZoneinfo(zoneinfo.tz);
     }
     // name, password, email, zoneinfo, phoneNumber, storeid, storeCode, verifiedPhoneNumber;
     await storeUser.hashPassword();
@@ -165,8 +166,8 @@ const setSessionData = (
 
 const resolvers: Resolvers = {
     Mutation: {
-        StoreSignIn: defaultResolver(
-            privateResolverForStore(StoreSignInMainFunc)
+        SignInStore: defaultResolver(
+            privateResolverForStore(SignInStoreMainFunc)
         )
     }
 };

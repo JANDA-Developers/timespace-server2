@@ -1,0 +1,8 @@
+type Query {
+    GetProductsForPublic: GetProductsForPublicResponse!
+}
+type GetProductsForPublicResponse {
+    ok: Boolean!
+    error: Err
+    data: [Product!]
+}

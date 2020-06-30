@@ -5,6 +5,8 @@ import { ResolverFunction } from "../types/resolvers";
 import { BaseResponse } from "GraphType";
 import { ERROR_CODES } from "../types/values";
 import { StoreModel } from "../models/Store/Store";
+import { StoreUserModel } from "../models/StoreUser";
+import { ObjectId } from "mongodb";
 
 export const hexDecode = function(str) {
     var j;
@@ -166,6 +168,12 @@ export const privateResolverForStore = (
         }
         const store = await StoreModel.findByCode(storeCode);
         context.req.store = store;
+        if (!store) {
+            throw new ApolloError(
+                "store 인증 에러",
+                ERROR_CODES.UNEXIST_STORE_CODE
+            );
+        }
         return await resolverFunction({ parent, args, context, info }, stack);
     } catch (error) {
         return await errorReturn(error);
@@ -186,13 +194,34 @@ export const privateResolverForStoreUser = (
                 ERROR_CODES.UNEXIST_STORE_CODE
             );
         }
-        console.log("privateResolverForStoreUser - ");
-        console.log({ storeCode });
-        console.log({
-            session: context.req.session?.storeUsers
-        });
         const storeUser = context.req.session?.storeUsers?.[storeCode];
-        context.req.storeUser = storeUser;
+        if (!storeUser) {
+            throw new ApolloError(
+                "인증되지 않았습니다.",
+                ERROR_CODES.UNAUTHORIZED_USER
+            );
+        }
+        // update여부 체크 ㄱㄱ
+        const updatedStoreUser = await StoreUserModel.findOne({
+            _id: new ObjectId(storeUser._id),
+            updatedAt: {
+                $gt: new Date(storeUser.updatedAt)
+            }
+        }).exec();
+        if (updatedStoreUser) {
+            context.req.session.storeUsers[
+                storeCode
+            ] = updatedStoreUser.toObject();
+            context.req.session.save((err: any) => {
+                if (err) {
+                    throw new err();
+                }
+            });
+            context.req.storeUser = updatedStoreUser.toObject();
+        } else {
+            context.req.storeUser = storeUser;
+        }
+
         return await resolverFunction({ parent, args, context, info }, stack);
     } catch (error) {
         return await errorReturn(error);

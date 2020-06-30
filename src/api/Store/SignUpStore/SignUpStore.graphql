@@ -1,12 +1,12 @@
 type Mutation {
-    StoreSignUp(param: StoreSignUpInput!): StoreSignUpResponse!
+    SignUpStore(param: SignUpStoreInput!): SignUpStoreResponse!
 }
-type StoreSignUpResponse {
+type SignUpStoreResponse {
     ok: Boolean!
     error: Err
     data: StoreUser
 }
-input StoreSignUpInput {
+input SignUpStoreInput {
     name: String!
     password: String!
     email: String!

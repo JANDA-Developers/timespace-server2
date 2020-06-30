@@ -117,6 +117,9 @@ export class ItemCls extends BaseSchema implements ItemProps, ItemFuncs {
     @prop()
     phoneNumber: string;
 
+    @prop()
+    storeUserId: ObjectId;
+
     @prop({ default: "PENDING" })
     status: ItemStatus;
 
@@ -129,6 +132,20 @@ export class ItemCls extends BaseSchema implements ItemProps, ItemFuncs {
 
     @prop({ default: () => 1 })
     orderCount: number;
+
+    // 처음 예약시에 status set! => product.needToConfirm 설정값에 따라서 달라짐
+    async setStatusForDefault(this: DocumentType<ItemCls>) {
+        const product = await ProductModel.findById(this.productId);
+        if (!product) {
+            throw new Error("Product is undefined in ItemCls");
+        }
+        const needToConfirm = product.needToConfirm;
+        if (needToConfirm) {
+            this.status = "PENDING";
+        } else {
+            this.status = "PERMITTED";
+        }
+    }
 
     applyStatus(
         status: ItemStatus,

@@ -43,6 +43,9 @@ export class StoreUserCls extends BaseSchema {
     @prop({ required: true, defualt: () => false })
     verifiedEmail: boolean;
 
+    @prop()
+    buyerSub?: string;
+
     // 전화번호 변경시에도 이 함수 사용.
     setPhoneNumber(
         this: DocumentType<StoreUserCls>,

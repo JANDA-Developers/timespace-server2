@@ -11,6 +11,7 @@ import {
 import { ApolloError } from "apollo-server";
 import { ERROR_CODES } from "../../../types/values";
 import { BuyerModel } from "../../../models/Buyer";
+import { StoreUserModel } from "../../../models/StoreUser";
 
 const resolvers: Resolvers = {
     Item: {
@@ -50,6 +51,9 @@ const resolvers: Resolvers = {
                     value: f.value || ""
                 };
             });
+        },
+        storeUser: async (item: DocumentType<ItemCls>) => {
+            return await StoreUserModel.findById(item.storeUserId).exec();
         }
     },
     ItemStatusChanged: {

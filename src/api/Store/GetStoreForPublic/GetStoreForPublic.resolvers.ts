@@ -1,21 +1,21 @@
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
-import { StoreUserGetProfileResponse } from "GraphType";
+import { GetStoreForPublicResponse } from "GraphType";
 import {
     defaultResolver,
-    privateResolverForStoreUser
+    privateResolverForStore
 } from "../../../utils/resolverFuncWrapper";
 
-export const StoreUserGetProfileFunc = async (
-    { context: { req } },
+export const GetStoreForPublicFunc = async (
+    { parent, info, args, context: { req } },
     stack: any[]
-): Promise<StoreUserGetProfileResponse> => {
+): Promise<GetStoreForPublicResponse> => {
     try {
-        const { storeUser } = req;
+        const { store } = req;
         return {
             ok: true,
             error: null,
-            data: storeUser as any
+            data: store as any
         };
     } catch (error) {
         return await errorReturn(error);
@@ -24,8 +24,8 @@ export const StoreUserGetProfileFunc = async (
 
 const resolvers: Resolvers = {
     Query: {
-        StoreUserGetProfile: defaultResolver(
-            privateResolverForStoreUser(StoreUserGetProfileFunc)
+        GetStoreForPublic: defaultResolver(
+            privateResolverForStore(GetStoreForPublicFunc)
         )
     }
 };
