@@ -4,15 +4,18 @@ type Mutation {
         param: UpdateStoreGroupInput!
     ): UpdateStoreGroupResponse!
 }
+
 type UpdateStoreGroupResponse {
     ok: Boolean!
     error: Err
     data: StoreGroup
 }
+
 input UpdateStoreGroupInput {
     name: String
     description: String
     designConfig: StoreDesignConfigInput
+    guestUserConfig: StoreUserSignUpOptionInput
 }
 
 input StoreDesignConfigInput {

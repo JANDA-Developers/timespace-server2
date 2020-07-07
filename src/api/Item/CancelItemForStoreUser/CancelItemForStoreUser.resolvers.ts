@@ -20,6 +20,7 @@ import {
     getReplacementSetsForItem,
     SendSmsWithTriggerEvent
 } from "../../../models/Item/ItemFunctions";
+import { ProductModel } from "../../../models/Product/Product";
 
 export const CancelItemForStoreUserFunc = async (
     { parent, info, args, context: { req } },
@@ -48,8 +49,11 @@ export const CancelItemForStoreUserFunc = async (
             .save({ session });
 
         // 문자를 보내야 하는데... 문자를 보내려면 관리자의 smsKey를 알아야함. 이하 그 과정임.
-        const store = await StoreModel.findByCode(storeUser.storeCode);
-        const user = await UserModel.findById(store.userId);
+        const product = await ProductModel.findById(item.productId);
+        const store = product?.storeId
+            ? await StoreModel.findById(product.storeId)
+            : undefined;
+        const user = await UserModel.findById(store?.userId);
         if (!user) {
             throw new ApolloError(
                 "존재하지 않는 UserId",

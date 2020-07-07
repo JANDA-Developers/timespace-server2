@@ -7,6 +7,8 @@ import { ERROR_CODES } from "../types/values";
 import { StoreModel } from "../models/Store/Store";
 import { StoreUserModel } from "../models/StoreUser";
 import { ObjectId } from "mongodb";
+import { StoreGroupModel } from "../models/StoreGroup";
+import { convertStoreGroupCode } from "../models/helpers/helper";
 
 export const hexDecode = function(str) {
     var j;
@@ -152,27 +154,43 @@ export const privateResolverForBuyer = (
     }
 };
 
-export const privateResolverForStore = (
+export const privateResolverForStoreGroup = (
     resolverFunction: ResolverFunction
 ) => async (
     { parent, args, context, info },
     stack: any[]
 ): Promise<BaseResponse & { data: any | null }> => {
     try {
-        const storeCode: string | undefined = context.req.storeCode;
-        if (!storeCode) {
+        const storeGroupCode: string | undefined = context.req.sgcode;
+        const storeCode: string | undefined = context.req.scode;
+        if (!storeGroupCode && !storeCode) {
             throw new ApolloError(
-                "존재하지 않는 StoreCode 입니다.",
-                ERROR_CODES.UNEXIST_STORE_CODE
+                "인증 에러.",
+                ERROR_CODES.ACCESS_DENY_STORE_GROUP
             );
         }
-        const store = await StoreModel.findByCode(storeCode);
-        context.req.store = store;
-        if (!store) {
-            throw new ApolloError(
-                "store 인증 에러",
-                ERROR_CODES.UNEXIST_STORE_CODE
-            );
+        if (storeGroupCode) {
+            const storeGroup = await StoreGroupModel.findByCode(storeGroupCode);
+            console.log({
+                storeGroup
+            });
+            if (!storeGroup) {
+                throw new ApolloError(
+                    "StoreGroup 인증 에러",
+                    ERROR_CODES.UNEXIST_STORE_CODE
+                );
+            }
+            context.req.storeGroup = storeGroup;
+        }
+        if (storeCode) {
+            const store = await StoreModel.findByCode(storeCode);
+            if (!store) {
+                throw new ApolloError(
+                    "Store 인증 에러",
+                    ERROR_CODES.UNEXIST_STORE_CODE
+                );
+            }
+            context.req.store = store;
         }
         return await resolverFunction({ parent, args, context, info }, stack);
     } catch (error) {
@@ -187,14 +205,26 @@ export const privateResolverForStoreUser = (
     stack: any[]
 ): Promise<BaseResponse & { data: any | null }> => {
     try {
-        const storeCode: string | undefined = context.req.storeCode;
-        if (!storeCode) {
+        const sgcode: string | undefined = context.req.sgcode;
+        if (!sgcode) {
             throw new ApolloError(
-                "존재하지 않는 StoreCode 입니다.",
+                "StoreGroupCode가 입력되지 않았습니다.",
+                ERROR_CODES.INVALID_PARAMETERS
+            );
+        }
+
+        const data = await convertStoreGroupCode(sgcode);
+
+        if (!data) {
+            throw new ApolloError(
+                "존재하지 않는 StoreGroupCode 입니다",
                 ERROR_CODES.UNEXIST_STORE_CODE
             );
         }
-        const storeUser = context.req.session?.storeUsers?.[storeCode];
+
+        // scode를 이용하는 경우... session.storeUsers[scode] 로 접근한다
+        // 만약 sgcode, scode 둘다 있는 경우에는 scode를 우선으로 접근한다.
+        const storeUser = context.req.session?.storeGroupUsers?.[sgcode];
         if (!storeUser) {
             throw new ApolloError(
                 "인증되지 않았습니다.",
@@ -210,7 +240,7 @@ export const privateResolverForStoreUser = (
         }).exec();
         if (updatedStoreUser) {
             context.req.session.storeUsers[
-                storeCode
+                sgcode
             ] = updatedStoreUser.toObject();
             context.req.session.save((err: any) => {
                 if (err) {

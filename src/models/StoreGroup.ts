@@ -11,7 +11,11 @@ import { ERROR_CODES, DEFAULT_STORE_COLOR } from "../types/values";
 import { BaseGroup } from "../abs/BaseGroup";
 import { StoreCls, StoreModel } from "./Store/Store";
 import { ObjectId } from "mongodb";
-import { StoreGroupConfig } from "GraphType";
+import {
+    StoreGroupConfig,
+    StoreUserSignUpOption,
+    StoreDesignConfig
+} from "GraphType";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.GROUP)))
 export class StoreGroupCls extends BaseGroup<StoreCls> {
@@ -39,7 +43,6 @@ export class StoreGroupCls extends BaseGroup<StoreCls> {
                 ERROR_CODES.UNEXIST_GROUP
             );
         }
-        console.log(group);
         return group;
     }
 
@@ -69,6 +72,24 @@ export class StoreGroupCls extends BaseGroup<StoreCls> {
         } as StoreGroupConfig
     })
     config: StoreGroupConfig;
+
+    @prop({
+        default: {
+            color: DEFAULT_STORE_COLOR,
+            logo: null,
+            link: null
+        } as Partial<StoreDesignConfig>
+    })
+    designOption: StoreDesignConfig;
+
+    @prop({
+        default: {
+            acceptAnonymousUser: false,
+            signUpPermission: "AUTO",
+            userAccessRange: "STORE_GROUP"
+        } as Partial<StoreUserSignUpOption>
+    })
+    signUpOption: StoreUserSignUpOption;
 }
 
 export const StoreGroupModel = getModelForClass(StoreGroupCls);

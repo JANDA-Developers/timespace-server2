@@ -80,11 +80,10 @@ const createItem = async (
         );
     }
     const item = new ItemModel();
-    const storeId = storeUser.storeId;
     item.productId = product._id;
     item.name = usersInput.name || storeUser.name;
     item.phoneNumber = usersInput.phoneNumber || storeUser.phoneNumber;
-    item.storeId = storeId;
+    item.storeId = product.storeId;
     item.storeUserId = storeUser._id;
     // set DateTimeRange
     const { from, to } = dateTimeRange;
@@ -95,7 +94,10 @@ const createItem = async (
     };
 
     // await item.setStatusForDefault();
-    const store = await StoreModel.findByCode(storeUser.storeCode);
+    const store = await StoreModel.findById(product.storeId);
+    if (!store) {
+        throw new Error("존재하지 않는 Store");
+    }
     // HACK: 오류있을 가능성 오짐.
     item.customFieldValues = (await getItemsCustomFieldValues({
         customFields: usersInput.customFieldValues,

@@ -204,22 +204,14 @@ export class StoreCls extends BaseSchema implements StoreProps, StoreFuncs {
     @prop(propOptPeriodOption())
     periodOption: PeriodOption;
 
-    // getBussinessHoursToString(
-    //     this: DocumentType<StoreCls>
-    // ): { days: string; hours: string } {
-    //     // TODO: 영업시간 String으로 구하기
-    //     // 1. 겹치는 부분들 다 취합해서 Array<Period> 구하기
-    //     // 2. String으로 출력하기
-    //     // 어떻게 겹치는 부분을 구하지?
-    //     let result = "";
-    //     this.businessHours.forEach(item => {
-    //         const { days, start, end } = item;
-    //         const daysArr = "";
-    //     });
-    // }
-
     @prop(propOptIdsOption({ defualt: [] }))
     groupIds: ObjectId[];
+
+    @prop({
+        get: (id: any) => new ObjectId(id),
+        set: (id: any) => new ObjectId(id)
+    })
+    groupId: ObjectId;
 
     @prop()
     warning: string;

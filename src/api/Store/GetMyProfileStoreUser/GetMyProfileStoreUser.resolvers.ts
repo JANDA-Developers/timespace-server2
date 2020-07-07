@@ -1,14 +1,14 @@
 import { Resolvers } from "../../../types/resolvers";
-import { GetStoreUsersProfileResponse } from "GraphType";
+import { GetMyProfileStoreUserResponse } from "GraphType";
 import {
     defaultResolver,
     privateResolverForStoreUser
 } from "../../../utils/resolverFuncWrapper";
 
-export const GetStoreUsersProfileFunc = async (
+export const GetMyProfileStoreUserFunc = async (
     { context: { req } },
     stack: any[]
-): Promise<GetStoreUsersProfileResponse> => ({
+): Promise<GetMyProfileStoreUserResponse> => ({
     ok: true,
     error: null,
     data: req.storeUser
@@ -16,8 +16,8 @@ export const GetStoreUsersProfileFunc = async (
 
 const resolvers: Resolvers = {
     Query: {
-        GetStoreUsersProfile: defaultResolver(
-            privateResolverForStoreUser(GetStoreUsersProfileFunc)
+        GetMyProfileStoreUser: defaultResolver(
+            privateResolverForStoreUser(GetMyProfileStoreUserFunc)
         )
     }
 };

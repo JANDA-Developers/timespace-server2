@@ -3,7 +3,7 @@ import { Resolvers } from "../../../types/resolvers";
 import { GetProductsForPublicResponse } from "GraphType";
 import {
     defaultResolver,
-    privateResolverForStore
+    privateResolverForStoreGroup
 } from "../../../utils/resolverFuncWrapper";
 import { ProductModel } from "../../../models/Product/Product";
 
@@ -34,7 +34,7 @@ export const GetProductsForPublicFunc = async (
 const resolvers: Resolvers = {
     Query: {
         GetProductsForPublic: defaultResolver(
-            privateResolverForStore(GetProductsForPublicFunc)
+            privateResolverForStoreGroup(GetProductsForPublicFunc)
         )
     }
 };

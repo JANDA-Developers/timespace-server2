@@ -1,14 +1,14 @@
 MyTodos: 
   Migrate buyer to storeUser:
-    ☐ GetItemForBuyer
-    ☐ GetItemsForBuyer
-    ☐ GetProductsForBuyer
-    ☐ GetStoreForBuyer
-    ☐ AuthorizeCodeSignInForBuyer
-    ☐ GetMyProfileForBuyer
-    ☐ CancelItemForBuyer
-    ☐ CreateItemForBuyer
-    ☐ ChangePasswordForBuyer
-    ☐ EmailSignInBuyer
-    ☐ EmailSignUpForBuyer
-    ☐ UpdateMyProfileForBuyer
+    ✔ GetItemForBuyer          => GetItemForStoreUser @done(20-06-30 17:57)
+    ✔ GetItemsForBuyer         => GetItemsForStoreUser @done(20-06-30 17:57)
+    ✔ GetProductsForBuyer      => GetProductsForPublic @done(20-06-30 17:57)
+    ✔ GetStoreForBuyer         => GetStoreForPublic @done(20-06-30 17:57)
+    ✔ GetMyProfileForBuyer     => GetStoreUsersProfile @done(20-06-30 17:57)
+    ✔ CancelItemForBuyer       => CancelItemForStoreUser @done(20-06-30 17:57)
+    ✔ CreateItemForBuyer       => CreateItemForStoreUser @done(20-06-30 17:57)
+    ✔ ChangePasswordForBuyer   => ChangePasswordForStoreUser @done(20-06-30 17:57)
+    ✔ EmailSignInBuyer         => SignInStore @done(20-06-30 17:57)
+    ✔ EmailSignUpForBuyer      => SignUpStore @done(20-06-30 17:57)
+    ✔ UpdateMyProfileForBuyer  => UpdateStoreUsersProfile @done(20-06-30 17:57)
+    ✔ SignOut                  => SignOutStore @done(20-06-30 17:57)

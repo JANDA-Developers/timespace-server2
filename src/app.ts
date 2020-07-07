@@ -101,7 +101,7 @@ class App {
         this.useLogger();
         this.app.use(this.jwt);
         this.app.use(this.jwtForBuyer);
-        this.app.use(this.parseStoreCode);
+        this.app.use(this.parseStoreGroupCode);
     };
 
     private useLogger = (): void => {
@@ -233,12 +233,12 @@ class App {
         next();
     };
 
-    private parseStoreCode = async (
+    private parseStoreGroupCode = async (
         req: Request,
         res: Response,
         next: NextFunction
     ) => {
-        req["storeCode"] = req.get("storeCode");
+        req["sgcode"] = req.get("sgcode");
         next();
     };
 }

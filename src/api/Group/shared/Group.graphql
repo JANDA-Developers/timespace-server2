@@ -19,10 +19,40 @@ enum GroupType {
 
 type StoreGroupConfig {
     design: StoreDesignConfig!
+    guestSignUpOption: StoreUserSignUpOption!
 }
 
 type StoreDesignConfig {
     logo: String
     color: String
     link: String
+}
+
+type StoreUserSignUpOption {
+    # default: false
+    acceptAnonymousUser: Boolean!
+    # default: STORE_GROUP
+    userAccessRange: UserAccessRange!
+    # default: AUTO
+    signUpPermission: SignUpPermission!
+}
+
+input StoreUserSignUpOptionInput {
+    # default: false
+    acceptAnonymousUser: Boolean
+    # default: STORE_GROUP
+    userAccessRange: UserAccessRange
+    # default: AUTO
+    signUpPermission: SignUpPermission
+}
+
+enum UserAccessRange {
+    STORE_GROUP
+    STORE
+    NONE
+}
+
+enum SignUpPermission {
+    AUTO
+    MANUAL
 }

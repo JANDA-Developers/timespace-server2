@@ -11,6 +11,7 @@ import { Zoneinfo } from "../types/graph";
 import { ObjectId } from "mongodb";
 import { getCountryInfo } from "../utils/utils";
 import { StoreCls } from "./Store/Store";
+import { StoreGroupCls } from "./StoreGroup";
 
 const BCRYPT_ROUNDS = 10;
 
@@ -31,11 +32,21 @@ export class StoreUserCls extends BaseSchema {
     @prop()
     phoneNumber: string;
 
-    @prop({ required: true })
-    storeId: ObjectId;
+    @prop()
+    storeId?: ObjectId;
+
+    // StoreCode? StoreGroupCode?
+    @prop()
+    storeCode?: string;
 
     @prop({ required: true })
-    storeCode: string;
+    storeGroupCode: string;
+
+    @prop({ required: true })
+    storeGroupId: ObjectId;
+
+    @prop()
+    groupCode: string;
 
     @prop({ required: true, default: () => false })
     verifiedPhoneNumber: boolean;
@@ -89,6 +100,15 @@ export class StoreUserCls extends BaseSchema {
     ): DocumentType<StoreUserCls> {
         this.storeId = store._id;
         this.storeCode = store.code;
+        return this;
+    }
+
+    setStoreGroupCode(
+        this: DocumentType<StoreUserCls>,
+        storeGroup: DocumentType<StoreGroupCls>
+    ): DocumentType<StoreUserCls> {
+        this.storeGroupId = storeGroup._id;
+        this.storeGroupCode = storeGroup.code;
         return this;
     }
 

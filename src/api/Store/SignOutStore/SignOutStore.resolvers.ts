@@ -4,20 +4,26 @@ import { Resolvers } from "../../../types/resolvers";
 import { SignOutStoreResponse } from "GraphType";
 import {
     defaultResolver,
-    privateResolverForStore
+    privateResolverForStoreGroup
 } from "../../../utils/resolverFuncWrapper";
 import { StoreCls } from "../../../models/Store/Store";
+import { StoreGroupCls } from "../../../models/StoreGroup";
 
 export const SignOutStoreFunc = async (
     { parent, info, args, context: { req } },
     stack: any[]
 ): Promise<SignOutStoreResponse> => {
     try {
-        const { store }: { store: DocumentType<StoreCls> } = req;
-        const storeCode = store.code;
+        const {
+            storeGroup
+        }: {
+            store: DocumentType<StoreCls>;
+            storeGroup: DocumentType<StoreGroupCls>;
+        } = req;
+        const storeGroupCode = storeGroup.code;
 
-        if (req.session.storeUsers) {
-            req.session.storeUsers[storeCode] = undefined;
+        if (req.session.storeGroupUsers) {
+            req.session.storeGroupUsers[storeGroupCode] = undefined;
         }
         req.session.save(err => {
             if (err) {
@@ -36,7 +42,9 @@ export const SignOutStoreFunc = async (
 
 const resolvers: Resolvers = {
     Mutation: {
-        SignOutStore: defaultResolver(privateResolverForStore(SignOutStoreFunc))
+        SignOutStore: defaultResolver(
+            privateResolverForStoreGroup(SignOutStoreFunc)
+        )
     }
 };
 export default resolvers;

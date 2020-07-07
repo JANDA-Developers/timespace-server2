@@ -1,13 +1,19 @@
 import { mongoose, DocumentType } from "@typegoose/typegoose";
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
-import { SignUpStoreResponse, SignUpStoreMutationArgs } from "GraphType";
+import {
+    SignUpStoreResponse,
+    SignUpStoreMutationArgs,
+    SignUpStoreInput
+} from "GraphType";
 import {
     defaultResolver,
-    privateResolverForStore
+    privateResolverForStoreGroup
 } from "../../../utils/resolverFuncWrapper";
 import { StoreCls } from "../../../models/Store/Store";
-import { StoreUserModel } from "../../../models/StoreUser";
+import { StoreUserModel, StoreUserCls } from "../../../models/StoreUser";
+import { StoreGroupCls } from "../../../models/StoreGroup";
+import { isExistingStoreUser } from "../../../models/helpers/helper";
 
 export const SignUpStoreFunc = async ({
     args,
@@ -16,17 +22,18 @@ export const SignUpStoreFunc = async ({
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-        const { store }: { store: DocumentType<StoreCls> } = req;
+        // store 또는 storeGroup
         const {
-            param: { timezone, phoneNumber, email, ...param }
-        } = args as SignUpStoreMutationArgs;
-        const storeUser = new StoreUserModel(param);
-        storeUser.setPhoneNumber(phoneNumber);
-        storeUser.setEmail(email);
-        await storeUser.setZoneinfo(timezone);
-        storeUser.setStoreCode(store);
-        await storeUser.hashPassword();
+            store,
+            storeGroup
+        }: {
+            store?: DocumentType<StoreCls>;
+            storeGroup: DocumentType<StoreGroupCls>;
+        } = req;
+        const { param } = args as SignUpStoreMutationArgs;
+        await validateParams(args, storeGroup);
 
+        const storeUser = await createStoreUser(param, storeGroup, store);
         await storeUser.save({ session });
 
         await session.commitTransaction();
@@ -41,9 +48,35 @@ export const SignUpStoreFunc = async ({
     }
 };
 
+const validateParams = async (
+    args: SignUpStoreMutationArgs,
+    storeGroup: DocumentType<StoreGroupCls>
+) => {
+    await isExistingStoreUser(args.param.email, storeGroup.code);
+};
+
+const createStoreUser = async (
+    { email, timezone, phoneNumber, ...param }: SignUpStoreInput,
+    storeGroup: DocumentType<StoreGroupCls>,
+    store?: DocumentType<StoreCls>
+): Promise<DocumentType<StoreUserCls>> => {
+    const storeUser = new StoreUserModel(param);
+    storeUser.setPhoneNumber(phoneNumber);
+    storeUser.setEmail(email);
+    await storeUser.setZoneinfo(timezone);
+    storeUser.setStoreGroupCode(storeGroup);
+    if (store) {
+        storeUser.setStoreCode(store);
+    }
+    await storeUser.hashPassword();
+    return storeUser;
+};
+
 const resolvers: Resolvers = {
     Mutation: {
-        SignUpStore: defaultResolver(privateResolverForStore(SignUpStoreFunc))
+        SignUpStore: defaultResolver(
+            privateResolverForStoreGroup(SignUpStoreFunc)
+        )
     }
 };
 export default resolvers;

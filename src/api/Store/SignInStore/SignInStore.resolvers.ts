@@ -5,7 +5,7 @@ import { Resolvers } from "../../../types/resolvers";
 import { SignInStoreResponse, SignInStoreMutationArgs } from "GraphType";
 import {
     defaultResolver,
-    privateResolverForStore
+    privateResolverForStoreGroup
 } from "../../../utils/resolverFuncWrapper";
 import { ERROR_CODES } from "../../../types/values";
 import { StoreCls } from "../../../models/Store/Store";
@@ -14,26 +14,44 @@ import { CognitoIdentityServiceProvider } from "aws-sdk";
 import { ObjectId } from "mongodb";
 import { decodeKeyForBuyer } from "../../../utils/decodeIdToken";
 import { BuyerModel, BuyerCls } from "../../../models/Buyer";
+import { StoreGroupCls } from "../../../models/StoreGroup";
 
 export const SignInStoreMainFunc = async ({
     args,
     context: { req }
 }): Promise<SignInStoreResponse> => {
     try {
-        const { store }: { store: DocumentType<StoreCls> } = req;
-        const storeId = store._id;
-        const storeCode = store.code;
+        const {
+            store,
+            storeGroup
+        }: {
+            store?: DocumentType<StoreCls>;
+            storeGroup: DocumentType<StoreGroupCls>;
+        } = req;
+        const storeId = store?._id;
+        const storeCode = store?.code;
+        const storeGroupId = storeGroup._id;
+        const storeGroupCode = storeGroup.code;
+
         const { email, password } = args as SignInStoreMutationArgs;
 
+        if (storeGroup.signUpOption.userAccessRange === "STORE" && !store) {
+            throw new ApolloError(
+                "존재하지 않는 StoreCode.",
+                ERROR_CODES.UNEXIST_STORE_CODE
+            );
+        }
+
         const storeUser = await StoreUserModel.findOne({
-            storeId,
-            email
+            email,
+            storeGroupId,
+            storeGroupCode
         });
 
         if (storeUser) {
             // 만약에 storeUser == undefined 인 경우,
             await comparePasswordForStoreUser(storeUser, password);
-            setSessionData(req, storeUser, storeCode);
+            setSessionData(req, storeUser, storeGroupCode);
         } else {
             const buyer = await signInWithBuyerAccount(email, password);
             if (!buyer) {
@@ -51,13 +69,16 @@ export const SignInStoreMainFunc = async ({
                     },
                     {
                         storeCode,
-                        storeId
+                        storeId,
+                        storeGroupCode,
+                        storeGroupId
                     }
                 );
 
                 await migratedStoreUser.save();
 
-                setSessionData(req, migratedStoreUser, storeCode);
+                // 우선은 StoreGroupCode 위주로 되어있음.
+                setSessionData(req, migratedStoreUser, storeGroupCode);
             }
         }
         return {
@@ -68,7 +89,6 @@ export const SignInStoreMainFunc = async ({
         return await errorReturn(error);
     }
 };
-
 const comparePasswordForStoreUser = async (
     storeUser: DocumentType<StoreUserCls>,
     password: string
@@ -119,8 +139,10 @@ const migrateBuyerToStoreUser = async (
         password: string;
     },
     storeInfo: {
-        storeId: ObjectId;
-        storeCode: string;
+        storeId?: ObjectId;
+        storeCode?: string;
+        storeGroupId: ObjectId;
+        storeGroupCode: string;
     }
 ): Promise<DocumentType<StoreUserCls>> => {
     // FIXME: zoneInfo undefined문제 해결 ㄱㄱ
@@ -147,14 +169,14 @@ const migrateBuyerToStoreUser = async (
 const setSessionData = (
     req: any,
     storeUser: DocumentType<StoreUserCls>,
-    storeCode: string
+    storeGroupCode: string
 ) => {
-    if (!req.session.storeUsers) {
-        req.session.storeUsers = {
-            [storeCode]: storeUser.toObject()
+    if (!req.session.storeGroupUsers) {
+        req.session.storeGroupUsers = {
+            [storeGroupCode]: storeUser.toObject()
         };
     } else {
-        req.session.storeUsers[storeCode] = storeUser.toObject();
+        req.session.storeGroupUsers[storeGroupCode] = storeUser.toObject();
     }
 
     req.session.save((err: any) => {
@@ -167,7 +189,7 @@ const setSessionData = (
 const resolvers: Resolvers = {
     Mutation: {
         SignInStore: defaultResolver(
-            privateResolverForStore(SignInStoreMainFunc)
+            privateResolverForStoreGroup(SignInStoreMainFunc)
         )
     }
 };

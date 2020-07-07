@@ -9,6 +9,8 @@ type StoreGroup implements BaseGroup {
     tags: [String!]
     list: [Store!]
     config: StoreGroupConfig!
+    designOption: StoreDesignConfig!
+    signUpOption: StoreUserSignUpOption!
     createdAt: DateTime!
     updatedAt: DateTime!
     expiresAt: DateTime

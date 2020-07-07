@@ -1,4 +1,3 @@
-import { ApolloError } from "apollo-server";
 import { mongoose, DocumentType } from "@typegoose/typegoose";
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
@@ -7,37 +6,29 @@ import {
     defaultResolver,
     privateResolver
 } from "../../../utils/resolverFuncWrapper";
-import { ERROR_CODES } from "../../../types/values";
 import { StoreGroupCls, StoreGroupModel } from "../../../models/StoreGroup";
-import { ObjectId } from "mongodb";
+import { UserCls } from "../../../models/User";
+import { ERROR_CODES } from "../../../types/values";
+import { ApolloError } from "apollo-server";
 
 const resolvers: Resolvers = {
     Mutation: {
         UpdateStoreGroup: defaultResolver(
             privateResolver(
-                async (
-                    {
-                        parent,
-                        info,
-                        args: { param, groupCode },
-                        context: { req }
-                    },
-                    stack
-                ): Promise<UpdateStoreGroupResponse> => {
+                async ({
+                    args: { param, groupCode },
+                    context: { req }
+                }): Promise<UpdateStoreGroupResponse> => {
                     const session = await mongoose.startSession();
                     session.startTransaction();
                     try {
-                        const { cognitoUser } = req;
+                        const { user }: { user: DocumentType<UserCls> } = req;
                         const storeGroup: DocumentType<StoreGroupCls> = await StoreGroupModel.findByCode(
                             groupCode
                         );
-                        if (
-                            !new ObjectId(cognitoUser._id).equals(
-                                storeGroup._id
-                            )
-                        ) {
+                        if (!storeGroup.userId.equals(user._id)) {
                             throw new ApolloError(
-                                "업데이트 권한이 없습니다.",
+                                "해당 StoreGroup에 대한 접근권한이 없습니다.",
                                 ERROR_CODES.ACCESS_DENY_STORE_GROUP
                             );
                         }
@@ -63,7 +54,7 @@ const resolvers: Resolvers = {
 
 const setParamsToStoreGroupObject = (
     storeGroup: DocumentType<StoreGroupCls>,
-    { description, designConfig, name }: UpdateStoreGroupInput
+    { description, designConfig, name, guestUserConfig }: UpdateStoreGroupInput
 ) => {
     if (name) {
         storeGroup.name = name;
@@ -73,6 +64,22 @@ const setParamsToStoreGroupObject = (
     }
     if (designConfig) {
         storeGroup.config.design = designConfig;
+        storeGroup.designOption = designConfig;
+    }
+
+    if (guestUserConfig) {
+        if (guestUserConfig.acceptAnonymousUser) {
+            storeGroup.signUpOption.acceptAnonymousUser =
+                guestUserConfig.acceptAnonymousUser;
+        }
+        if (guestUserConfig.signUpPermission != null) {
+            storeGroup.signUpOption.signUpPermission =
+                guestUserConfig.signUpPermission;
+        }
+        if (guestUserConfig.userAccessRange) {
+            storeGroup.signUpOption.userAccessRange =
+                guestUserConfig.userAccessRange;
+        }
     }
 };
 export default resolvers;
