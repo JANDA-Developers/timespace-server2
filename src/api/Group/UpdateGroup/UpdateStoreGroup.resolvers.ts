@@ -10,6 +10,7 @@ import { StoreGroupCls, StoreGroupModel } from "../../../models/StoreGroup";
 import { UserCls } from "../../../models/User";
 import { ERROR_CODES } from "../../../types/values";
 import { ApolloError } from "apollo-server";
+import { uploadFile } from "../../../utils/s3Funcs";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -32,7 +33,11 @@ const resolvers: Resolvers = {
                                 ERROR_CODES.ACCESS_DENY_STORE_GROUP
                             );
                         }
-                        setParamsToStoreGroupObject(storeGroup, param);
+                        await setParamsToStoreGroupObject(
+                            storeGroup,
+                            param,
+                            user
+                        );
 
                         await storeGroup.save({ session });
 
@@ -52,9 +57,10 @@ const resolvers: Resolvers = {
     }
 };
 
-const setParamsToStoreGroupObject = (
+const setParamsToStoreGroupObject = async (
     storeGroup: DocumentType<StoreGroupCls>,
-    { description, designConfig, name, guestUserConfig }: UpdateStoreGroupInput
+    { description, designConfig, name, guestUserConfig }: UpdateStoreGroupInput,
+    user: DocumentType<UserCls>
 ) => {
     if (name) {
         storeGroup.name = name;
@@ -63,8 +69,20 @@ const setParamsToStoreGroupObject = (
         storeGroup.description = description;
     }
     if (designConfig) {
-        storeGroup.config.design = designConfig;
-        storeGroup.designOption = designConfig;
+        const { color, link, logo } = designConfig;
+        if (logo) {
+            const syncedLogo = await logo;
+            const { url } = await uploadFile(syncedLogo, {
+                dir: `${user.sub}/storegroup/${storeGroup.code}/design/logos/`
+            });
+            storeGroup.designOption.logo = storeGroup.config.design.logo = url;
+        }
+        if (color) {
+            storeGroup.designOption.color = storeGroup.config.design.color = color;
+        }
+        if (link) {
+            storeGroup.designOption.link = storeGroup.config.design.link = link;
+        }
     }
 
     if (guestUserConfig) {
