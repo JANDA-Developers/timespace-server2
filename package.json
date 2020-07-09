@@ -82,6 +82,7 @@
         "jwk-to-pem": "^2.0.3",
         "lodash": "^4.17.15",
         "merge-graphql-schemas": "^1.7.6",
+        "moment": "^2.27.0",
         "mongodb": "^3.5.9",
         "mongoose": "^5.9.20",
         "morgan": "^1.9.1",
