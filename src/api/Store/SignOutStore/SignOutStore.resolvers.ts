@@ -25,12 +25,14 @@ export const SignOutStoreFunc = async (
         if (req.session.storeGroupUsers) {
             req.session.storeGroupUsers[storeGroupCode] = undefined;
         }
+        console.time("signOutStore_1");
         req.session.save(err => {
             if (err) {
                 throw new err();
             }
         });
 
+        console.timeEnd("signOutStore_1");
         return {
             ok: true,
             error: null

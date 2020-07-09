@@ -116,7 +116,7 @@ export const createStoreFunc: ResolverFunction = async (
                     cognitoUser.phone_number,
                 isVerifiedPhoneNumber: false
             },
-            groupIds: [group._id],
+            groupId: group._id,
             customFields,
             bookingPolicy: bookingPolicy || {
                 limitFirstBooking: 0,

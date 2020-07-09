@@ -4,6 +4,7 @@ type Store implements BaseModel {
     name: String!
     code: String!
     groups: [StoreGroup!]
+    group: StoreGroup!
     type: StoreType!
     zoneinfo: Zoneinfo!
     description: String

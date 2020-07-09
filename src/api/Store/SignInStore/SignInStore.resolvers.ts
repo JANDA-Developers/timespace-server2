@@ -61,6 +61,15 @@ export const SignInStoreMainFunc = async ({
                 );
             }
             if (buyer) {
+                const storeUser = await StoreUserModel.findOne({
+                    email: buyer.email
+                }).exec();
+                if (storeUser) {
+                    throw new ApolloError(
+                        "ID 또는 Password를 확인해 주세요.",
+                        ERROR_CODES.UNEXIST_STORE_USER
+                    );
+                }
                 const migratedStoreUser = await migrateBuyerToStoreUser(
                     buyer,
                     {

@@ -3,8 +3,8 @@ import { mongoose } from "@typegoose/typegoose";
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
 import {
-    ChangeStoreUsersPasswordResponse,
-    ChangeStoreUsersPasswordMutationArgs
+    ChangePasswordStoreUserResponse,
+    ChangePasswordStoreUserMutationArgs
 } from "GraphType";
 import {
     defaultResolver,
@@ -13,10 +13,10 @@ import {
 import { ERROR_CODES } from "../../../types/values";
 import { StoreUserModel } from "../../../models/StoreUser";
 
-export const ChangeStoreUsersPasswordFunc = async (
-    { parent, info, args, context: { req } },
-    stack: any[]
-): Promise<ChangeStoreUsersPasswordResponse> => {
+export const ChangePasswordStoreUserFunc = async ({
+    args,
+    context: { req }
+}): Promise<ChangePasswordStoreUserResponse> => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
@@ -24,7 +24,7 @@ export const ChangeStoreUsersPasswordFunc = async (
         const {
             oldPassword,
             newPassword
-        } = args as ChangeStoreUsersPasswordMutationArgs;
+        } = args as ChangePasswordStoreUserMutationArgs;
         const storeUser = await StoreUserModel.findById(userDoc._id);
         if (!storeUser) {
             throw new Error("존재하지 않는 storeUser");
@@ -52,8 +52,8 @@ export const ChangeStoreUsersPasswordFunc = async (
 
 const resolvers: Resolvers = {
     Mutation: {
-        ChangeStoreUsersPassword: defaultResolver(
-            privateResolverForStoreUser(ChangeStoreUsersPasswordFunc)
+        ChangePasswordStoreUser: defaultResolver(
+            privateResolverForStoreUser(ChangePasswordStoreUserFunc)
         )
     }
 };

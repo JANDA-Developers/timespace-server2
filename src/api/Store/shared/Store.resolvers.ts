@@ -34,6 +34,13 @@ const resolvers: Resolvers = {
             });
             return groups;
         },
+        group: async (store: DocumentType<StoreCls>) => {
+            if (store.groupIds[0]) {
+                store.groupId = store.groupIds[0];
+                await store.save();
+            }
+            return StoreGroupModel.findById(store.groupId);
+        },
         bookingPolicy: (store: DocumentType<StoreCls>) => {
             return (
                 store.bookingPolicy || {

@@ -1,8 +1,15 @@
 type Query {
-    GetProductsForPublic: GetProductsForPublicResponse!
+    GetProductsForPublic(
+        filter: GetProductsForPublicFilter
+    ): GetProductsForPublicResponse!
 }
+
 type GetProductsForPublicResponse {
     ok: Boolean!
     error: Err
     data: [Product!]
+}
+
+input GetProductsForPublicFilter {
+    storeCodes: [String!]
 }

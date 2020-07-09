@@ -48,6 +48,7 @@ class App {
                 credentials: true,
                 origin: [
                     "http://localhost:3000",
+                    "http://localhost:3001",
                     "http://localhost:80",
                     "https://dev-ticket-yeulbep6p.stayjanda.cloud",
                     "https://space.stayjanda.cloud"
@@ -76,6 +77,7 @@ class App {
                 credentials: true,
                 origin: [
                     "http://localhost:3000",
+                    "http://localhost:3001",
                     "http://localhost",
                     "https://dev-ticket-yeulbep6p.stayjanda.cloud",
                     "https://space.stayjanda.cloud"

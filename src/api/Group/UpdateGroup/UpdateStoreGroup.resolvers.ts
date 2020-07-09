@@ -7,7 +7,6 @@ import {
     privateResolver
 } from "../../../utils/resolverFuncWrapper";
 import { StoreGroupCls, StoreGroupModel } from "../../../models/StoreGroup";
-import { UserCls } from "../../../models/User";
 import { ERROR_CODES } from "../../../types/values";
 import { ApolloError } from "apollo-server";
 import { uploadFile } from "../../../utils/s3Funcs";
@@ -23,11 +22,11 @@ const resolvers: Resolvers = {
                     const session = await mongoose.startSession();
                     session.startTransaction();
                     try {
-                        const { user }: { user: DocumentType<UserCls> } = req;
+                        const { cognitoUser } = req;
                         const storeGroup: DocumentType<StoreGroupCls> = await StoreGroupModel.findByCode(
                             groupCode
                         );
-                        if (!storeGroup.userId.equals(user._id)) {
+                        if (!storeGroup.userId.equals(cognitoUser._id)) {
                             throw new ApolloError(
                                 "해당 StoreGroup에 대한 접근권한이 없습니다.",
                                 ERROR_CODES.ACCESS_DENY_STORE_GROUP
@@ -36,7 +35,7 @@ const resolvers: Resolvers = {
                         await setParamsToStoreGroupObject(
                             storeGroup,
                             param,
-                            user
+                            cognitoUser
                         );
 
                         await storeGroup.save({ session });
@@ -60,7 +59,7 @@ const resolvers: Resolvers = {
 const setParamsToStoreGroupObject = async (
     storeGroup: DocumentType<StoreGroupCls>,
     { description, designConfig, name, guestUserConfig }: UpdateStoreGroupInput,
-    user: DocumentType<UserCls>
+    user: any
 ) => {
     if (name) {
         storeGroup.name = name;
