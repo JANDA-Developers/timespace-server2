@@ -9,9 +9,9 @@ export enum ModelName {
     ITEM_STATUS_CHANGE = "ItemStatusChangeHistory",
     ZONE_INFO = "CountryInfoList",
     NOTIFICATION = "Notifications",
-    PAYMETHOD = "PayMethodList",
     PAYMENT_HISTORY = "PaymentHistory",
-    STORE_USER = "StoreUser"
+    STORE_USER = "StoreUser",
+    TRANSACTION = "Transaction"
 }
 
 export const getCollectionName = (modelName: ModelName): string =>

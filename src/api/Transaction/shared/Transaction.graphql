@@ -1,0 +1,36 @@
+# 부산클라우드혁신센터에서 받은 노트 참조
+type Transaction {
+    _id: ID!
+    seller: User!
+    store: Store!
+    storeUser: StoreUser!
+    transactionItem: TransactionItem!
+    amount: Float!
+    paymethod: String!
+    history: [TransactionHistoryItem!]!
+    # 현재 결제 상태: default: PENDING
+    paymentStatus: PaymentStatus!
+    # 현재 환불 상태. default: NONE
+    refundStatus: RefundStatus!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    expiresAt: DateTime
+}
+
+type TransactionItem {
+    target: String!
+    payload: String!
+}
+
+enum PaymentStatus {
+    PENDING
+    DONE
+    CANCELED
+}
+
+enum RefundStatus {
+    NONE
+    PENDING
+    CANCELED
+    DONE
+}

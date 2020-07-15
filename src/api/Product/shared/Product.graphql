@@ -19,7 +19,13 @@ type Product implements BaseModel {
     # null이 출력되는 경우 해당 date값이 영업시간이 포함되지 않기 때문임.
     schedules(date: DateTime!, soldOut: Boolean): ProductSchedules
     bookingPolicy: BookingPolicy!
+    # 기본 예약 가격
+    defaultPrice: Float!
+    # 예약 Segment당 가격
+    segmentPrice: Float!
 
+    # 결제 사용 여부
+    usingPayment: Boolean!
     # 수용 가능 예약 수. 인원수가 될수도 있고 인원수가 아닌 예약한 팀의 수가 될수도 있고...
     capacity: Int
     # 수용 가능 성별 옵션

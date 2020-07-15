@@ -1,0 +1,14 @@
+type Mutation {
+    SetProductPrice(
+        productId: ID!
+        input: SetProductPriceInput!
+    ): SetProductPriceResponse!
+}
+type SetProductPriceResponse {
+    ok: Boolean!
+    error: Err
+}
+input SetProductPriceInput {
+    defaultPrice: Float
+    segmentPrice: Float
+}

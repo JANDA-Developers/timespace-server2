@@ -1,0 +1,29 @@
+type TransactionHistoryItem {
+    type: TrxHistoryItemType!
+    status: TrxHistoryItemStatus!
+    amount: Float!
+    currency: CurrencyCode!
+    date: DateTime!
+    # type = PAY, status: DONE 인 경우에 출력
+    payResult: NicepayPayResult
+    # type = REFUND, status: DONE 인 경우에 출력
+    refundResult: NicepayRefundResult
+}
+
+enum TrxHistoryItemType {
+    PAY
+    REFUND
+}
+
+enum TrxHistoryItemStatus {
+    PENDING
+    DONE
+    CANCELED
+}
+
+enum Paymethod {
+    CARD
+    BANK_TRANSFER
+    VBANK
+    BILLING
+}

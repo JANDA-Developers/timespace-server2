@@ -1,4 +1,0 @@
-type PayItem {
-    _id: ID!
-    payMethod: PayMethod!
-}

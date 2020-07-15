@@ -257,3 +257,18 @@ export const privateResolverForStoreUser = (
         return await errorReturn(error);
     }
 };
+
+export const privateResolverForInternalExec = (
+    resolverFunction: ResolverFunction
+) => async (
+    { parent, args, context, info },
+    stack: any[]
+): Promise<BaseResponse & { data: any | null }> => {
+    try {
+        // TODO: IP WriteList에 포함되는지 확인한다.
+
+        return await resolverFunction({ parent, args, context, info }, stack);
+    } catch (error) {
+        return await errorReturn(error);
+    }
+};

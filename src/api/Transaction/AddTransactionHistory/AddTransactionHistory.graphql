@@ -1,0 +1,16 @@
+type Mutation {
+    AddTransactionHistory(
+        transactionId: ID!
+        input: AddTransactionHistoryInput!
+    ): AddTransactionHistoryResponse!
+}
+type AddTransactionHistoryResponse {
+    ok: Boolean!
+    error: Err
+}
+input AddTransactionHistoryInput {
+    type: TrxHistoryItemType!
+    amount: Float!
+    currency: CurrencyCode
+    message: String
+}

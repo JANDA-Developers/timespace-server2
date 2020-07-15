@@ -51,7 +51,11 @@ class App {
                     "http://localhost:3001",
                     "http://localhost:80",
                     "https://dev-ticket-yeulbep6p.stayjanda.cloud",
-                    "https://space.stayjanda.cloud"
+                    "https://space.stayjanda.cloud",
+                    "http://192.168.10.8:3001",
+                    "http://192.168.10.8",
+                    "http://10.159.7.226:3000",
+                    "http://10.159.7.226"
                 ]
             },
             path,
@@ -80,7 +84,11 @@ class App {
                     "http://localhost:3001",
                     "http://localhost",
                     "https://dev-ticket-yeulbep6p.stayjanda.cloud",
-                    "https://space.stayjanda.cloud"
+                    "https://space.stayjanda.cloud",
+                    "http://192.168.10.8:3001",
+                    "http://192.168.10.8",
+                    "http://10.159.7.226:3000",
+                    "http://10.159.7.226"
                 ]
             })
         );

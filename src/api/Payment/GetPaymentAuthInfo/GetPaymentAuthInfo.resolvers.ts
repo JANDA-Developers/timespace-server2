@@ -4,10 +4,7 @@ import {
     GetPaymentAuthInfoResponse,
     GetPaymentAuthInfoQueryArgs
 } from "GraphType";
-import {
-    defaultResolver,
-    privateResolver
-} from "../../../utils/resolverFuncWrapper";
+import { defaultResolver } from "../../../utils/resolverFuncWrapper";
 import crypto from "crypto";
 import moment from "moment";
 
@@ -22,7 +19,6 @@ export const GetPaymentAuthInfoFunc = async ({
         const time = moment(date).format("YYYYMMDDHHmmss");
         const merchantId = process.env.NICEPAYMENT_MERCHANT_ID || "";
         const merchantKey = process.env.NICEPAYMENT_MERCHANT_KEY || "";
-        const mid = process.env.NICEPAYMENT_MID || "";
         const hash = crypto
             .createHash("sha256")
             .update(`${time}${merchantId}${amount}${merchantKey}`)
@@ -32,7 +28,7 @@ export const GetPaymentAuthInfoFunc = async ({
             ok: true,
             error: null,
             data: {
-                mid,
+                mid: merchantId,
                 hash,
                 date: time
             }
@@ -44,9 +40,7 @@ export const GetPaymentAuthInfoFunc = async ({
 
 const resolvers: Resolvers = {
     Query: {
-        GetPaymentAuthInfo: defaultResolver(
-            privateResolver(GetPaymentAuthInfoFunc)
-        )
+        GetPaymentAuthInfo: defaultResolver(GetPaymentAuthInfoFunc)
     }
 };
 export default resolvers;

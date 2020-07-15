@@ -12,14 +12,15 @@ import { ApolloError } from "apollo-server";
 import { ERROR_CODES } from "../../../types/values";
 import { BuyerModel } from "../../../models/Buyer";
 import { StoreUserModel } from "../../../models/StoreUser";
+import { TransactionModel } from "../../../models/Transaction/Transaction";
 
 const resolvers: Resolvers = {
     Item: {
         store: async (item: DocumentType<ItemCls>) => {
-            return await StoreModel.findById(item.storeId);
+            return StoreModel.findById(item.storeId);
         },
         product: async (item: DocumentType<ItemCls>) => {
-            return await ProductModel.findById(item.productId);
+            return ProductModel.findById(item.productId);
         },
         user: async (item: DocumentType<ItemCls>, args, { req }) => {
             const user = await UserModel.findById(item.userId);
@@ -53,7 +54,10 @@ const resolvers: Resolvers = {
             });
         },
         storeUser: async (item: DocumentType<ItemCls>) => {
-            return await StoreUserModel.findById(item.storeUserId).exec();
+            return StoreUserModel.findById(item.storeUserId).exec();
+        },
+        transaction: async (item: DocumentType<ItemCls>) => {
+            return TransactionModel.findById(item.transactionId).exec();
         }
     },
     ItemStatusChanged: {

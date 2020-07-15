@@ -17,6 +17,9 @@ type Item implements BaseModel {
     dateTimeRange: DateTimeRange
     permissionInfo: ItemPermissionInfo
     customFieldValues: [CustomFieldValue!]
+    # seller쪽에서 결제 사용여부가 NONE인 경우 해당 필드값 null 될수있음.
+    transaction: Transaction
+
     # agreeWithPrivacyPolicy: AgreeWithPrivacyPolicy!
     orderCount: Int!
     createdAt: DateTime!

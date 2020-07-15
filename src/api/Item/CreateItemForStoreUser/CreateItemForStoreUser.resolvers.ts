@@ -7,7 +7,8 @@ import {
     CreateItemForStoreUserMutationArgs,
     CreateItemForStoreUserInput,
     DateTimeRangeInput,
-    CustomFieldInput
+    CustomFieldInput,
+    SmsTriggerEvent
 } from "GraphType";
 import {
     defaultResolver,
@@ -24,6 +25,13 @@ import { CustomFieldCls } from "../../../types/types";
 import { ObjectId } from "mongodb";
 import { uploadFile } from "../../../utils/s3Funcs";
 import { StoreModel } from "../../../models/Store/Store";
+import { UserModel } from "../../../models/User";
+import {
+    SendSmsWithTriggerEvent,
+    getReplacementSetsForItem
+} from "../../../models/Item/ItemFunctions";
+import { createTransaction } from "../../../models/Transaction/transactionFuncs";
+import { TransactionCls } from "../../../models/Transaction/Transaction";
 
 export const CreateItemForStoreUserFunc = async ({
     args,
@@ -111,8 +119,66 @@ const createItem = async (
         .applyStatus(product.needToConfirm ? "PENDING" : "PERMITTED", {})
         .save({ session });
 
+    if (
+        product.usingPayment &&
+        (product.segmentPrice != 0 || product.defaultPrice != 0)
+    ) {
+        const transaction = setTransaction({
+            product,
+            item,
+            storeUser
+        });
+
+        await transaction.save({ session });
+        console.log({ transaction, _id: transaction._id });
+
+        item.transactionId = transaction._id;
+    }
+    // SMS 전송 ㄱㄱㄱ
+    await SendSmsForStoreUser(product, item);
+
     await item.save({ session });
     return item;
+};
+
+const setTransaction = ({
+    product,
+    item,
+    storeUser
+}: {
+    item: DocumentType<ItemCls>;
+    product: DocumentType<ProductCls>;
+    storeUser: DocumentType<StoreUserCls>;
+}): DocumentType<TransactionCls> => {
+    const {
+        defaultPrice,
+        segmentPrice,
+        periodOption: { unit }
+    } = product;
+    const {
+        dateTimeRange: { interval }
+    } = item;
+
+    // 아이템 수량
+    const itemCount = Math.floor(interval / unit);
+    const defaultCount = Math.floor(product.periodOption.min / unit);
+    const additionalCount = itemCount - defaultCount;
+    // 최종 아이템 가격
+    const amount =
+        defaultCount * (defaultPrice || segmentPrice) +
+        additionalCount * segmentPrice;
+    const transaction = createTransaction({
+        amount,
+        paymethod: "CARD",
+        productInfo: {
+            target: "PRODUCT",
+            payload: item._id
+        },
+        sellerId: product.userId,
+        storeId: product.storeId,
+        storeUserId: storeUser._id
+    });
+    return transaction;
 };
 
 const getItemsCustomFieldValues = async ({
@@ -207,6 +273,67 @@ const validateDateTimeRange = async (
                     segment: list
                 }
             );
+        }
+    }
+};
+
+const SendSmsForStoreUser = async (
+    product: DocumentType<ProductCls>,
+    item: DocumentType<ItemCls>
+) => {
+    const smsKey = (await UserModel.findById(product.userId))?.smsKey;
+    // trigger검색: Event & tags 검색(storeId)
+    if (smsKey && item.phoneNumber) {
+        // Send for buyer
+        const tags = [
+            {
+                key: "storeId",
+                value: item.storeId.toHexString()
+            }
+        ];
+        const store = await StoreModel.findById(item.storeId);
+        if (!store) {
+            throw new ApolloError(
+                "존재하지 않는 StoreId입니다...",
+                ERROR_CODES.UNEXIST_STORE
+            );
+        }
+        const event: SmsTriggerEvent = "ITEM_CREATED";
+
+        const eventForSeller: SmsTriggerEvent = "ITEM_CREATED_FOR_SELLER";
+
+        const myObject = await getReplacementSetsForItem(item);
+
+        // SMS 전송 => Buyer에게 전송
+        await SendSmsWithTriggerEvent({
+            smsKey,
+            event,
+            tags,
+            recWithReplSets: [
+                {
+                    receivers: [
+                        // 국가코드 제거하자 ㅜㅜ
+                        item.phoneNumber.replace("+82", "")
+                    ],
+                    replacementSets: myObject
+                }
+            ]
+        });
+
+        if (store.manager.phoneNumber) {
+            await SendSmsWithTriggerEvent({
+                smsKey,
+                event: eventForSeller,
+                tags,
+                recWithReplSets: [
+                    {
+                        receivers: [
+                            store.manager.phoneNumber.replace("+82", "")
+                        ],
+                        replacementSets: myObject
+                    }
+                ]
+            });
         }
     }
 };

@@ -79,6 +79,9 @@ export class ItemCls extends BaseSchema implements ItemProps, ItemFuncs {
     @prop()
     memo: string;
 
+    @prop()
+    transactionId?: ObjectId;
+
     async setCode(
         this: DocumentType<ItemCls>,
         productCode: string,

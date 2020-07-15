@@ -39,3 +39,9 @@ type Currency {
     name: String
     symbol: String
 }
+
+enum CurrencyCode {
+    KRW
+    USD
+    JPY
+}

@@ -102,6 +102,15 @@ export class ProductCls extends BaseSchema
     @prop({ default: () => false })
     usingCapacityOption: boolean;
 
+    @prop({ default: () => false })
+    usingPayment: boolean;
+
+    @prop({ default: () => 0 })
+    defaultPrice: number;
+
+    @prop({ default: () => 0 })
+    segmentPrice: number;
+
     /*
      ! =============================================================================================================================
      !
@@ -403,9 +412,6 @@ export class ProductCls extends BaseSchema
             date,
             this.periodOption.offset
         );
-        console.log({
-            dateTimeRange
-        });
         if (!dateTimeRange) {
             return {
                 info: {
@@ -423,9 +429,6 @@ export class ProductCls extends BaseSchema
             dateTimeRange,
             soldOut
         );
-        console.info({
-            itemExistsList
-        });
         const list = await Promise.all(
             itemExistsList.map(async o => {
                 return {

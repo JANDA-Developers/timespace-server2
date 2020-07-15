@@ -85,7 +85,13 @@ const resolvers: Resolvers = {
                                 .save({ session }),
                             await item.save({ session })
                         ]);
-
+                        /*
+                         * ========================================================================
+                         *
+                         *  SMS 전송 로직
+                         *
+                         * ========================================================================
+                         */
                         const smsKey = (
                             await UserModel.findById(product.userId).session(
                                 session

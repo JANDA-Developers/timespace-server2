@@ -90,13 +90,11 @@ const resolvers: Resolvers = {
                         );
                         await StoreGroupModel.updateMany(
                             {
-                                list: {
-                                    $in: store.groupIds
-                                }
+                                list: store.groupId
                             },
                             {
                                 $pull: {
-                                    list: store._id
+                                    list: new ObjectId(store._id)
                                 }
                             },
                             {
