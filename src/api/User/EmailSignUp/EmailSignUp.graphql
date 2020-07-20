@@ -17,6 +17,7 @@ input EmailSignUpInput {
     timezone: String!
     # SELLER, BUYER
     role: UserRole!
+    company: String
 }
 
 type EmailSignUpResult {

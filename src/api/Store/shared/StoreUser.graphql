@@ -5,6 +5,7 @@ type StoreUser implements BaseModel {
     email: String!
     zoneinfo: Zoneinfo!
     phoneNumber: String!
+    company: String
     store: Store
     storeGroup: StoreGroup!
     createdAt: DateTime!

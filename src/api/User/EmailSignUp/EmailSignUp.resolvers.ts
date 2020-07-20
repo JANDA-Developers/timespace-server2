@@ -42,7 +42,8 @@ const resolvers: Resolvers = {
                         password,
                         phoneNumber,
                         timezone,
-                        role
+                        role,
+                        company
                     } = param as EmailSignUpInput;
 
                     const zoneinfo = await getCountryInfo(timezone);
@@ -87,7 +88,8 @@ const resolvers: Resolvers = {
                             zoneinfo,
                             loginInfos: [],
                             roles: [role],
-                            role
+                            role,
+                            company
                         });
                         await buyer.save({
                             session

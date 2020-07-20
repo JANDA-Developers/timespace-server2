@@ -1,12 +1,13 @@
 # 부산클라우드혁신센터에서 받은 노트 참조
-type Transaction {
+type Transaction implements BaseModel {
     _id: ID!
     seller: User!
     store: Store!
     storeUser: StoreUser!
-    transactionItem: TransactionItem!
+    item: Item!
     amount: Float!
     paymethod: String!
+    currency: CurrencyCode!
     history: [TransactionHistoryItem!]!
     # 현재 결제 상태: default: PENDING
     paymentStatus: PaymentStatus!
@@ -23,6 +24,7 @@ type TransactionItem {
 }
 
 enum PaymentStatus {
+    NONE
     PENDING
     DONE
     CANCELED
@@ -33,4 +35,10 @@ enum RefundStatus {
     PENDING
     CANCELED
     DONE
+}
+
+type AmountInfo {
+    origin: Float!
+    paid: Float!
+    refunded: Float!
 }

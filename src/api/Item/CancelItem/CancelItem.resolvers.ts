@@ -21,7 +21,7 @@ import {
     getReplacementSetsForItem
 } from "../../../models/Item/ItemFunctions";
 
-export const deniedItems = async (
+export const denyItems = async (
     { args, context: { req } },
     stack: any[]
 ): Promise<CancelItemResponse> => {
@@ -113,7 +113,7 @@ export const deniedItems = async (
 };
 const resolvers: Resolvers = {
     Mutation: {
-        CancelItem: defaultResolver(privateResolver(deniedItems))
+        CancelItem: defaultResolver(privateResolver(denyItems))
     }
 };
 export default resolvers;

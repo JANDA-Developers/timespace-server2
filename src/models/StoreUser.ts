@@ -57,6 +57,9 @@ export class StoreUserCls extends BaseSchema {
     @prop()
     buyerSub?: string;
 
+    @prop()
+    company: string;
+
     // 전화번호 변경시에도 이 함수 사용.
     setPhoneNumber(
         this: DocumentType<StoreUserCls>,

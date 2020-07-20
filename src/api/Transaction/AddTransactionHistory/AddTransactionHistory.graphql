@@ -10,7 +10,11 @@ type AddTransactionHistoryResponse {
 }
 input AddTransactionHistoryInput {
     type: TrxHistoryItemType!
+    status: TrxHistoryItemStatus!
     amount: Float!
+    paymethod: Paymethod!
     currency: CurrencyCode
     message: String
+    nicepayPayResultInput: NicepayPayResultInput
+    nicepayRefundResultInput: NicepayRefundResultInput
 }

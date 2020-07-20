@@ -9,3 +9,8 @@ interface OffsetPagingData {
     pageInfo: PageInfo!
     data: [BaseModel!]!
 }
+
+input PagingInput {
+    rowCount: Int!
+    index: Int!
+}

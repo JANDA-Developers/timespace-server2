@@ -17,4 +17,5 @@ input CreateItemForStoreUserInput {
     gender: Gender
     customFieldValues: [CustomFieldInput!]
     privacyPolicyAgreement: Boolean
+    isExtended: Boolean
 }

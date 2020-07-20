@@ -19,9 +19,10 @@ import {
     TransactionModel
 } from "../../../models/Transaction/Transaction";
 import {
-    addPayTrxHistoryItem,
-    addCancelTrxHistoryItem,
-    addRefundTrxHistoryItem
+    setTransactionPayStatusToDone as setTransactionPayToDone,
+    setTransactionPayStatusToCanceled as setTransactionPayToCanceled,
+    setTransactionRefundStatusToPending as setTransactionRefundToPending,
+    setTransactionRefundStatusToDone as setTransactionRefundToDone
 } from "../../../models/Transaction/transactionFuncs";
 
 export const AddTransactionHistoryToItemFunc = async ({
@@ -38,7 +39,7 @@ export const AddTransactionHistoryToItemFunc = async ({
         const item = await getExistItem(itemId);
 
         const transaction = await getTransaction(item.transactionId);
-        addTransactionHistory(transaction, input);
+        setTransactionStatus(transaction, input);
 
         await transaction.save({ session });
         // TODO: transaction history 추가.
@@ -63,22 +64,41 @@ const getExistItem = async (itemId: string): Promise<DocumentType<ItemCls>> => {
     return item;
 };
 
-const addTransactionHistory = (
+const setTransactionStatus = (
     item: DocumentType<TransactionCls>,
     input: AddTransactionHistoryInput
 ): void => {
-    switch (input.type) {
+    const { type, status } = input;
+    switch (type) {
         case "PAY":
-            addPayTrxHistoryItem(item, {
-                amount: input.amount,
-                currency: input.currency || "KRW"
-            });
+            if (status === "DONE") {
+                if (!input.nicepayPayResultInput) {
+                    throw new Error("결제결과가 존재하지 않습니다. ");
+                }
+                setTransactionPayToDone(item, {
+                    ...input,
+                    currency: input.currency!!,
+                    payResultInput: input.nicepayPayResultInput
+                });
+            } else if (status === "CANCELED") {
+                setTransactionPayToCanceled(item, {
+                    ...input,
+                    currency: input.currency!!
+                });
+            }
             break;
         case "REFUND":
-            addRefundTrxHistoryItem(item, {
-                amount: input.amount,
-                currency: input.currency || "KRW"
-            });
+            if (status === "PENDING") {
+                setTransactionRefundToPending(item, {
+                    ...input,
+                    currency: input.currency!!
+                });
+            } else if (status === "DONE") {
+                setTransactionRefundToDone(item, {
+                    ...input,
+                    currency: input.currency!!
+                });
+            }
             break;
         default:
             throw new Error("TransactionHistoryItemTypeError");

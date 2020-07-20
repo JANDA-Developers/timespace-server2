@@ -6,7 +6,7 @@ import {
     PaymentStatus,
     RefundStatus,
     TransactionHistoryItem,
-    TransactionItem
+    AmountInfo
 } from "../../types/graph";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.TRANSACTION)))
@@ -24,10 +24,17 @@ export class TransactionCls extends BaseSchema {
     storeId: ObjectId;
 
     @prop()
-    transactionItem: TransactionItem;
+    itemId: ObjectId;
 
-    @prop()
-    amount: number;
+    @prop({
+        required: true,
+        default: {
+            origin: 0,
+            paid: 0,
+            refunded: 0
+        } as AmountInfo
+    })
+    amountInfo: AmountInfo;
 
     @prop({
         set: id => new ObjectId(id),
@@ -44,10 +51,10 @@ export class TransactionCls extends BaseSchema {
     @prop()
     history: TransactionHistoryItem[];
 
-    @prop()
+    @prop({ default: (): PaymentStatus => "NONE" })
     paymentStatus: PaymentStatus;
 
-    @prop()
+    @prop({ default: (): RefundStatus => "NONE" })
     refundStatus: RefundStatus;
 }
 

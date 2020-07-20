@@ -13,4 +13,5 @@ input SignUpStoreInput {
     phoneNumber: String!
     # default: KR
     timezone: String!
+    company: String
 }

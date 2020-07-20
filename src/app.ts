@@ -55,7 +55,9 @@ class App {
                     "http://192.168.10.8:3001",
                     "http://192.168.10.8",
                     "http://10.159.7.226:3000",
-                    "http://10.159.7.226"
+                    "http://10.159.7.226",
+                    "https://manager.space.stayjanda.cloud",
+                    "https://storeuser.space.stayjanda.cloud"
                 ]
             },
             path,
@@ -88,7 +90,9 @@ class App {
                     "http://192.168.10.8:3001",
                     "http://192.168.10.8",
                     "http://10.159.7.226:3000",
-                    "http://10.159.7.226"
+                    "http://10.159.7.226",
+                    "https://manager.space.stayjanda.cloud",
+                    "https://storeuser.space.stayjanda.cloud"
                 ]
             })
         );

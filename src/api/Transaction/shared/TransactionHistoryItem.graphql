@@ -3,6 +3,8 @@ type TransactionHistoryItem {
     status: TrxHistoryItemStatus!
     amount: Float!
     currency: CurrencyCode!
+    # 환불의 경우에도 마찬가지임. 카드로 결제하면 카드로 환불!
+    paymethod: Paymethod!
     date: DateTime!
     # type = PAY, status: DONE 인 경우에 출력
     payResult: NicepayPayResult
@@ -23,6 +25,8 @@ enum TrxHistoryItemStatus {
 
 enum Paymethod {
     CARD
+    # 현장결제같은 경우... ㅎㅎ
+    CASH
     BANK_TRANSFER
     VBANK
     BILLING

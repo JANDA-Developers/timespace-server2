@@ -15,7 +15,7 @@ import { ERROR_CODES } from "../../../types/values";
 import { ItemModel } from "../../../models/Item/Item";
 import { ObjectId } from "mongodb";
 import { ProductModel } from "../../../models/Product/Product";
-import { deniedItems } from "../CancelItem/CancelItem.resolvers";
+import { denyItems } from "../CancelItem/CancelItem.resolvers";
 import { UserModel } from "../../../models/User";
 import {
     SendSmsWithTriggerEvent,
@@ -72,10 +72,10 @@ const resolvers: Resolvers = {
 
                         const duplItems = await ItemModel.find({
                             "dateTimeRange.from": {
-                                $lt: item.dateTimeRange.to
+                                $lt: new Date(item.dateTimeRange.to)
                             },
                             "dateTimeRange.to": {
-                                $gt: item.dateTimeRange.from
+                                $gt: new Date(item.dateTimeRange.from)
                             },
                             expiresAt: {
                                 $exists: false
@@ -85,7 +85,7 @@ const resolvers: Resolvers = {
                         // 이게 무슨코드니 ㅜㅜ 과거의 나는 왜 이런코드를 짰는가...
                         const itemDeniedResult = await Promise.all(
                             duplItems.map(async i => {
-                                return await deniedItems(
+                                return await denyItems(
                                     {
                                         args: { itemId: i._id },
                                         context: { req }

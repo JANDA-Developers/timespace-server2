@@ -74,7 +74,8 @@ export const SignInStoreMainFunc = async ({
                     buyer,
                     {
                         email,
-                        password
+                        password,
+                        company: buyer.company
                     },
                     {
                         storeCode,
@@ -146,6 +147,7 @@ const migrateBuyerToStoreUser = async (
     accountInfo: {
         email: string;
         password: string;
+        company: string;
     },
     storeInfo: {
         storeId?: ObjectId;

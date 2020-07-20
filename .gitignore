@@ -12,3 +12,4 @@ logs
 *.uri.ts
 yarn.lock
 *.zip
+*.tar*

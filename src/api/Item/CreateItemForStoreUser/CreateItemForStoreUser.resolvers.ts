@@ -52,6 +52,11 @@ export const CreateItemForStoreUserFunc = async ({
         // product = undefined 인 경우 에러나면서 종료됨.
         const product = await ProductModel.findByCode(productCode);
 
+        console.log({
+            usingPayment: product.usingPayment,
+            product
+        });
+
         await validateDateTimeRange(product, dateTimeRange);
 
         const item = await createItem(
@@ -170,10 +175,7 @@ const setTransaction = ({
     const transaction = createTransaction({
         amount,
         paymethod: "CARD",
-        productInfo: {
-            target: "PRODUCT",
-            payload: item._id
-        },
+        itemId: item._id,
         sellerId: product.userId,
         storeId: product.storeId,
         storeUserId: storeUser._id

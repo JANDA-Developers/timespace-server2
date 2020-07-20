@@ -7,8 +7,9 @@ import { ERROR_CODES } from "../types/values";
 import { StoreModel } from "../models/Store/Store";
 import { StoreUserModel } from "../models/StoreUser";
 import { ObjectId } from "mongodb";
-import { StoreGroupModel } from "../models/StoreGroup";
+import { StoreGroupModel, StoreGroupCls } from "../models/StoreGroup";
 import { convertStoreGroupCode } from "../models/helpers/helper";
+import { DocumentType } from "@typegoose/typegoose";
 
 export const hexDecode = function(str) {
     var j;
@@ -225,7 +226,11 @@ export const privateResolverForStoreUser = (
         // scode를 이용하는 경우... session.storeUsers[scode] 로 접근한다
         // 만약 sgcode, scode 둘다 있는 경우에는 scode를 우선으로 접근한다.
         const storeUser = context.req.session?.storeGroupUsers?.[sgcode];
-        if (!storeUser) {
+        if (
+            !storeUser &&
+            (data as DocumentType<StoreGroupCls>).signUpOption
+                .acceptAnonymousUser !== true
+        ) {
             throw new ApolloError(
                 "인증되지 않았습니다.",
                 ERROR_CODES.UNAUTHORIZED_USER

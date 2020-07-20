@@ -4,6 +4,7 @@ import { DocumentType } from "@typegoose/typegoose";
 import { TransactionCls } from "../../../models/Transaction/Transaction";
 import { StoreModel } from "../../../models/Store/Store";
 import { StoreUserModel } from "../../../models/StoreUser";
+import { ItemModel } from "../../../models/Item/Item";
 
 const resolvers: Resolvers = {
     Transaction: {
@@ -17,6 +18,9 @@ const resolvers: Resolvers = {
         },
         storeUser: async (trx: DocumentType<TransactionCls>) => {
             return StoreUserModel.findById(trx.sellerId);
+        },
+        item: async (trx: DocumentType<TransactionCls>) => {
+            return ItemModel.findById(trx.itemId);
         }
     }
 };

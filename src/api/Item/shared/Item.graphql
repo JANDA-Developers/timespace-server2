@@ -3,8 +3,6 @@ type Item implements BaseModel {
     store: Store
     # 관리자 ID임..
     user: User!
-    # deprecated
-    buyer: Buyer
     # store에 종속된 User
     storeUser: StoreUser
     product: Product
@@ -19,7 +17,10 @@ type Item implements BaseModel {
     customFieldValues: [CustomFieldValue!]
     # seller쪽에서 결제 사용여부가 NONE인 경우 해당 필드값 null 될수있음.
     transaction: Transaction
+    isExtended: Boolean!
 
+    # deprecated
+    buyer: Buyer
     # agreeWithPrivacyPolicy: AgreeWithPrivacyPolicy!
     orderCount: Int!
     createdAt: DateTime!
