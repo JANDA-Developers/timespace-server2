@@ -25,7 +25,7 @@ import { uploadFile } from "../../../utils/s3Funcs";
 import {
     getReplacementSetsForItem,
     SendSmsWithTriggerEvent
-} from "../../../models/Item/ItemFunctions";
+} from "../../../models/Item/ItemSmsFunctions";
 import { UserModel } from "../../../models/User";
 
 const resolvers: Resolvers = {
@@ -56,12 +56,7 @@ const resolvers: Resolvers = {
                         }
 
                         // Item 생성
-                        const item = await createItem(
-                            product,
-                            buyer,
-                            param,
-                            stack
-                        );
+                        const item = await createItem(product, buyer, param);
 
                         // Item Validation ㄱㄱ
                         await validateDateTimerange(product, dateTimeRange);
@@ -179,8 +174,7 @@ const resolvers: Resolvers = {
 const createItem = async (
     product: DocumentType<ProductCls>,
     buyer: DocumentType<BuyerCls>,
-    param: CreateItemForBuyerInput,
-    stack: any[]
+    param: CreateItemForBuyerInput
 ): Promise<DocumentType<ItemCls>> => {
     const item = new ItemModel();
     if (param.dateTimeRange) {

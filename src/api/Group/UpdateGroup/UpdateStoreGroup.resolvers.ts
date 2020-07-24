@@ -89,10 +89,6 @@ const setParamsToStoreGroupObject = async (
             storeGroup.signUpOption.acceptAnonymousUser =
                 guestUserConfig.acceptAnonymousUser;
         }
-        if (guestUserConfig.signUpPermission != null) {
-            storeGroup.signUpOption.signUpPermission =
-                guestUserConfig.signUpPermission;
-        }
         if (guestUserConfig.userAccessRange) {
             storeGroup.signUpOption.userAccessRange =
                 guestUserConfig.userAccessRange;

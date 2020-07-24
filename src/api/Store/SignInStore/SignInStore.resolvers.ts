@@ -9,7 +9,10 @@ import {
 } from "../../../utils/resolverFuncWrapper";
 import { ERROR_CODES } from "../../../types/values";
 import { StoreCls } from "../../../models/Store/Store";
-import { StoreUserModel, StoreUserCls } from "../../../models/StoreUser";
+import {
+    StoreUserModel,
+    StoreUserCls
+} from "../../../models/StoreUser/StoreUser";
 import { CognitoIdentityServiceProvider } from "aws-sdk";
 import { ObjectId } from "mongodb";
 import { decodeKeyForBuyer } from "../../../utils/decodeIdToken";

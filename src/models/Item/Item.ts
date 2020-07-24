@@ -126,7 +126,7 @@ export class ItemCls extends BaseSchema implements ItemProps, ItemFuncs {
     @prop()
     storeUserId: ObjectId;
 
-    @prop({ default: "PENDING" })
+    @prop({ default: "PENDING" as ItemStatus })
     status: ItemStatus;
 
     @prop({

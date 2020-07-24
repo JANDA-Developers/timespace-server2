@@ -11,7 +11,10 @@ import {
     privateResolverForStoreGroup
 } from "../../../utils/resolverFuncWrapper";
 import { StoreCls } from "../../../models/Store/Store";
-import { StoreUserModel, StoreUserCls } from "../../../models/StoreUser";
+import {
+    StoreUserModel,
+    StoreUserCls
+} from "../../../models/StoreUser/StoreUser";
 import { StoreGroupCls } from "../../../models/StoreGroup";
 import { isExistingStoreUser } from "../../../models/helpers/helper";
 

@@ -5,13 +5,13 @@ import {
     prop,
     DocumentType
 } from "@typegoose/typegoose";
-import { getCollectionName, ModelName } from "./__collectionNames";
-import { BaseSchema, createSchemaOptions } from "../abs/BaseSchema";
-import { Zoneinfo } from "../types/graph";
+import { getCollectionName, ModelName } from "../__collectionNames";
+import { BaseSchema, createSchemaOptions } from "../../abs/BaseSchema";
+import { Zoneinfo } from "../../types/graph";
 import { ObjectId } from "mongodb";
-import { getCountryInfo } from "../utils/utils";
-import { StoreCls } from "./Store/Store";
-import { StoreGroupCls } from "./StoreGroup";
+import { getCountryInfo } from "../../utils/utils";
+import { StoreCls } from "../Store/Store";
+import { StoreGroupCls } from "../StoreGroup";
 
 const BCRYPT_ROUNDS = 10;
 
@@ -35,7 +35,6 @@ export class StoreUserCls extends BaseSchema {
     @prop()
     storeId?: ObjectId;
 
-    // StoreCode? StoreGroupCode?
     @prop()
     storeCode?: string;
 
@@ -53,6 +52,12 @@ export class StoreUserCls extends BaseSchema {
 
     @prop({ required: true, defualt: () => false })
     verifiedEmail: boolean;
+
+    @prop()
+    phoneVerificationCode: string;
+
+    @prop()
+    emailVerificationCode: string;
 
     @prop()
     buyerSub?: string;

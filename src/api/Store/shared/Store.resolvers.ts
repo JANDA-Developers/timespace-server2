@@ -1,10 +1,10 @@
 import { Resolvers } from "../../../types/resolvers";
 import { DocumentType } from "@typegoose/typegoose";
-import { StoreCls } from "../../../models/Store/Store";
+import { StoreCls, StoreModel } from "../../../models/Store/Store";
 import { ProductModel } from "../../../models/Product/Product";
 import { UserModel } from "../../../models/User";
 import { StoreGroupModel } from "../../../models/StoreGroup";
-import { StoreUserModel } from "../../../models/StoreUser";
+import { StoreUserModel } from "../../../models/StoreUser/StoreUser";
 
 const resolvers: Resolvers = {
     Store: {
@@ -63,6 +63,32 @@ const resolvers: Resolvers = {
                     $in: store._id
                 }
             });
+        },
+        signUpOption: async (store: DocumentType<StoreCls>) => {
+            if (!store.signUpOption) {
+                await StoreModel.updateOne(
+                    { _id: store._id },
+                    {
+                        $set: {
+                            signUpOption: {
+                                acceptAnonymousUser: false,
+                                userAccessRange: "STORE_GROUP",
+                                useSignUpAutoPermit: false,
+                                useEmailVerification: false,
+                                usePhoneVerification: true
+                            }
+                        }
+                    }
+                );
+                return {
+                    acceptAnonymousUser: false,
+                    userAccessRange: "STORE_GROUP",
+                    useSignUpAutoPermit: false,
+                    useEmailVerification: false,
+                    usePhoneVerification: true
+                };
+            }
+            return store.signUpOption;
         }
     }
 };

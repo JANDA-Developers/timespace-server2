@@ -12,7 +12,7 @@ import {
 } from "../../../utils/resolverFuncWrapper";
 import { ERROR_CODES } from "../../../types/values";
 import { ItemModel } from "../../../models/Item/Item";
-import { StoreUserCls } from "../../../models/StoreUser";
+import { StoreUserCls } from "../../../models/StoreUser/StoreUser";
 import { StoreGroupModel } from "../../../models/StoreGroup";
 
 export const GetItemForStoreUserFunc = async ({

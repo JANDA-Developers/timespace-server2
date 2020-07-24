@@ -85,8 +85,10 @@ export class StoreGroupCls extends BaseGroup<StoreCls> {
     @prop({
         default: {
             acceptAnonymousUser: false,
-            signUpPermission: "AUTO",
-            userAccessRange: "STORE_GROUP"
+            userAccessRange: "STORE_GROUP",
+            useSignUpAutoPermit: false,
+            useEmailVerification: false,
+            usePhoneVerification: true
         } as Partial<StoreUserSignUpOption>
     })
     signUpOption: StoreUserSignUpOption;

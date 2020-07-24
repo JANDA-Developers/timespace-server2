@@ -9,7 +9,7 @@ import {
     defaultResolver,
     privateResolverForStoreUser
 } from "../../../utils/resolverFuncWrapper";
-import { StoreUserModel } from "../../../models/StoreUser";
+import { StoreUserModel } from "../../../models/StoreUser/StoreUser";
 import { ERROR_CODES } from "../../../types/values";
 import { ApolloError } from "apollo-server";
 

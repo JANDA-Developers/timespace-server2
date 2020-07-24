@@ -19,7 +19,7 @@ import { ProductModel } from "../../../models/Product/Product";
 import {
     SendSmsWithTriggerEvent,
     getReplacementSetsForItem
-} from "../../../models/Item/ItemFunctions";
+} from "../../../models/Item/ItemSmsFunctions";
 
 const resolvers: Resolvers = {
     Mutation: {

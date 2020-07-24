@@ -13,19 +13,19 @@ import {
 } from "../../../utils/resolverFuncWrapper";
 import { ERROR_CODES } from "../../../types/values";
 import { ItemModel } from "../../../models/Item/Item";
-import { StoreUserCls } from "../../../models/StoreUser";
+import { StoreUserCls } from "../../../models/StoreUser/StoreUser";
 import { StoreModel } from "../../../models/Store/Store";
 import { UserModel } from "../../../models/User";
 import {
     getReplacementSetsForItem,
     SendSmsWithTriggerEvent
-} from "../../../models/Item/ItemFunctions";
+} from "../../../models/Item/ItemSmsFunctions";
 import { ProductModel } from "../../../models/Product/Product";
 
-export const CancelItemForStoreUserFunc = async (
-    { parent, info, args, context: { req } },
-    stack: any[]
-): Promise<CancelItemForStoreUserResponse> => {
+export const CancelItemForStoreUserFunc = async ({
+    args,
+    context: { req }
+}): Promise<CancelItemForStoreUserResponse> => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {

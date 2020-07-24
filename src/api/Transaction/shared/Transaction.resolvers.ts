@@ -3,7 +3,7 @@ import { UserModel } from "../../../models/User";
 import { DocumentType } from "@typegoose/typegoose";
 import { TransactionCls } from "../../../models/Transaction/Transaction";
 import { StoreModel } from "../../../models/Store/Store";
-import { StoreUserModel } from "../../../models/StoreUser";
+import { StoreUserModel } from "../../../models/StoreUser/StoreUser";
 import { ItemModel } from "../../../models/Item/Item";
 
 const resolvers: Resolvers = {

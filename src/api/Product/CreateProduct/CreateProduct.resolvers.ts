@@ -61,9 +61,6 @@ const resolvers: Resolvers = {
                             infos: infos
                         });
 
-                        // TODO: Store의 기본값을 미리 상속받고 간다.
-                        product.usingPeriodOption = store.usingPeriodOption;
-                        product.usingCapacityOption = store.usingCapacityOption;
                         if (store.businessHours && store.periodOption) {
                             product.periodOption = store.periodOption;
                             product.businessHours = store.businessHours;

@@ -11,7 +11,7 @@ import {
 import { ApolloError } from "apollo-server";
 import { ERROR_CODES } from "../../../types/values";
 import { BuyerModel } from "../../../models/Buyer";
-import { StoreUserModel } from "../../../models/StoreUser";
+import { StoreUserModel } from "../../../models/StoreUser/StoreUser";
 import { TransactionModel } from "../../../models/Transaction/Transaction";
 
 const resolvers: Resolvers = {

@@ -28,6 +28,16 @@ export type TrxHistoryInput = {
     refundResult?: NicepayRefundResultInput;
 };
 
+export const findTransaction = async (
+    id: ObjectId | string
+): Promise<DocumentType<TransactionCls>> => {
+    const result = await TransactionModel.findById(id);
+    if (!result) {
+        throw new Error("존재하지 않는 TransactionId");
+    }
+    return result;
+};
+
 // default => paymentStatus: PENDING, refundStatus: NONE
 export const createTransaction = (
     input: CreateTransactionItemType

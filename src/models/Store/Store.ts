@@ -17,7 +17,8 @@ import {
     PeriodOption,
     CustomField,
     CustomFieldDefineInput,
-    Info
+    Info,
+    StoreUserSignUpOption
 } from "GraphType";
 import { ERROR_CODES } from "../../types/values";
 import { PeriodCls } from "../../utils/Period";
@@ -118,23 +119,6 @@ export class StoreCls extends BaseSchema implements StoreProps, StoreFuncs {
         }
     })
     products: ObjectId[];
-
-    @prop({
-        default(this: DocumentType<StoreCls>) {
-            if (this.type === "LEASE") {
-                return true;
-            }
-            return false;
-        }
-    })
-    usingPeriodOption: boolean;
-
-    @prop({
-        default(this: DocumentType<StoreCls>) {
-            return false;
-        }
-    })
-    usingCapacityOption: boolean;
 
     @prop()
     manager: Manager;
@@ -277,6 +261,17 @@ export class StoreCls extends BaseSchema implements StoreProps, StoreFuncs {
         default: []
     })
     infos: Info[];
+
+    @prop({
+        default: {
+            acceptAnonymousUser: false,
+            userAccessRange: "STORE_GROUP",
+            useSignUpAutoPermit: false,
+            useEmailVerification: false,
+            usePhoneVerification: true
+        } as Partial<StoreUserSignUpOption>
+    })
+    signUpOption: StoreUserSignUpOption;
 }
 
 export const StoreModel = getModelForClass(StoreCls);

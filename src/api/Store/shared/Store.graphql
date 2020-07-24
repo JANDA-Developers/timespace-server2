@@ -25,6 +25,7 @@ type Store implements BaseModel {
     warning: String
     customFields: [CustomField!]
     storeUsers: [StoreUser!]!
+    signUpOption: StoreUserSignUpOption!
 }
 
 enum StoreType {

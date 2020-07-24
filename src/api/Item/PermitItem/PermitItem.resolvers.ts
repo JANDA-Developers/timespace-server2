@@ -15,12 +15,11 @@ import { ERROR_CODES } from "../../../types/values";
 import { ItemModel } from "../../../models/Item/Item";
 import { ObjectId } from "mongodb";
 import { ProductModel } from "../../../models/Product/Product";
-import { denyItems } from "../CancelItem/CancelItem.resolvers";
 import { UserModel } from "../../../models/User";
 import {
     SendSmsWithTriggerEvent,
     getReplacementSetsForItem
-} from "../../../models/Item/ItemFunctions";
+} from "../../../models/Item/ItemSmsFunctions";
 
 const resolvers: Resolvers = {
     Mutation: {
@@ -69,34 +68,6 @@ const resolvers: Resolvers = {
                             session
                         });
                         // 취소 로직 ㄱㄱ
-
-                        const duplItems = await ItemModel.find({
-                            "dateTimeRange.from": {
-                                $lt: new Date(item.dateTimeRange.to)
-                            },
-                            "dateTimeRange.to": {
-                                $gt: new Date(item.dateTimeRange.from)
-                            },
-                            expiresAt: {
-                                $exists: false
-                            }
-                        });
-
-                        // 이게 무슨코드니 ㅜㅜ 과거의 나는 왜 이런코드를 짰는가...
-                        const itemDeniedResult = await Promise.all(
-                            duplItems.map(async i => {
-                                return await denyItems(
-                                    {
-                                        args: { itemId: i._id },
-                                        context: { req }
-                                    },
-                                    stack
-                                );
-                            })
-                        );
-                        stack.push({
-                            itemDeniedResult
-                        });
 
                         const smsKey = (
                             await UserModel.findById(cognitoUser._id).session(

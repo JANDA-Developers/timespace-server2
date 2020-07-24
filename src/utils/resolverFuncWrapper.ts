@@ -5,7 +5,7 @@ import { ResolverFunction } from "../types/resolvers";
 import { BaseResponse } from "GraphType";
 import { ERROR_CODES } from "../types/values";
 import { StoreModel } from "../models/Store/Store";
-import { StoreUserModel } from "../models/StoreUser";
+import { StoreUserModel } from "../models/StoreUser/StoreUser";
 import { ObjectId } from "mongodb";
 import { StoreGroupModel, StoreGroupCls } from "../models/StoreGroup";
 import { convertStoreGroupCode } from "../models/helpers/helper";
@@ -244,7 +244,10 @@ export const privateResolverForStoreUser = (
             }
         }).exec();
         if (updatedStoreUser) {
-            context.req.session.storeUsers[
+            console.log({ updatedStoreUser });
+            console.log({ sgcode });
+            console.log({ session: context.req.session });
+            context.req.session.storeGroupUsers[
                 sgcode
             ] = updatedStoreUser.toObject();
             context.req.session.save((err: any) => {

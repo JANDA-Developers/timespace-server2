@@ -12,7 +12,7 @@ import { UserModel } from "../../../models/User";
 import { requestApi } from "../../../utils/requestSmsApi";
 import { print } from "graphql";
 import { ItemModel } from "../../../models/Item/Item";
-import { getReplacementSetsForItem } from "../../../models/Item/ItemFunctions";
+import { getReplacementSetsForItem } from "../../../models/Item/ItemSmsFunctions";
 
 export const SendFunc = async (
     { parent, info, args, context: { req } },

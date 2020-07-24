@@ -20,8 +20,6 @@ export interface StoreProps extends BaseSchema {
     image: string;
     description: string;
     products: ObjectId[];
-    usingPeriodOption: boolean;
-    usingCapacityOption: boolean;
     manager: Manager;
     location: Location;
     businessHours: Array<PeriodWithDays>;

@@ -1,6 +1,8 @@
 type Mutation {
     PermitItem(param: PermitItemInput!): PermitItemResponse!
+    PermitItemAndCancelOthers(itemId: ID!, comment: String): PermitItemResponse!
 }
+
 # 아이템 승인
 type PermitItemResponse {
     ok: Boolean!
@@ -10,4 +12,15 @@ type PermitItemResponse {
 input PermitItemInput {
     itemId: ID!
     comment: String
+}
+
+type PermitItemAndCancelOthersResponse {
+    ok: Boolean!
+    error: Err
+    data: PermitItemAndCancelOthersResultData
+}
+
+type PermitItemAndCancelOthersResultData {
+    permittedItem: Item!
+    canceledItem: [Item!]!
 }

@@ -15,7 +15,7 @@ import {
     privateResolverForStoreUser
 } from "../../../utils/resolverFuncWrapper";
 import { ERROR_CODES } from "../../../types/values";
-import { StoreUserCls } from "../../../models/StoreUser";
+import { StoreUserCls } from "../../../models/StoreUser/StoreUser";
 import { ClientSession } from "mongoose";
 import { ItemCls, ItemModel } from "../../../models/Item/Item";
 import { ProductModel, ProductCls } from "../../../models/Product/Product";
@@ -29,7 +29,7 @@ import { UserModel } from "../../../models/User";
 import {
     SendSmsWithTriggerEvent,
     getReplacementSetsForItem
-} from "../../../models/Item/ItemFunctions";
+} from "../../../models/Item/ItemSmsFunctions";
 import { createTransaction } from "../../../models/Transaction/transactionFuncs";
 import { TransactionCls } from "../../../models/Transaction/Transaction";
 

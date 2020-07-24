@@ -1,7 +1,7 @@
 import { Resolvers } from "../../../types/resolvers";
 import { DocumentType } from "@typegoose/typegoose";
 import { StoreCls, StoreModel } from "../../../models/Store/Store";
-import { StoreUserCls } from "../../../models/StoreUser";
+import { StoreUserCls } from "../../../models/StoreUser/StoreUser";
 import { StoreGroupModel, StoreGroupCls } from "../../../models/StoreGroup";
 
 const resolvers: Resolvers = {

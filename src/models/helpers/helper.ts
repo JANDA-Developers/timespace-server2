@@ -1,12 +1,8 @@
 import { StoreCls, StoreModel } from "../Store/Store";
 import { DocumentType } from "@typegoose/typegoose";
 import { StoreGroupCls, StoreGroupModel } from "../StoreGroup";
-import {
-    StoreUserSignUpOption,
-    SignUpPermission,
-    UserAccessRange
-} from "../../types/graph";
-import { StoreUserModel } from "../StoreUser";
+import { StoreUserSignUpOption, UserAccessRange } from "../../types/graph";
+import { StoreUserModel } from "../StoreUser/StoreUser";
 import { ApolloError } from "apollo-server";
 
 export const convertStoreGroupCode = async (
@@ -34,8 +30,10 @@ export const convertStoreGroupCode = async (
 
 export class SignUpOption {
     private acceptAnonymousUser: boolean;
-    private signUpPermission: SignUpPermission;
     private userAccessRange: UserAccessRange;
+    private useEmailVerification: boolean;
+    private usePhoneVerification: boolean;
+    private useSignUpAutoPermit: boolean;
 
     static builder() {
         return new SignUpOption();
@@ -48,11 +46,6 @@ export class SignUpOption {
         return this;
     }
 
-    public setSingUpPermission(input: SignUpPermission): SignUpOption {
-        this.signUpPermission = input;
-        return this;
-    }
-
     public setUserAccessRange(input: UserAccessRange): SignUpOption {
         this.userAccessRange = input;
         return this;
@@ -61,8 +54,10 @@ export class SignUpOption {
     public build(): StoreUserSignUpOption {
         return {
             acceptAnonymousUser: this.acceptAnonymousUser,
-            signUpPermission: this.signUpPermission,
-            userAccessRange: this.userAccessRange
+            userAccessRange: this.userAccessRange,
+            useEmailVerification: this.useEmailVerification,
+            usePhoneVerification: this.usePhoneVerification,
+            useSignUpAutoPermit: this.useSignUpAutoPermit
         };
     }
 }

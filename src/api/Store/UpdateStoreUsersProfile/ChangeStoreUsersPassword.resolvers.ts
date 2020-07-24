@@ -11,7 +11,7 @@ import {
     privateResolverForStoreUser
 } from "../../../utils/resolverFuncWrapper";
 import { ERROR_CODES } from "../../../types/values";
-import { StoreUserModel } from "../../../models/StoreUser";
+import { StoreUserModel } from "../../../models/StoreUser/StoreUser";
 
 export const ChangePasswordStoreUserFunc = async ({
     args,

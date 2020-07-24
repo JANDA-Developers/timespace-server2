@@ -19,7 +19,7 @@ import { UserModel } from "../../../models/User";
 import {
     SendSmsWithTriggerEvent,
     getReplacementSetsForItem
-} from "../../../models/Item/ItemFunctions";
+} from "../../../models/Item/ItemSmsFunctions";
 
 export const denyItems = async (
     { args, context: { req } },
