@@ -24,7 +24,7 @@ import { ONE_DAY, ONE_MINUTE } from "../../../utils/dateFuncs";
 import { CustomFieldCls } from "../../../types/types";
 import { ObjectId } from "mongodb";
 import { uploadFile } from "../../../utils/s3Funcs";
-import { StoreModel } from "../../../models/Store/Store";
+import { StoreModel, StoreCls } from "../../../models/Store/Store";
 import { UserModel } from "../../../models/User";
 import {
     SendSmsWithTriggerEvent,
@@ -46,8 +46,6 @@ export const CreateItemForStoreUserFunc = async ({
             productCode,
             usersInput
         } = args as CreateItemForStoreUserMutationArgs;
-
-        // TODO: 1. 아이템 생성
 
         // product = undefined 인 경우 에러나면서 종료됨.
         const product = await ProductModel.findByCode(productCode);
@@ -76,6 +74,31 @@ export const CreateItemForStoreUserFunc = async ({
         };
     } catch (error) {
         return await errorReturn(error, session);
+    }
+};
+
+export const checkVerification = async (
+    store: DocumentType<StoreCls>,
+    storeUser: DocumentType<StoreUserCls>
+) => {
+    const storeVerificationPolicy = {
+        phoneVerification: store.signUpOption.usePhoneVerification,
+        emailVerification: store.signUpOption.useEmailVerification
+    };
+    if (
+        storeVerificationPolicy.phoneVerification &&
+        !storeUser.verifiedPhoneNumber
+    ) {
+        throw new ApolloError(
+            "전화번호 인증이 되지 않은 User 입니다. 인증후 사용해 주세요.",
+            ERROR_CODES.UNAUTHORIZED_STORE_USER
+        );
+    }
+    if (storeVerificationPolicy.emailVerification && !storeUser.verifiedEmail) {
+        throw new ApolloError(
+            "전화번호 인증이 되지 않은 User 입니다. 인증후 사용해 주세요.",
+            ERROR_CODES.UNAUTHORIZED_STORE_USER
+        );
     }
 };
 
@@ -111,6 +134,10 @@ const createItem = async (
     if (!store) {
         throw new Error("존재하지 않는 Store");
     }
+
+    // 통과 못하면 여기서 에러냄
+    checkVerification(store, storeUser);
+
     // HACK: 오류있을 가능성 오짐.
     item.customFieldValues = (await getItemsCustomFieldValues({
         customFields: usersInput.customFieldValues,
