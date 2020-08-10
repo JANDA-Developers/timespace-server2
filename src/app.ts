@@ -7,7 +7,7 @@ import express, { Express, NextFunction, Response, Request } from "express";
 import { decodeKey, decodeKeyForBuyer } from "./utils/decodeIdToken";
 import session from "express-session";
 import { mongoose } from "@typegoose/typegoose";
-import { ONE_MINUTE } from "./utils/dateFuncs";
+import { ONE_MINUTE, ONE_DAY } from "./utils/dateFuncs";
 import { refreshToken } from "./utils/refreshToken";
 import { UserModel } from "./models/User";
 import { BuyerModel } from "./models/Buyer";
@@ -17,6 +17,17 @@ const MongoStore = require("connect-mongo")(session);
 class App {
     public server: ApolloServer;
     public app: Express;
+
+    private corsOrigin: string[] = [
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://localhost:80",
+        "https://dev-ticket-yeulbep6p.stayjanda.cloud",
+        "https://space.stayjanda.cloud",
+        "https://manager.space.stayjanda.cloud",
+        "https://storeuser.space.stayjanda.cloud",
+        "https://dev-timespace.stayjanda.cloud"
+    ];
 
     constructor() {
         const path: string = process.env.GRAPHQL_ENDPOINT || "/graphql";
@@ -46,19 +57,7 @@ class App {
             app: this.app,
             cors: {
                 credentials: true,
-                origin: [
-                    "http://localhost:3000",
-                    "http://localhost:3001",
-                    "http://localhost:80",
-                    "https://dev-ticket-yeulbep6p.stayjanda.cloud",
-                    "https://space.stayjanda.cloud",
-                    "http://192.168.10.8:3001",
-                    "http://192.168.10.8",
-                    "http://10.159.7.226:3000",
-                    "http://10.159.7.226",
-                    "https://manager.space.stayjanda.cloud",
-                    "https://storeuser.space.stayjanda.cloud"
-                ]
+                origin: this.corsOrigin
             },
             path,
             onHealthCheck: req => {
@@ -81,21 +80,10 @@ class App {
         this.app.use(
             cors({
                 credentials: true,
-                origin: [
-                    "http://localhost:3000",
-                    "http://localhost:3001",
-                    "http://localhost",
-                    "https://dev-ticket-yeulbep6p.stayjanda.cloud",
-                    "https://space.stayjanda.cloud",
-                    "http://192.168.10.8:3001",
-                    "http://192.168.10.8",
-                    "http://10.159.7.226:3000",
-                    "http://10.159.7.226",
-                    "https://manager.space.stayjanda.cloud",
-                    "https://storeuser.space.stayjanda.cloud"
-                ]
+                origin: this.corsOrigin
             })
         );
+
         this.app.use(helmet());
         // MongoDB for Session Storage
         this.app.use(
@@ -108,7 +96,11 @@ class App {
                     mongooseConnection: mongoose.connection
                 }),
                 cookie: {
-                    httpOnly: false
+                    httpOnly: true,
+                    secure: "auto",
+                    domain: ".stayjanda.cloud",
+                    sameSite: "lax",
+                    maxAge: ONE_DAY * 14
                 }
             })
         );

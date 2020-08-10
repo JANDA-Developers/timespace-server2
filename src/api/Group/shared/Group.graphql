@@ -23,8 +23,13 @@ type StoreGroupConfig {
 }
 
 type StoreDesignConfig {
+    # 메뉴바 상단 로고
     logo: String
+    # 앱 아이콘 로고
+    iconLogo: String
+    # 메인 테마 컬러
     color: String
+    # 상단 로고 클릭시 이동하는 링크
     link: String
 }
 

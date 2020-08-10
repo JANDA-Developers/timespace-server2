@@ -133,9 +133,9 @@ const resolvers: Resolvers = {
                                 );
                             }
 
-                            const isAvailable = list
-                                .map(l => !l.soldOut)
-                                .filter(t => t).length;
+                            const isAvailable =
+                                list.map(l => !l.soldOut).filter(t => t)
+                                    .length === list.length;
                             if (!isAvailable) {
                                 throw new ApolloError(
                                     "SoldOut인 Segment가 존재합니다.",

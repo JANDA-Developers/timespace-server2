@@ -4,7 +4,6 @@ import {
     Segment,
     ProductSchedules,
     PeriodOption,
-    GenderOption,
     ItemStatus,
     Info
 } from "GraphType";
@@ -22,10 +21,7 @@ export interface ProductProps extends BaseSchema {
     images: string[];
     description: string;
     needToConfirm: boolean;
-    usingPeriodOption: boolean;
-    usingCapacityOption: boolean;
     capacity: number;
-    genderOption: GenderOption;
     intro: string;
     warning: string;
     businessHours: Array<PeriodWithDays>;

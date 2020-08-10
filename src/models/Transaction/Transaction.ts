@@ -6,7 +6,9 @@ import {
     PaymentStatus,
     RefundStatus,
     TransactionHistoryItem,
-    AmountInfo
+    AmountInfo,
+    CurrencyCode,
+    Paymethod
 } from "../../types/graph";
 
 @modelOptions(createSchemaOptions(getCollectionName(ModelName.TRANSACTION)))
@@ -21,7 +23,7 @@ export class TransactionCls extends BaseSchema {
         set: id => new ObjectId(id),
         get: id => new ObjectId(id)
     })
-    storeId: ObjectId;
+    storeId?: ObjectId;
 
     @prop()
     itemId: ObjectId;
@@ -43,10 +45,13 @@ export class TransactionCls extends BaseSchema {
     storeUserId: ObjectId;
 
     @prop()
-    paymethod: string;
+    paymethod: Paymethod;
 
     @prop()
     count: number;
+
+    @prop()
+    currency: CurrencyCode;
 
     @prop()
     history: TransactionHistoryItem[];

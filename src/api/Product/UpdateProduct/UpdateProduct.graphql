@@ -24,4 +24,5 @@ input UpdateProductParamInput {
     periodOption: PeriodOptionInput
     bookingPolicy: BookingPolicyInput
     infos: [InfoInput!]
+    usingPayment: Boolean
 }

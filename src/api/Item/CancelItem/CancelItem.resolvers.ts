@@ -20,11 +20,12 @@ import {
     SendSmsWithTriggerEvent,
     getReplacementSetsForItem
 } from "../../../models/Item/ItemSmsFunctions";
+import { cancelTransaction } from "../CancelItemForStoreUser/CancelItemForStoreUser.resolvers";
 
-export const denyItems = async (
-    { args, context: { req } },
-    stack: any[]
-): Promise<CancelItemResponse> => {
+export const denyItems = async ({
+    args,
+    context: { req }
+}): Promise<CancelItemResponse> => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
@@ -99,6 +100,7 @@ export const denyItems = async (
                 ]
             });
         }
+        await cancelTransaction(item, session);
         await session.commitTransaction();
         session.endSession();
 

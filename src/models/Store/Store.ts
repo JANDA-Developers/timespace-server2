@@ -247,6 +247,9 @@ export class StoreCls extends BaseSchema implements StoreProps, StoreFuncs {
     })
     customFields: CustomFieldCls[];
 
+    @prop()
+    usingPayment: boolean;
+
     @prop({
         default: (): BookingPolicy => {
             return {

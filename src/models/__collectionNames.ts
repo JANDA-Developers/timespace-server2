@@ -12,7 +12,8 @@ export enum ModelName {
     PAYMENT_HISTORY = "PaymentHistory",
     STORE_USER = "StoreUser",
     TRANSACTION = "Transaction",
-    PRIVACY_POLICY = "PrivacyPolicy"
+    PRIVACY_POLICY = "PrivacyPolicy",
+    VERIFICATION = "Verification"
 }
 
 export const getCollectionName = (modelName: ModelName): string =>

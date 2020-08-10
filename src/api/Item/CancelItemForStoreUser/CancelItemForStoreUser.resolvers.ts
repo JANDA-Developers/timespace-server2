@@ -12,7 +12,7 @@ import {
     privateResolverForStoreUser
 } from "../../../utils/resolverFuncWrapper";
 import { ERROR_CODES } from "../../../types/values";
-import { ItemModel } from "../../../models/Item/Item";
+import { ItemModel, ItemCls } from "../../../models/Item/Item";
 import { StoreUserCls } from "../../../models/StoreUser/StoreUser";
 import { StoreModel } from "../../../models/Store/Store";
 import { UserModel } from "../../../models/User";
@@ -21,6 +21,16 @@ import {
     SendSmsWithTriggerEvent
 } from "../../../models/Item/ItemSmsFunctions";
 import { ProductModel } from "../../../models/Product/Product";
+import { TransactionModel } from "../../../models/Transaction/Transaction";
+import {
+    setTransactionRefundStatusToPending,
+    setTransactionRefundStatusToDone,
+    nicepayRefund,
+    findTidFromTransaction
+} from "../../../models/Transaction/transactionFuncs";
+import { ClientSession } from "mongoose";
+import moment from "moment";
+import { ONE_HOUR } from "../../../utils/dateFuncs";
 
 export const CancelItemForStoreUserFunc = async ({
     args,
@@ -60,30 +70,11 @@ export const CancelItemForStoreUserFunc = async ({
                 ERROR_CODES.UNEXIST_USER
             );
         }
-        const smsKey = user.smsKey;
-        if (smsKey && item.phoneNumber) {
-            // Send for buyer
-            const tags = [
-                {
-                    key: "storeId",
-                    value: item.storeId.toHexString()
-                }
-            ];
-            const event: SmsTriggerEvent = "ITEM_CANCELED";
 
-            // SMS 전송
-            await SendSmsWithTriggerEvent({
-                smsKey,
-                event,
-                tags,
-                recWithReplSets: [
-                    {
-                        receivers: [item.phoneNumber],
-                        replacementSets: await getReplacementSetsForItem(item)
-                    }
-                ]
-            });
-        } // 문자 전송 끝.
+        await sendSms(item, user.smsKey);
+
+        await cancelTransaction(item, session);
+
         await item.save({ session });
 
         await session.commitTransaction();
@@ -97,6 +88,83 @@ export const CancelItemForStoreUserFunc = async ({
     }
 };
 
+const sendSms = async (item: DocumentType<ItemCls>, smsKey?: string) => {
+    if (smsKey && item.phoneNumber) {
+        // Send for buyer
+        const tags = [
+            {
+                key: "storeId",
+                value: item.storeId.toHexString()
+            }
+        ];
+        const event: SmsTriggerEvent = "ITEM_CANCELED";
+
+        // SMS 전송
+        await SendSmsWithTriggerEvent({
+            smsKey,
+            event,
+            tags,
+            recWithReplSets: [
+                {
+                    receivers: [item.phoneNumber],
+                    replacementSets: await getReplacementSetsForItem(item)
+                }
+            ]
+        });
+    }
+};
+
+export const cancelTransaction = async (
+    item: DocumentType<ItemCls>,
+    session?: ClientSession
+) => {
+    const trxId = item.transactionId;
+    if (!trxId) {
+        return;
+    }
+
+    const transaction = await TransactionModel.findById(trxId);
+    if (!transaction) {
+        throw new Error("존재하지 않는 Transaction");
+    }
+
+    const cardPayResult = findTidFromTransaction(transaction);
+
+    // TODO: 예약 취소
+    const result = await nicepayRefund({
+        amount: transaction.amountInfo.paid || transaction.amountInfo.origin,
+        ediDate: moment(new Date(Date.now() + ONE_HOUR * 9)).format(
+            "YYYYMMDDHHmmss"
+        ),
+        message: "Canceled by StoreUser",
+        moid: cardPayResult?.Moid || "",
+        tid: cardPayResult?.TID || ""
+    });
+
+    console.log({
+        result
+    });
+
+    // DB상의 트랜잭션 상태 변경
+    setTransactionRefundStatusToPending(transaction, {
+        amount: transaction.amountInfo.paid,
+        paymethod: transaction.paymethod,
+        currency: transaction.currency
+    });
+
+    if (
+        transaction.paymethod === "CARD" ||
+        transaction.paymethod === "BILLING"
+    ) {
+        setTransactionRefundStatusToDone(transaction, {
+            amount: transaction.amountInfo.origin,
+            paymethod: transaction.paymethod,
+            currency: transaction.currency
+        });
+    }
+    await transaction.save({ session });
+};
+
 const resolvers: Resolvers = {
     Mutation: {
         CancelItemForStoreUser: defaultResolver(
@@ -104,4 +172,5 @@ const resolvers: Resolvers = {
         )
     }
 };
+
 export default resolvers;

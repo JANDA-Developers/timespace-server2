@@ -122,6 +122,9 @@ export class UserCls extends BaseSchema {
     refreshToken: string;
 
     @prop()
+    confirmationCode: string;
+
+    @prop()
     refreshTokenLastUpdate: Date;
 
     @prop()

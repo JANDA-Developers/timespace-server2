@@ -1,0 +1,10 @@
+type Query {
+    GetItemsForAnonymous(
+        filter: GetItemsFilterInput!
+    ): GetItemsForAnonymousResponse!
+}
+type GetItemsForAnonymousResponse {
+    ok: Boolean!
+    error: Err
+    data: [Item!]
+}

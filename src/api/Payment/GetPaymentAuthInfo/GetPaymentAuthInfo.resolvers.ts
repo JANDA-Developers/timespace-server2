@@ -7,6 +7,7 @@ import {
 import { defaultResolver } from "../../../utils/resolverFuncWrapper";
 import crypto from "crypto";
 import moment from "moment";
+import { ONE_HOUR } from "../../../utils/dateFuncs";
 
 export const GetPaymentAuthInfoFunc = async ({
     args,
@@ -15,15 +16,15 @@ export const GetPaymentAuthInfoFunc = async ({
     try {
         const { amount } = args as GetPaymentAuthInfoQueryArgs;
 
-        const date = new Date();
-        const time = moment(date).format("YYYYMMDDHHmmss");
+        const time = moment(new Date(Date.now() + ONE_HOUR * 9)).format(
+            "YYYYMMDDHHmmss"
+        );
         const merchantId = process.env.NICEPAYMENT_MERCHANT_ID || "";
         const merchantKey = process.env.NICEPAYMENT_MERCHANT_KEY || "";
         const hash = crypto
             .createHash("sha256")
             .update(`${time}${merchantId}${amount}${merchantKey}`)
             .digest("hex");
-
         return {
             ok: true,
             error: null,

@@ -9,14 +9,16 @@ import {
     NicepayRefundResultInput,
     NicepayPayResultInput
 } from "../../types/graph";
+import axios from "axios";
 
 export type CreateTransactionItemType = {
     sellerId: ObjectId;
     storeId: ObjectId;
-    storeUserId: ObjectId;
+    storeUserId?: ObjectId;
     itemId: ObjectId;
     amount: number;
     paymethod: Paymethod;
+    currency: CurrencyCode;
 };
 
 export type TrxHistoryInput = {
@@ -111,7 +113,10 @@ export const setTransactionPayStatusToDone = (
         paymethod: input.paymethod,
         refundResult: null
     };
-    transaction.amountInfo.paid += input.amount;
+    transaction.amountInfo = {
+        ...transaction.amountInfo,
+        paid: transaction.amountInfo.paid + input.amount
+    };
     transaction.paymentStatus = "DONE";
     transaction.history.push(item);
     return item;
@@ -289,4 +294,52 @@ export const setTransactionAmount = (
             transaction.amountInfo.paid = amtInfo.paid;
         }
     }
+};
+
+export const nicepayRefund = async (input: {
+    tid: string;
+    moid: string;
+    amount: number;
+    ediDate: string;
+    message: string;
+}) => {
+    console.log({
+        cancelItemInput: input
+    });
+
+    const result = await axios.post<{
+        ResultCode: string;
+        ResultMsg: string;
+        CancelAmt: string;
+        MID: string;
+        Moid: string;
+        PayMethod: string;
+        TID: string;
+        CancelDate: string;
+        CancelTime: string;
+        RemainAmt: string;
+    }>(process.env.API_URL + "/payment/pay/cancel", input, {
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+
+    const { data, statusText, status } = result;
+    if (status !== 200) {
+        throw new Error(statusText);
+    }
+    console.log({
+        data,
+        status
+    });
+    return data;
+};
+
+export const findTidFromTransaction = (trx: DocumentType<TransactionCls>) => {
+    const history = trx.history;
+
+    const item = history.filter(
+        item => item.type === "PAY" && item.payResult
+    )[0];
+    return item?.payResult;
 };

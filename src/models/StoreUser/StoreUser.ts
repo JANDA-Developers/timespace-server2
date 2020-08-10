@@ -60,6 +60,9 @@ export class StoreUserCls extends BaseSchema {
     emailVerificationCode: string;
 
     @prop()
+    passwordChangeVerificationId: ObjectId;
+
+    @prop()
     buyerSub?: string;
 
     @prop()

@@ -65,6 +65,7 @@ const resolvers: Resolvers = {
                             Date.now(),
                         accessToken: authResult.AccessToken
                     };
+
                     if (role === "SELLER") {
                         const user = await UserModel.findOne({
                             sub: cognitoUser.data.sub

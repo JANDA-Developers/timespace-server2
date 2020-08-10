@@ -1,7 +1,11 @@
 import { mongoose, DocumentType } from "@typegoose/typegoose";
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
-import { UpdateStoreGroupResponse, UpdateStoreGroupInput } from "GraphType";
+import {
+    UpdateStoreGroupResponse,
+    UpdateStoreGroupInput,
+    StoreDesignConfig
+} from "GraphType";
 import {
     defaultResolver,
     privateResolver
@@ -68,7 +72,8 @@ const setParamsToStoreGroupObject = async (
         storeGroup.description = description;
     }
     if (designConfig) {
-        const { color, link, logo } = designConfig;
+        const { color, link, logo, iconLogo } = designConfig;
+
         if (logo) {
             const syncedLogo = await logo;
             const { url } = await uploadFile(syncedLogo, {
@@ -76,12 +81,32 @@ const setParamsToStoreGroupObject = async (
             });
             storeGroup.designOption.logo = storeGroup.config.design.logo = url;
         }
+
+        if (iconLogo) {
+            const syncedLogo = await iconLogo;
+            const { url } = await uploadFile(syncedLogo, {
+                dir: `${user.sub}/storegroup/${storeGroup.code}/design/appicon/`
+            });
+            storeGroup.designOption.iconLogo = storeGroup.config.design.iconLogo = url;
+        }
+
         if (color) {
             storeGroup.designOption.color = storeGroup.config.design.color = color;
         }
+
         if (link) {
             storeGroup.designOption.link = storeGroup.config.design.link = link;
         }
+        const tempDesignConfig: StoreDesignConfig = {
+            color: storeGroup.config.design.color || designConfig.color,
+            iconLogo:
+                storeGroup.config.design.iconLogo || designConfig.iconLogo,
+            link: storeGroup.config.design.link || designConfig.link,
+            logo: storeGroup.config.design.logo || designConfig.logo
+        };
+        storeGroup.designOption = tempDesignConfig;
+        storeGroup.config = { ...storeGroup.config, design: tempDesignConfig };
+        console.log({ designConfig: storeGroup.designOption });
     }
 
     if (guestUserConfig) {

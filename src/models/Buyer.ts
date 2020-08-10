@@ -115,6 +115,9 @@ export class BuyerCls extends BaseSchema {
     @prop()
     company: string;
 
+    @prop()
+    confirmationCode: string;
+
     async deleteBuyer(
         this: DocumentType<BuyerCls>,
         session: ClientSession,

@@ -13,6 +13,7 @@ import { ONE_DAY, ONE_HOUR } from "../../utils/dateFuncs";
 import _ from "lodash";
 import { requestApi } from "../../utils/requestSmsApi";
 import { print } from "graphql";
+import { StoreModel } from "../Store/Store";
 
 export const getReplacementSetsForItem = async (
     item: DocumentType<ItemCls>
@@ -31,6 +32,7 @@ export const getReplacementSetsForItem = async (
         item.dateTimeRange.to,
         offset
     );
+    const store = await StoreModel.findById(product.storeId);
     const replacements: Replacements = {
         ITEM_CODE: item.code,
         ITEM_END: end,
@@ -40,7 +42,9 @@ export const getReplacementSetsForItem = async (
         ITEM_NAME: item.name,
         ITEM_STATUS: item.status,
         ITEM_ORDERCOUNT: item.orderCount + "개",
-        PRODUCT_NAME: product.name
+        PRODUCT_NAME: product.name,
+        MANAGER_PHONENUMBER: store?.manager.phoneNumber,
+        MANAGER_NAME: store?.manager.name
     };
     const result: SmsTemplateAttributeSets[] = [];
 

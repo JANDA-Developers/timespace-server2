@@ -21,6 +21,9 @@ const resolvers: Resolvers = {
         },
         item: async (trx: DocumentType<TransactionCls>) => {
             return ItemModel.findById(trx.itemId);
+        },
+        amount: async (trx: DocumentType<TransactionCls>) => {
+            return trx.amountInfo.origin;
         }
     }
 };

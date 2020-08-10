@@ -58,7 +58,8 @@ const resolvers: Resolvers = {
                             description,
                             intro: intro || undefined,
                             warning: warning || undefined,
-                            infos: infos
+                            infos,
+                            usingPayment: store.usingPayment
                         });
 
                         if (store.businessHours && store.periodOption) {

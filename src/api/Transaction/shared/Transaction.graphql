@@ -3,9 +3,10 @@ type Transaction implements BaseModel {
     _id: ID!
     seller: User!
     store: Store!
-    storeUser: StoreUser!
+    storeUser: StoreUser
     item: Item!
     amount: Float!
+    amountInfo: AmountInfo!
     paymethod: String!
     currency: CurrencyCode!
     history: [TransactionHistoryItem!]!

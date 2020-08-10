@@ -9,7 +9,6 @@ import { getCollectionName, ModelName } from "../__collectionNames";
 import { ObjectId } from "mongodb";
 import { PeriodCls } from "../../utils/Period";
 import {
-    GenderOption,
     PeriodOption,
     ProductSchedules,
     Segment,
@@ -97,12 +96,6 @@ export class ProductCls extends BaseSchema
     needToPermit: boolean;
 
     @prop({ default: () => false })
-    usingPeriodOption: boolean;
-
-    @prop({ default: () => false })
-    usingCapacityOption: boolean;
-
-    @prop({ default: () => false })
     usingPayment: boolean;
 
     @prop({ default: () => 0 })
@@ -134,29 +127,9 @@ export class ProductCls extends BaseSchema
                 message: "capacity는 음수가 될 수 없습니다."
             }
         ],
-        required: [
-            function(this: DocumentType<ProductCls>) {
-                return this.usingCapacityOption;
-            },
-            "Capacity가 설정되지 않았습니다. "
-        ]
+        required: [true, "Capacity가 설정되지 않았습니다. "]
     })
     capacity: number;
-
-    @prop({
-        validate: [
-            {
-                validator(this: DocumentType<ProductCls>, value) {
-                    return this.usingCapacityOption ? value : true;
-                },
-                message: "GenderOption이 설정되지 않았습니다. "
-            }
-        ],
-        default(this: DocumentType<ProductCls>) {
-            return this.usingCapacityOption ? "ANY" : undefined;
-        }
-    })
-    genderOption: GenderOption;
 
     @prop()
     intro: string;
@@ -213,12 +186,7 @@ export class ProductCls extends BaseSchema
                 message: "end값이 start보다 작거나 같습니다."
             }
         ],
-        required: [
-            function(this: DocumentType<ProductCls>) {
-                return this.usingPeriodOption;
-            },
-            "BusinessHours가 설정되지 않았습니다."
-        ],
+        required: [true, "BusinessHours가 설정되지 않았습니다."],
         get(this: DocumentType<ProductCls>, periodArr: Array<PeriodCls>) {
             return getPeriodFromDB(periodArr, this.periodOption.offset);
         },
@@ -238,12 +206,7 @@ export class ProductCls extends BaseSchema
 
     @prop(
         propOptPeriodOption({
-            required: [
-                function(this: DocumentType<ProductCls>) {
-                    return this.usingPeriodOption;
-                },
-                "PeriodOption가 설정되지 않았습니다."
-            ]
+            required: [true, "PeriodOption가 설정되지 않았습니다."]
         })
     )
     periodOption: PeriodOption;
@@ -326,11 +289,17 @@ export class ProductCls extends BaseSchema
                 items: [] as ObjectId[]
             };
         });
+        console.log(
+            "Product.ts => getSegmentSchedules=============================================="
+        );
         real.forEach(o => {
             const filtered = productSegmentList.filter(
                 i => i._id * 1000 === o.segment.from.getTime()
             );
             const item = filtered[0];
+            console.log({
+                filteredItem: item
+            });
             if (item) {
                 o.itemCount = item.count;
                 o.items.push(...item.items.map(i => i._id));

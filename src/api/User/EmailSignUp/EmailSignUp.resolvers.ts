@@ -10,6 +10,7 @@ import { StoreGroupModel } from "../../../models/StoreGroup";
 import { errorReturn, getCountryInfo } from "../../../utils/utils";
 import _ from "lodash";
 import { BuyerModel } from "../../../models/Buyer";
+import { sendSMS } from "../../../utils/smsFunction";
 
 /**
  * Error에 대한 부분
@@ -66,6 +67,9 @@ const resolvers: Resolvers = {
                     );
 
                     const group = StoreGroupModel.makeDefaultGroup(_id);
+                    const confirmationCode = Math.floor(Math.random() * 1000000)
+                        .toString()
+                        .padStart(6, "0");
                     if (role === "SELLER") {
                         const user = new UserModel({
                             _id,
@@ -77,7 +81,13 @@ const resolvers: Resolvers = {
                             roles: [role],
                             role
                         });
-                        // TODO: EmailSignUp 하는 동시에 "기본 그룹"을 생성한다.
+
+                        user.confirmationCode = confirmationCode;
+                        await sendSMS({
+                            receivers: phoneNumber,
+                            msg: `회원가입 인증코드는 [${confirmationCode}] 입니다.`
+                        });
+                        // EmailSignUp 하는 동시에 "기본 그룹"을 생성한다.
                         await user.save({ session });
                         await group.save({ session });
                     } else {
@@ -91,10 +101,16 @@ const resolvers: Resolvers = {
                             role,
                             company
                         });
+                        buyer.confirmationCode = confirmationCode;
+                        await sendSMS({
+                            receivers: phoneNumber,
+                            msg: `회원가입 인증코드는 [${confirmationCode}] 입니다.`
+                        });
                         await buyer.save({
                             session
                         });
                     }
+
                     await session.commitTransaction();
                     session.endSession();
                     return {
@@ -166,17 +182,19 @@ const emailSignUp = async (
     role: UserRole
 ) => {
     const cognito = new CognitoIdentityServiceProvider();
+    const ClientId =
+        (role === "SELLER"
+            ? process.env.COGNITO_CLIENT_ID
+            : process.env.COGNITO_CLIENT_ID_BUYER) || "";
     const result = await cognito
         .signUp({
-            ClientId:
-                (role === "SELLER"
-                    ? process.env.COGNITO_CLIENT_ID
-                    : process.env.COGNITO_CLIENT_ID_BUYER) || "",
+            ClientId,
             Username: email,
             Password: password,
             UserAttributes: userAttributes
         })
         .promise();
+
     return result;
 };
 

@@ -226,6 +226,9 @@ export const privateResolverForStoreUser = (
         // scode를 이용하는 경우... session.storeUsers[scode] 로 접근한다
         // 만약 sgcode, scode 둘다 있는 경우에는 scode를 우선으로 접근한다.
         const storeUser = context.req.session?.storeGroupUsers?.[sgcode];
+        console.log({
+            testestest: context.req.session?.storeGroupUsers
+        });
         if (
             !storeUser &&
             (data as DocumentType<StoreGroupCls>).signUpOption

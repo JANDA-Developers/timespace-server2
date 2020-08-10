@@ -195,6 +195,18 @@ export const getUsableRateQuery = async (
                                     },
                                     {
                                         $eq: ["$status", "PERMITTED"]
+                                    },
+                                    {
+                                        $gt: [
+                                            originDTRange.from,
+                                            "$dateTimeRange.to"
+                                        ]
+                                    },
+                                    {
+                                        $lt: [
+                                            originDTRange.to,
+                                            "$dateTimeRange.from"
+                                        ]
                                     }
                                 ]
                             }
@@ -375,16 +387,24 @@ export const getUsableRateQuery = async (
             $addFields: {
                 date: "$_id",
                 usableRate: {
-                    $floor: {
-                        $multiply: [
-                            {
-                                $divide: [
-                                    "$segmentUsableCount",
-                                    "$segmentCount"
+                    $cond: {
+                        if: {
+                            $eq: ["$segmentCount", 0]
+                        },
+                        then: 0,
+                        else: {
+                            $floor: {
+                                $multiply: [
+                                    {
+                                        $divide: [
+                                            "$segmentUsableCount",
+                                            "$segmentCount"
+                                        ]
+                                    },
+                                    100
                                 ]
-                            },
-                            100
-                        ]
+                            }
+                        }
                     }
                 },
                 "details.items.date": "$$REMOVE",

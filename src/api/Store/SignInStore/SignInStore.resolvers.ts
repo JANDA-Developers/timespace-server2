@@ -31,6 +31,7 @@ export const SignInStoreMainFunc = async ({
             store?: DocumentType<StoreCls>;
             storeGroup: DocumentType<StoreGroupCls>;
         } = req;
+        console.log({ req });
         const storeId = store?._id;
         const storeCode = store?.code;
         const storeGroupId = storeGroup._id;
@@ -163,7 +164,7 @@ const migrateBuyerToStoreUser = async (
     const storeUser = new StoreUserModel({
         name: buyer.name,
         phoneNumber: buyer.phone_number,
-        verifiedPhoneNumber: buyer.phone_number_verified || false,
+        verifiedPhoneNumber: true,
         verifiedEmail: buyer.email_verified || false,
         ...storeInfo,
         ...accountInfo
@@ -193,6 +194,8 @@ const setSessionData = (
         req.session.storeGroupUsers[storeGroupCode] = storeUser.toObject();
     }
 
+    console.log({ storeGroupUsers: req.session.storeGroupUsers });
+
     req.session.save((err: any) => {
         if (err) {
             throw new err();
@@ -207,4 +210,5 @@ const resolvers: Resolvers = {
         )
     }
 };
+
 export default resolvers;

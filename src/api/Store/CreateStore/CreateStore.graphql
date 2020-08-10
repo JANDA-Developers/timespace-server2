@@ -22,4 +22,5 @@ input CreateStoreInput {
     customFieldInput: [CustomFieldDefineInput!]
     infos: [InfoInput!]
     bookingPolicy: BookingPolicyInput
+    usingPayment: Boolean
 }

@@ -3,19 +3,18 @@ import { mongoose, DocumentType } from "@typegoose/typegoose";
 import { errorReturn } from "../../../utils/utils";
 import { Resolvers } from "../../../types/resolvers";
 import {
-    CreateItemForStoreUserResponse,
-    CreateItemForStoreUserMutationArgs,
-    CreateItemForStoreUserInput,
+    CreateItemForAnonymousResponse,
+    CreateItemForAnonymousMutationArgs,
+    CreateItemForAnonymousInput,
     DateTimeRangeInput,
     CustomFieldInput,
     SmsTriggerEvent
 } from "GraphType";
 import {
     defaultResolver,
-    privateResolverForStoreUser
+    privateResolverForStoreGroup
 } from "../../../utils/resolverFuncWrapper";
 import { ERROR_CODES } from "../../../types/values";
-import { StoreUserCls } from "../../../models/StoreUser/StoreUser";
 import { ClientSession } from "mongoose";
 import { ItemCls, ItemModel } from "../../../models/Item/Item";
 import { ProductModel, ProductCls } from "../../../models/Product/Product";
@@ -33,19 +32,18 @@ import {
 import { createTransaction } from "../../../models/Transaction/transactionFuncs";
 import { TransactionCls } from "../../../models/Transaction/Transaction";
 
-export const CreateItemForStoreUserFunc = async ({
+export const CreateItemForAnonymousFunc = async ({
     args,
     context: { req }
-}): Promise<CreateItemForStoreUserResponse> => {
+}): Promise<CreateItemForAnonymousResponse> => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-        const { storeUser }: { storeUser: DocumentType<StoreUserCls> } = req;
         const {
             dateTimeRange,
             productCode,
             usersInput
-        } = args as CreateItemForStoreUserMutationArgs;
+        } = args as CreateItemForAnonymousMutationArgs;
 
         // product = undefined 인 경우 에러나면서 종료됨.
         const product = await ProductModel.findByCode(productCode);
@@ -63,10 +61,7 @@ export const CreateItemForStoreUserFunc = async ({
             throw new Error("존재하지 않는 Store");
         }
 
-        checkVerification(store, storeUser);
-
         const item = await createItem(
-            storeUser,
             store,
             product,
             dateTimeRange,
@@ -86,44 +81,11 @@ export const CreateItemForStoreUserFunc = async ({
     }
 };
 
-export const checkVerification = async (
-    store: DocumentType<StoreCls>,
-    storeUser: DocumentType<StoreUserCls>
-) => {
-    const storeVerificationPolicy = {
-        phoneVerification: store.signUpOption.usePhoneVerification,
-        emailVerification: store.signUpOption.useEmailVerification
-    };
-    const phoneVerified =
-        storeVerificationPolicy.phoneVerification &&
-        !storeUser.verifiedPhoneNumber;
-    const emailVerified =
-        storeVerificationPolicy.emailVerification && !storeUser.verifiedEmail;
-    console.log({
-        storeVerificationPolicy,
-        phoneVerified,
-        emailVerified
-    });
-    if (phoneVerified) {
-        throw new ApolloError(
-            "전화번호 인증이 되지 않은 User 입니다. 인증후 사용해 주세요.",
-            ERROR_CODES.UNAUTHORIZED_STORE_USER
-        );
-    }
-    if (emailVerified) {
-        throw new ApolloError(
-            "전화번호 인증이 되지 않은 User 입니다. 인증후 사용해 주세요.",
-            ERROR_CODES.UNAUTHORIZED_STORE_USER
-        );
-    }
-};
-
 const createItem = async (
-    storeUser: DocumentType<StoreUserCls>,
     store: DocumentType<StoreCls>,
     product: DocumentType<ProductCls>,
     dateTimeRange: DateTimeRangeInput,
-    usersInput: CreateItemForStoreUserInput,
+    usersInput: CreateItemForAnonymousInput,
     session?: ClientSession
 ): Promise<DocumentType<ItemCls>> => {
     if (!usersInput.privacyPolicyAgreement) {
@@ -134,10 +96,15 @@ const createItem = async (
     }
     const item = new ItemModel();
     item.productId = product._id;
-    item.name = usersInput.name || storeUser.name;
-    item.phoneNumber = usersInput.phoneNumber || storeUser.phoneNumber;
+    if (!usersInput.name) {
+        throw new ApolloError("이름이 입력되지 않았습니다.");
+    }
+    if (!usersInput.phoneNumber) {
+        throw new ApolloError("전화번호가 입력되지 않았습니다.");
+    }
+    item.name = usersInput.name;
+    item.phoneNumber = usersInput.phoneNumber;
     item.storeId = product.storeId;
-    item.storeUserId = storeUser._id;
     // set DateTimeRange
     const { from, to } = dateTimeRange;
     item.dateTimeRange = {
@@ -168,8 +135,7 @@ const createItem = async (
     ) {
         const transaction = setTransaction({
             product,
-            item,
-            storeUser
+            item
         });
 
         await transaction.save({ session });
@@ -186,12 +152,10 @@ const createItem = async (
 
 const setTransaction = ({
     product,
-    item,
-    storeUser
+    item
 }: {
     item: DocumentType<ItemCls>;
     product: DocumentType<ProductCls>;
-    storeUser: DocumentType<StoreUserCls>;
 }): DocumentType<TransactionCls> => {
     const {
         defaultPrice,
@@ -216,7 +180,6 @@ const setTransaction = ({
         itemId: item._id,
         sellerId: product.userId,
         storeId: product.storeId,
-        storeUserId: storeUser._id,
         // TODO: 통화 단위 관련
         currency: "KRW"
     });
@@ -387,8 +350,8 @@ const SendSmsForStoreUser = async (
 
 const resolvers: Resolvers = {
     Mutation: {
-        CreateItemForStoreUser: defaultResolver(
-            privateResolverForStoreUser(CreateItemForStoreUserFunc)
+        CreateItemForAnonymous: defaultResolver(
+            privateResolverForStoreGroup(CreateItemForAnonymousFunc)
         )
     }
 };

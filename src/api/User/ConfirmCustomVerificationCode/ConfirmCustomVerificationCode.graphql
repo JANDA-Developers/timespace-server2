@@ -1,0 +1,11 @@
+type Mutation {
+    ConfirmCustomVerificationCode(
+        email: String!
+        code: String!
+        role: UserRole!
+    ): ConfirmCustomVerificationCodeResponse!
+}
+type ConfirmCustomVerificationCodeResponse {
+    ok: Boolean!
+    error: Err
+}
