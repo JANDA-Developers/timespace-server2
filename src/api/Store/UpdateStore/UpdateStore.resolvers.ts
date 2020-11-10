@@ -100,7 +100,10 @@ const productUpdate = async (
     // bookingPolicy
 
     const products = await ProductModel.find({
-        storeId: store._id
+        storeId: store._id,
+        isDeleted: {
+            $ne: true
+        }
     });
 
     products.forEach(product => {

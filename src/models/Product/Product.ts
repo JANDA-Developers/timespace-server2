@@ -89,7 +89,7 @@ export class ProductCls extends BaseSchema
     @prop()
     description: string;
 
-    @prop({ default: () => true })
+    @prop({ default: () => false })
     needToConfirm: boolean;
 
     @prop({ default: () => false })
@@ -103,6 +103,9 @@ export class ProductCls extends BaseSchema
 
     @prop({ default: () => 0 })
     segmentPrice: number;
+
+    @prop({ default: false })
+    isDeleted?: boolean;
 
     /*
      ! =============================================================================================================================

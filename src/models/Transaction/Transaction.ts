@@ -42,7 +42,7 @@ export class TransactionCls extends BaseSchema {
         set: id => new ObjectId(id),
         get: id => new ObjectId(id)
     })
-    storeUserId: ObjectId;
+    storeUserId?: ObjectId;
 
     @prop()
     paymethod: Paymethod;

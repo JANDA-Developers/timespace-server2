@@ -16,6 +16,9 @@ type User {
     groups: [StoreGroup!]
     groupCount: Int!
     smsKey: String
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    expiresAt: DateTime
 }
 
 type Zoneinfo {

@@ -20,6 +20,16 @@ const resolvers: Resolvers = {
             return StoreGroupModel.findOne({
                 _id: storeUser.storeGroupId
             });
+        },
+        isPhoneVerified: async (
+            storeUser: DocumentType<StoreUserCls>
+        ): Promise<boolean> => {
+            return storeUser.verifiedPhoneNumber;
+        },
+        isEmailVerified: async (
+            storeUser: DocumentType<StoreUserCls>
+        ): Promise<boolean> => {
+            return storeUser.verifiedEmail;
         }
     }
 };

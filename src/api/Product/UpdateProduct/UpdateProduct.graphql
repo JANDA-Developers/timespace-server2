@@ -18,7 +18,9 @@ input UpdateProductParamInput {
     needToConfirm: Boolean
     addImages: [Upload!]
     deleteImages: [String!]
+    # deprecated
     peopleCapacity: Int
+    capacity: Int
     genderOption: GenderOption
     businessHours: [PeriodInput!]
     periodOption: PeriodOptionInput

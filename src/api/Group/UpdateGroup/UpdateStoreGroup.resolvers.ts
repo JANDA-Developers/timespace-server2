@@ -110,14 +110,21 @@ const setParamsToStoreGroupObject = async (
     }
 
     if (guestUserConfig) {
-        if (guestUserConfig.acceptAnonymousUser) {
-            storeGroup.signUpOption.acceptAnonymousUser =
-                guestUserConfig.acceptAnonymousUser;
+        const temp = { ...storeGroup.signUpOption };
+        if (guestUserConfig.acceptAnonymousUser != null) {
+            temp.acceptAnonymousUser = guestUserConfig.acceptAnonymousUser;
+            // storeGroup.signUpOption.acceptAnonymousUser =
+            //     guestUserConfig.acceptAnonymousUser;
         }
         if (guestUserConfig.userAccessRange) {
-            storeGroup.signUpOption.userAccessRange =
-                guestUserConfig.userAccessRange;
+            // storeGroup.signUpOption.userAccessRange =
+            temp.userAccessRange = guestUserConfig.userAccessRange;
         }
+        if (guestUserConfig.signUpPolicyContent) {
+            // storeGroup.signUpOption.signUpPolicyContent =
+            temp.signUpPolicyContent = guestUserConfig.signUpPolicyContent;
+        }
+        storeGroup.signUpOption = temp;
     }
 };
 export default resolvers;

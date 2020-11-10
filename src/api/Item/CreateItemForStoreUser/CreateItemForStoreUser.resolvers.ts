@@ -208,7 +208,7 @@ const setTransaction = ({
     const additionalCount = itemCount - defaultCount;
     // 최종 아이템 가격
     const amount =
-        defaultCount * (defaultPrice || segmentPrice) +
+        (defaultPrice || defaultCount * segmentPrice) +
         additionalCount * segmentPrice;
     const transaction = createTransaction({
         amount,

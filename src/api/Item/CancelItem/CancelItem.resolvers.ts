@@ -20,7 +20,7 @@ import {
     SendSmsWithTriggerEvent,
     getReplacementSetsForItem
 } from "../../../models/Item/ItemSmsFunctions";
-import { cancelTransaction } from "../CancelItemForStoreUser/CancelItemForStoreUser.resolvers";
+import { cancelTransaction } from "../shared/CancelItemTransaction";
 
 export const denyItems = async ({
     args,
@@ -60,9 +60,14 @@ export const denyItems = async ({
                 }
             );
         }
-        item.applyStatus("CANCELED", {
-            workerId: cognitoUser._id
-        });
+        await item
+            .applyStatus("CANCELED", {
+                workerId: cognitoUser._id
+            })
+            .save({ session });
+
+        await cancelTransaction(item, param.refundParams!!, session);
+
         await item.save({ session });
 
         const product = await ProductModel.findById(item.productId);
@@ -100,7 +105,6 @@ export const denyItems = async ({
                 ]
             });
         }
-        await cancelTransaction(item, session);
         await session.commitTransaction();
         session.endSession();
 

@@ -67,6 +67,9 @@ const resolvers: Resolvers = {
             return await ProductModel.find({
                 _id: {
                     $in: group.list
+                },
+                isDeleted: {
+                    $ne: true
                 }
             });
         }

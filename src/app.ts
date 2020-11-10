@@ -26,7 +26,7 @@ class App {
         "https://space.stayjanda.cloud",
         "https://manager.space.stayjanda.cloud",
         "https://storeuser.space.stayjanda.cloud",
-        "https://dev-timespace.stayjanda.cloud"
+        "https://dev.timespace.stayjanda.cloud"
     ];
 
     constructor() {
@@ -83,7 +83,7 @@ class App {
                 origin: this.corsOrigin
             })
         );
-
+        this.app.set("trust procy", true);
         this.app.use(helmet());
         // MongoDB for Session Storage
         this.app.use(
@@ -97,9 +97,9 @@ class App {
                 }),
                 cookie: {
                     httpOnly: true,
-                    secure: "auto",
+                    secure: true,
                     domain: ".stayjanda.cloud",
-                    sameSite: "lax",
+                    sameSite: "none",
                     maxAge: ONE_DAY * 14
                 }
             })

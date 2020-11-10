@@ -20,6 +20,9 @@ const resolvers: Resolvers = {
                 _id: {
                     $in: store.products
                     // .map(productId => new ObjectId(productId))
+                },
+                isDeleted: {
+                    $ne: true
                 }
             });
         },
@@ -75,7 +78,8 @@ const resolvers: Resolvers = {
                                 userAccessRange: "STORE_GROUP",
                                 useSignUpAutoPermit: false,
                                 useEmailVerification: false,
-                                usePhoneVerification: true
+                                usePhoneVerification: true,
+                                signUpPolicyContent: null
                             }
                         }
                     }

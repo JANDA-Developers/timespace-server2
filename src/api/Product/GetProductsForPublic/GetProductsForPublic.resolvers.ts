@@ -41,6 +41,9 @@ export const GetProductsForPublicFunc = async (
             data: (await ProductModel.find({
                 _id: {
                     $in: stores.flatMap(item => item.products)
+                },
+                isDeleted: {
+                    $ne: true
                 }
             })) as any
         };

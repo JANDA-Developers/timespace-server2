@@ -55,7 +55,7 @@ export const SignInStoreMainFunc = async ({
         if (storeUser) {
             // 만약에 storeUser == undefined 인 경우,
             await comparePasswordForStoreUser(storeUser, password);
-            setSessionData(req, storeUser, storeGroupCode);
+            setStoreUserSessionData(req, storeUser, storeGroupCode);
         } else {
             const buyer = await signInWithBuyerAccount(email, password);
             if (!buyer) {
@@ -92,7 +92,7 @@ export const SignInStoreMainFunc = async ({
                 await migratedStoreUser.save();
 
                 // 우선은 StoreGroupCode 위주로 되어있음.
-                setSessionData(req, migratedStoreUser, storeGroupCode);
+                setStoreUserSessionData(req, migratedStoreUser, storeGroupCode);
             }
         }
         return {
@@ -181,7 +181,7 @@ const migrateBuyerToStoreUser = async (
     return storeUser;
 };
 
-const setSessionData = (
+export const setStoreUserSessionData = (
     req: any,
     storeUser: DocumentType<StoreUserCls>,
     storeGroupCode: string

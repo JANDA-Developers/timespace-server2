@@ -20,7 +20,7 @@ import {
     SendSmsWithTriggerEvent
 } from "../../../models/Item/ItemSmsFunctions";
 import { UserModel } from "../../../models/User";
-import { ItemCls } from "../../../models/Item/Item";
+import { ItemCls, ItemModel } from "../../../models/Item/Item";
 import { ProductCls } from "../../../models/Product/Product";
 import { findProduct } from "../../../models/Product/productFunctions";
 
@@ -56,6 +56,17 @@ export const ConfirmItemPaymentFunc = async (
         });
         await transaction.save({ session });
         const product = await findProduct(item.productId);
+
+        await ItemModel.updateOne(
+            {
+                _id: item._id
+            },
+            {
+                $set: {
+                    expiresAt: undefined
+                }
+            }
+        );
 
         await SendSmsForStoreUser(product, item);
         await session.commitTransaction();

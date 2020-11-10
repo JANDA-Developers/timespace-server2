@@ -140,6 +140,9 @@ const createItem = async (
 
         await transaction.save({ session });
         item.transactionId = transaction._id;
+        if (transaction.paymethod === "CARD") {
+            item.expiresAt = new Date(Date.now() + ONE_MINUTE * 30);
+        }
     }
     // SMS 전송 ㄱㄱㄱ
     if (!product.usingPayment) {

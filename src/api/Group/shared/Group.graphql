@@ -41,6 +41,7 @@ type StoreUserSignUpOption {
     useEmailVerification: Boolean!
     usePhoneVerification: Boolean!
     useSignUpAutoPermit: Boolean!
+    signUpPolicyContent: String
 }
 
 input StoreUserSignUpOptionInput {
@@ -51,6 +52,7 @@ input StoreUserSignUpOptionInput {
     useEmailVerification: Boolean
     usePhoneVerification: Boolean
     useSignUpAutoPermit: Boolean
+    signUpPolicyContent: String
 }
 
 enum UserAccessRange {

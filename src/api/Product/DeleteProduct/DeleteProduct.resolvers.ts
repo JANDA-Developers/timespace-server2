@@ -53,13 +53,16 @@ const resolvers: Resolvers = {
                             itm => !pid.equals(itm)
                         );
 
-                        await ProductModel.deleteOne(
+                        await ProductModel.updateOne(
                             {
                                 _id: pid
                             },
                             {
-                                session
-                            }
+                                $set: {
+                                    isDeleted: true
+                                }
+                            },
+                            { session }
                         );
                         await store.save({ session });
 

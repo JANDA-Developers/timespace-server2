@@ -17,6 +17,7 @@ import {
 } from "../../../models/StoreUser/StoreUser";
 import { StoreGroupCls } from "../../../models/StoreGroup";
 import { isExistingStoreUser } from "../../../models/helpers/helper";
+import { setStoreUserSessionData } from "../SignInStore/SignInStore.resolvers";
 
 export const SignUpStoreFunc = async ({
     args,
@@ -38,6 +39,8 @@ export const SignUpStoreFunc = async ({
 
         const storeUser = await createStoreUser(param, storeGroup, store);
         await storeUser.save({ session });
+
+        setStoreUserSessionData(req, storeUser, storeGroup.code);
 
         await session.commitTransaction();
         session.endSession();

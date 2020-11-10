@@ -28,8 +28,13 @@ export type TrxHistoryInput = {
     payResult?: NicepayPayResultInput;
     paymethod: Paymethod;
     refundResult?: NicepayRefundResultInput;
+    message?: string;
 };
 
+/**
+ * Find Transaction in Database. If nothing found, throw error and exit.
+ * @param id transaction Id
+ */
 export const findTransaction = async (
     id: ObjectId | string
 ): Promise<DocumentType<TransactionCls>> => {
@@ -63,6 +68,7 @@ export const setTransactionPayStatusToPending = (
         amount: number;
         currency: CurrencyCode;
         paymethod: Paymethod;
+        message?: string;
     }
 ): TransactionHistoryItem => {
     if (transaction.amountInfo.origin !== input.amount) {
@@ -76,7 +82,8 @@ export const setTransactionPayStatusToPending = (
         date: new Date(),
         payResult: null,
         paymethod: input.paymethod,
-        refundResult: null
+        refundResult: null,
+        message: input.message || null
     };
     transaction.paymentStatus = "PENDING";
     transaction.history.push(item);
@@ -93,6 +100,7 @@ export const setTransactionPayStatusToDone = (
         currency?: CurrencyCode;
         paymethod: Paymethod;
         payResultInput: NicepayPayResultInput;
+        message?: string;
     }
 ): TransactionHistoryItem => {
     if (transaction.amountInfo.origin !== input.amount) {
@@ -111,7 +119,8 @@ export const setTransactionPayStatusToDone = (
         date: new Date(),
         payResult: input.payResultInput,
         paymethod: input.paymethod,
-        refundResult: null
+        refundResult: null,
+        message: input.message || null
     };
     transaction.amountInfo = {
         ...transaction.amountInfo,
@@ -131,6 +140,7 @@ export const setTransactionPayStatusToCanceled = (
         amount: number;
         currency?: CurrencyCode;
         paymethod: Paymethod;
+        message?: string;
     }
 ) => {
     if (transaction.amountInfo.origin !== input.amount) {
@@ -152,7 +162,8 @@ export const setTransactionPayStatusToCanceled = (
         date: new Date(),
         payResult: null,
         paymethod: input.paymethod,
-        refundResult: null
+        refundResult: null,
+        message: input.message || null
     };
     transaction.paymentStatus = "DONE";
     transaction.history.push(item);
@@ -168,6 +179,7 @@ export const setTransactionRefundStatusToPending = (
         amount: number;
         currency?: CurrencyCode;
         paymethod: Paymethod;
+        message?: string;
     }
 ): TransactionHistoryItem => {
     const item: TransactionHistoryItem = {
@@ -178,7 +190,8 @@ export const setTransactionRefundStatusToPending = (
         date: new Date(),
         payResult: null,
         paymethod: input.paymethod,
-        refundResult: null
+        refundResult: null,
+        message: input.message || null
     };
     transaction.refundStatus = "PENDING";
     transaction.history.push(item);
@@ -199,6 +212,7 @@ export const setTransactionRefundStatusToDone = (
         amount: number;
         currency?: CurrencyCode;
         paymethod: Paymethod;
+        message?: string;
     }
 ): TransactionHistoryItem => {
     // FIXME: 이게 있어야 하는지 고민좀 해봅시다... 20200716212000
@@ -213,7 +227,8 @@ export const setTransactionRefundStatusToDone = (
         date: new Date(),
         payResult: null,
         paymethod: input.paymethod,
-        refundResult: null
+        refundResult: null,
+        message: input.message || null
     };
     transaction.refundStatus = "DONE";
     transaction.history.push(item);
@@ -234,6 +249,7 @@ export const setTransactionRefundStatusToCancel = (
         amount: number;
         currency?: CurrencyCode;
         paymethod: Paymethod;
+        message?: string;
     }
 ): TransactionHistoryItem => {
     if (transaction.amountInfo.refunded !== input.amount) {
@@ -247,7 +263,8 @@ export const setTransactionRefundStatusToCancel = (
         date: new Date(),
         payResult: null,
         paymethod: input.paymethod,
-        refundResult: null
+        refundResult: null,
+        message: input.message || null
     };
     transaction.refundStatus = "DONE";
     transaction.history.push(item);
@@ -270,7 +287,8 @@ export const addRefundTrxHistoryItem = (
         date: new Date(),
         payResult: input.payResult || null,
         paymethod: input.paymethod,
-        refundResult: input.refundResult || null
+        refundResult: input.refundResult || null,
+        message: null
     };
     transaction.refundStatus = input.status;
     transaction.history.push(item);
@@ -302,6 +320,7 @@ export const nicepayRefund = async (input: {
     amount: number;
     ediDate: string;
     message: string;
+    originAmount: number;
 }) => {
     console.log({
         cancelItemInput: input
@@ -318,11 +337,18 @@ export const nicepayRefund = async (input: {
         CancelDate: string;
         CancelTime: string;
         RemainAmt: string;
-    }>(process.env.API_URL + "/payment/pay/cancel", input, {
-        headers: {
-            "Content-Type": "application/json"
+    }>(
+        process.env.API_URL + "/payment/pay/cancel",
+        {
+            ...input,
+            isPartialCancel: input.amount !== input.originAmount ? 1 : 0
+        },
+        {
+            headers: {
+                "Content-Type": "application/json"
+            }
         }
-    });
+    );
 
     const { data, statusText, status } = result;
     if (status !== 200) {

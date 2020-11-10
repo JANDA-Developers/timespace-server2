@@ -10,6 +10,7 @@ type TransactionHistoryItem {
     payResult: NicepayPayResult
     # type = REFUND, status: DONE 인 경우에 출력
     refundResult: NicepayRefundResult
+    message: String
 }
 
 enum TrxHistoryItemType {

@@ -10,4 +10,5 @@ type CancelItemResponse {
 
 input CancelItemInput {
     itemId: ID!
+    refundParams: RefundInput
 }

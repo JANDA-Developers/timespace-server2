@@ -34,6 +34,7 @@ export class SignUpOption {
     private useEmailVerification: boolean;
     private usePhoneVerification: boolean;
     private useSignUpAutoPermit: boolean;
+    private signUpPolicyContent: string | null;
 
     static builder() {
         return new SignUpOption();
@@ -57,7 +58,8 @@ export class SignUpOption {
             userAccessRange: this.userAccessRange,
             useEmailVerification: this.useEmailVerification,
             usePhoneVerification: this.usePhoneVerification,
-            useSignUpAutoPermit: this.useSignUpAutoPermit
+            useSignUpAutoPermit: this.useSignUpAutoPermit,
+            signUpPolicyContent: this.signUpPolicyContent
         };
     }
 }

@@ -2,15 +2,9 @@ type Mutation {
     CancelItemForStoreUser(
         itemCode: String!
         comment: String
-        refundParams: RefundParams
     ): CancelItemForStoreUserResponse!
 }
 type CancelItemForStoreUserResponse {
     ok: Boolean!
     error: Err
-}
-
-input RefundParams {
-    amount: Float!
-    cancelMessage: String
 }

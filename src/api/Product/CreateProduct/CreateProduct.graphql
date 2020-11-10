@@ -17,6 +17,7 @@ input CreateProductInput {
     warning: String
     optionalParams: ProductOptionalFieldInput
     infos: [InfoInput!]
+    needToConfirm: Boolean
 }
 
 input ProductOptionalFieldInput {

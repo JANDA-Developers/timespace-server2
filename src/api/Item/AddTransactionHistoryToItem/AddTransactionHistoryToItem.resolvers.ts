@@ -78,12 +78,14 @@ const setTransactionStatus = (
                 setTransactionPayToDone(item, {
                     ...input,
                     currency: input.currency!!,
-                    payResultInput: input.nicepayPayResultInput
+                    payResultInput: input.nicepayPayResultInput,
+                    message: input.message || undefined
                 });
             } else if (status === "CANCELED") {
                 setTransactionPayToCanceled(item, {
                     ...input,
-                    currency: input.currency!!
+                    currency: input.currency!!,
+                    message: input.message || undefined
                 });
             }
             break;
@@ -91,12 +93,14 @@ const setTransactionStatus = (
             if (status === "PENDING") {
                 setTransactionRefundToPending(item, {
                     ...input,
-                    currency: input.currency!!
+                    currency: input.currency!!,
+                    message: input.message || undefined
                 });
             } else if (status === "DONE") {
                 setTransactionRefundToDone(item, {
                     ...input,
-                    currency: input.currency!!
+                    currency: input.currency!!,
+                    message: input.message || undefined
                 });
             }
             break;
