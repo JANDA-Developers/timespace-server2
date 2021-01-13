@@ -37,6 +37,7 @@ class App {
             this.app.set("trust procy", true);
             this.app.use(helmet_1.default());
             // MongoDB for Session Storage
+            console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!qid");
             this.app.use(express_session_1.default({
                 name: "qid",
                 secret: process.env.JD_TIMESPACE_SECRET || "",
