@@ -4,8 +4,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
+const path_1 = __importDefault(require("path"));
 dotenv_1.default.config({
-    path: "../.env"
+    path: path_1.default.join(__dirname, `../.env`)
 });
 const app_1 = __importDefault(require("./app"));
 const typegoose_1 = require("@typegoose/typegoose");

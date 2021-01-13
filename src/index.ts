@@ -1,8 +1,10 @@
 import dotenv from "dotenv";
+import path from "path";
 
 dotenv.config({
-    path: "../.env"
+    path: path.join(__dirname, `../.env`)
 });
+
 import app from "./app";
 import { mongoose } from "@typegoose/typegoose";
 import { DB_URI } from "./types/values";
