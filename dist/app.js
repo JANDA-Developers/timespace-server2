@@ -50,7 +50,7 @@ class App {
                     secure: true,
                     domain: ".stayjanda.cloud",
                     sameSite: "none",
-                    maxAge: dateFuncs_1.ONE_DAY * 14
+                    maxAge: dateFuncs_1.ONE_DAY * 99
                 }
             }));
             this.useLogger();

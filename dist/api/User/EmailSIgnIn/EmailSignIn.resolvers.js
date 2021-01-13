@@ -18,6 +18,8 @@ const resolvers = {
             session.startTransaction();
             try {
                 const result = await cognitoSignIn(email, password, role);
+                console.log("reuslt");
+                console.log(result);
                 const { AuthenticationResult: authResult } = result;
                 if (!authResult || !authResult.IdToken) {
                     throw result.$response.error;

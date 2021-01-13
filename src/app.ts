@@ -100,7 +100,7 @@ class App {
                     secure: true,
                     domain: ".stayjanda.cloud",
                     sameSite: "none",
-                    maxAge: ONE_DAY * 14
+                    maxAge: ONE_DAY * 99
                 }
             })
         );
