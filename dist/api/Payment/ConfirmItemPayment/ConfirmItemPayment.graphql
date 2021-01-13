@@ -1,0 +1,16 @@
+type Mutation {
+    ConfirmItemPayment(
+        itemId: ID!
+        input: ConfirmItemPaymentInput!
+    ): ConfirmItemPaymentResponse!
+}
+type ConfirmItemPaymentResponse {
+    ok: Boolean!
+    error: Err
+}
+input ConfirmItemPaymentInput {
+    amount: Float!
+    paymethod: Paymethod!
+    currency: CurrencyCode
+    payResult: NicepayPayResultInput
+}

@@ -1,0 +1,33 @@
+type Mutation {
+    EmailSignUp(param: EmailSignUpInput!): EmailSignUpResponse!
+}
+
+type EmailSignUpResponse implements BaseResponse {
+    ok: Boolean!
+    error: Err
+    data: EmailSignUpResult
+}
+
+input EmailSignUpInput {
+    email: EmailAddress!
+    # 국가번호까지 다 쳐야됨. countries 메서드로 국가 검색 => zoneinfo필드에서 해당하는 Timezone 선택 후 "callingCode" 받으면됨. => ex) +8201000000000
+    phoneNumber: PhoneNumber!
+    password: Password!
+    username: String!
+    timezone: String!
+    # SELLER, BUYER
+    role: UserRole!
+    company: String
+}
+
+type EmailSignUpResult {
+    CodeDeliveryDetails: CodeDeliveryDetails
+    UserConfirmed: Boolean!
+    UserSub: String
+}
+
+type CodeDeliveryDetails {
+    AttributeName: String
+    DeliveryMedium: String
+    Destination: String
+}

@@ -1,0 +1,15 @@
+type Query {
+    GetPaymentAuthInfo(amount: Float!): GetPaymentAuthInfoResponse!
+}
+
+type GetPaymentAuthInfoResponse {
+    ok: Boolean!
+    error: Err
+    data: PaymentAuthObject
+}
+
+type PaymentAuthObject {
+    mid: String!
+    hash: String!
+    date: String
+}

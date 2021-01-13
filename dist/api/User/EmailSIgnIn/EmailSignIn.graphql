@@ -1,0 +1,15 @@
+type Mutation {
+    # Email 로그인
+    EmailSignIn(param: EmailSignInInput!): EmailSignInResponse!
+}
+
+type EmailSignInResponse implements BaseResponse {
+    ok: Boolean!
+    error: Err
+}
+
+input EmailSignInInput {
+    email: EmailAddress!
+    password: String!
+    role: UserRole!
+}

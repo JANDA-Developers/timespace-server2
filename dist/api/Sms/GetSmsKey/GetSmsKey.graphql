@@ -1,0 +1,10 @@
+type Query {
+    # 현재 등록된 SmsKey 가져오는 함수
+    GetSmsKey: GetSmsKeyResponse!
+}
+type GetSmsKeyResponse {
+    ok: Boolean!
+    error: Err
+    # SmsKey 바로나옴
+    data: String
+}

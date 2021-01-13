@@ -1,0 +1,87 @@
+type NicepayPayResult {
+    ResultCode: String!
+    ResultMsg: String!
+    Amt: String!
+    MID: String!
+    Moid: String!
+    BuyerEmail: String!
+    BuyerTel: String!
+    BuyerName: String!
+    GoodsName: String!
+    TID: String!
+    AuthCode: String!
+    AuthDate: String!
+    PayMethod: String!
+    CartData: String!
+    Signature: String!
+    CardCode: String!
+    CardName: String!
+    CardNo: String!
+    CardQuota: String!
+    CardInterest: String!
+    AcquCardCode: String!
+    AcquCardName: String!
+    CardCl: String!
+    CcPartCl: String!
+    CouponAmt: String!
+    CouponMinAmt: String!
+    PointAppAmt: String!
+    ClickpayCl: String!
+}
+
+input NicepayPayResultInput {
+    ResultCode: String!
+    ResultMsg: String!
+    Amt: String!
+    MID: String!
+    Moid: String!
+    BuyerEmail: String!
+    BuyerTel: String!
+    BuyerName: String!
+    GoodsName: String!
+    TID: String!
+    AuthCode: String!
+    AuthDate: String!
+    PayMethod: String!
+    CartData: String!
+    Signature: String!
+    CardCode: String!
+    CardName: String!
+    CardNo: String!
+    CardQuota: String!
+    CardInterest: String!
+    AcquCardCode: String!
+    AcquCardName: String!
+    CardCl: String!
+    CcPartCl: String!
+    CouponAmt: String!
+    CouponMinAmt: String!
+    PointAppAmt: String!
+    ClickpayCl: String!
+}
+
+type NicepayRefundResult {
+    ResultCode: String!
+    ResultMsg: String!
+    CancelAmt: String!
+    MID: String!
+    Moid: String!
+    PayMethod: String
+    TID: String
+    CancelDate: String
+    CancelTime: String
+    RemainAmt: String
+}
+
+input NicepayRefundResultInput {
+    ResultCode: String!
+    ResultMsg: String!
+    CancelAmt: String!
+    MID: String!
+    Moid: String!
+    PayMethod: String
+    TID: String
+    CancelDate: String
+    CancelTime: String
+    RemainAmt: String
+}

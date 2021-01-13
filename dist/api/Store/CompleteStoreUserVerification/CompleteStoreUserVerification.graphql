@@ -1,0 +1,10 @@
+type Mutation {
+    CompleteStoreUserVerification(
+        target: VerificationTarget!
+        code: String!
+    ): CompleteStoreUserVerificationResponse!
+}
+type CompleteStoreUserVerificationResponse {
+    ok: Boolean!
+    error: Err
+}

@@ -1,0 +1,12 @@
+type Query {
+    # 외부에서 Store를 조회할떄 사용함 => ex) Buyer가 예약을 위해 조회할떄 사용
+    GetStoreForBuyer(param: GetStoreForBuyerInput!): GetStoreForBuyerResponse!
+}
+type GetStoreForBuyerResponse {
+    ok: Boolean!
+    error: Err
+    data: Store
+}
+input GetStoreForBuyerInput {
+    storeCode: String!
+}

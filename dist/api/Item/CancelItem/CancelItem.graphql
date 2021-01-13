@@ -1,0 +1,14 @@
+type Mutation {
+    CancelItem(param: CancelItemInput!): CancelItemResponse!
+}
+
+type CancelItemResponse {
+    ok: Boolean!
+    error: Err
+    data: Item
+}
+
+input CancelItemInput {
+    itemId: ID!
+    refundParams: RefundInput
+}

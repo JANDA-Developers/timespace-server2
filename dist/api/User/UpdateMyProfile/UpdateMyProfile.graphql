@@ -1,0 +1,18 @@
+type Mutation {
+    UpdateMyProfile(param: UpdateMyProfileInput!): UpdateMyProfileResponse!
+}
+
+type UpdateMyProfileResponse {
+    ok: Boolean!
+    error: Err
+    data: String
+}
+
+input UpdateMyProfileInput {
+    roles: [UserRole!]
+    name: String
+    # callingCode 제거한채로 넣기...
+    phoneNumber: String
+    # timezone... ex) Asia/Seoul
+    timezone: String
+}

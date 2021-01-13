@@ -1,0 +1,13 @@
+type Mutation {
+    UpdateItem(itemId: ID!, input: UpdateItemInput!): UpdateItemResponse!
+}
+type UpdateItemResponse {
+    ok: Boolean!
+    error: Err
+}
+input UpdateItemInput {
+    name: String
+    phoneNumber: String
+    start: DateTime
+    end: DateTime
+}

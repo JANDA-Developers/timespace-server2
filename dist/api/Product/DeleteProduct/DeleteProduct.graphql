@@ -1,0 +1,11 @@
+type Mutation {
+    DeleteProduct(param: DeleteProductInput!): DeleteProductResponse!
+}
+type DeleteProductResponse {
+    ok: Boolean!
+    error: Err
+    data: Product
+}
+input DeleteProductInput {
+    productId: ID!
+}

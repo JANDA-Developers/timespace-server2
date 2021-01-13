@@ -1,0 +1,11 @@
+type Mutation {
+    AddTransactionHistoryToItem(
+        itemId: ID!
+        input: AddTransactionHistoryInput!
+    ): AddTransactionHistoryToItemResponse!
+}
+type AddTransactionHistoryToItemResponse {
+    ok: Boolean!
+    error: Err
+    data: Transaction
+}

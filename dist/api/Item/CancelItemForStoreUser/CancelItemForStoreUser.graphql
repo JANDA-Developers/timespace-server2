@@ -1,0 +1,10 @@
+type Mutation {
+    CancelItemForStoreUser(
+        itemCode: String!
+        comment: String
+    ): CancelItemForStoreUserResponse!
+}
+type CancelItemForStoreUserResponse {
+    ok: Boolean!
+    error: Err
+}

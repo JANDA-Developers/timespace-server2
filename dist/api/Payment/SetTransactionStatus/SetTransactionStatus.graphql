@@ -1,0 +1,18 @@
+type Mutation {
+    SetTransactionStatus(
+        transactionId: ID!
+        input: SetTransactionStatusInput!
+    ): SetTransactionStatusResponse!
+}
+
+type SetTransactionStatusResponse {
+    ok: Boolean!
+    error: Err
+}
+
+input SetTransactionStatusInput {
+    amount: Float!
+    paymethod: Paymethod!
+    currency: CurrencyCode
+    payResult: NicepayPayResultInput
+}

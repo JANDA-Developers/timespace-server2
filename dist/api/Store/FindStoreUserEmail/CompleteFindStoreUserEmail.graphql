@@ -1,0 +1,11 @@
+type Mutation {
+    CompleteFindStoreUserEmail(
+        phoneNumber: String!
+        code: String!
+    ): CompleteFindStoreUserEmailResponse!
+}
+type CompleteFindStoreUserEmailResponse {
+    ok: Boolean!
+    error: Err
+    email: String
+}

@@ -1,0 +1,11 @@
+type Query {
+    FindMyEmail(param: FindMyEmailInput!): FindMyEmailResponse!
+}
+type FindMyEmailResponse {
+    ok: Boolean!
+    error: Err
+    data: String
+}
+input FindMyEmailInput {
+    phoneNumber: String!
+}

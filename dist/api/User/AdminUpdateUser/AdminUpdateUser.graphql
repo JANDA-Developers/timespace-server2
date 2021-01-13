@@ -1,0 +1,22 @@
+type Mutation {
+    AdminUpdateUser(param: AdminUpdateUserInput!): AdminUpdateUserResponse!
+}
+type AdminUpdateUserResponse {
+    ok: Boolean!
+    error: Err
+    # IdToken => 헤더에 저장할것!
+    data: String
+}
+input AdminUpdateUserInput {
+    userSub: String!
+    role: UserRole!
+    updateParam: UpdateUserParamInput!
+}
+
+input UpdateUserParamInput {
+    name: String
+    smsKey: String
+    # callingCode 앞에 자동으로 붙임. 그냥 010부터 적으면됨
+    phoneNumber: String
+    timezone: String
+}

@@ -1,0 +1,8 @@
+type PrivacyPolicy implements BaseModel {
+    _id: ID!
+    name: String!
+    content: String!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    expiresAt: DateTime
+}

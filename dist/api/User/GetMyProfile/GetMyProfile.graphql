@@ -1,0 +1,13 @@
+type Query {
+    GetMyProfile: GetMyProfileResponse!
+}
+
+type GetMyProfileResponse implements BaseResponse {
+    ok: Boolean!
+    error: Err
+    data: GetMyProfileResult
+}
+
+type GetMyProfileResult {
+    user: User!
+}

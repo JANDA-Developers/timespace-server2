@@ -1,0 +1,28 @@
+type Query {
+    GetItems(param: GetItemsInput!): GetItemsResponse!
+}
+type GetItemsResponse {
+    ok: Boolean!
+    error: Err
+    data: [Item!]
+}
+input GetItemsInput {
+    storeId: ID
+    filter: GetItemsFilterInput!
+    sort: [GetItemsSortInput]
+}
+
+input GetItemsFilterInput {
+    productCode: String
+    productId: String
+    date: DateTime
+    dateTimeRange: DateTimeRangeInput
+    name: String
+    status: ItemStatus
+    createdAtRange: DateTimeRangeInput
+}
+
+input GetItemsSortInput {
+    sortKey: String!
+    sort: Int!
+}

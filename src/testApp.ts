@@ -7,7 +7,7 @@ import express, { Express, NextFunction, Response } from "express";
 import axios from "axios";
 import { decodeKey } from "./utils/decodeIdToken";
 import { mongoose } from "@typegoose/typegoose";
-import { testDBUri } from "./test.uri";
+// import { testDBUri } from "./test.uri";
 
 class TestApp {
     public server: ApolloServer;
@@ -26,7 +26,8 @@ class TestApp {
         });
         this.middlewares();
         if (mongoose.connections.length === 0) {
-            mongoose.createConnection(testDBUri, {
+            // @ts-ignore
+            mongoose.createConnection("", {
                 useNewUrlParser: true,
                 useCreateIndex: true,
                 useUnifiedTopology: true

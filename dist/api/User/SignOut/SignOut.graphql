@@ -1,0 +1,8 @@
+type Mutation {
+    SignOut(role: UserRole!): SignOutResponse!
+}
+
+type SignOutResponse {
+    ok: Boolean!
+    error: Err
+}

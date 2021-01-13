@@ -134,9 +134,11 @@ class App {
         res: Response,
         next: NextFunction
     ): Promise<void> => {
+        // @ts-ignore
         const seller = req.session?.seller;
         const token = seller?.idToken;
         if (token) {
+            // @ts-ignore
             const expiresAt = parseInt(req.session?.seller?.expiresIn);
             const now = Date.now();
             // TODO: Refresh Token...
@@ -169,6 +171,7 @@ class App {
                             result
                         });
                         if (req.session) {
+                            // @ts-ignore
                             req.session.seller = {
                                 idToken: result.idToken,
                                 expiresIn: result.expDate?.getTime(),
@@ -192,9 +195,11 @@ class App {
         res: Response,
         next: NextFunction
     ): Promise<void> => {
+        // @ts-ignore
         const buyer = req.session?.buyer;
         const token = buyer?.idToken;
         if (token) {
+            // @ts-ignore
             const expiresAt = parseInt(req.session?.buyer?.expiresIn);
             const now = Date.now();
             // TODO: Refresh Token...
@@ -221,6 +226,7 @@ class App {
                     );
                     if (ok && result) {
                         if (req.session) {
+                            // @ts-ignore
                             req.session.buyer = {
                                 idToken: result.idToken,
                                 expiresIn: result.expDate?.getTime(),

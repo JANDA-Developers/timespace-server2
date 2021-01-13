@@ -1,0 +1,17 @@
+type Mutation {
+    SignUpStore(param: SignUpStoreInput!): SignUpStoreResponse!
+}
+type SignUpStoreResponse {
+    ok: Boolean!
+    error: Err
+    data: StoreUser
+}
+input SignUpStoreInput {
+    name: String!
+    password: String!
+    email: String!
+    phoneNumber: String!
+    # default: KR
+    timezone: String!
+    company: String
+}
