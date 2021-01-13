@@ -21,6 +21,7 @@ class App {
     private corsOrigin: string[] = [
         "http://localhost:3000",
         "http://localhost:3001",
+        "http://localhost:4001",
         "http://localhost:80",
         "https://dev-ticket-yeulbep6p.stayjanda.cloud",
         "https://space.stayjanda.cloud",
@@ -86,6 +87,9 @@ class App {
         this.app.set("trust procy", true);
         this.app.use(helmet());
         // MongoDB for Session Storage
+        console.log(process.env.JD_TIMESPACE_SECRET);
+        console.log(process.env.JD_TIMESPACE_SECRET);
+        console.log(process.env.JD_TIMESPACE_SECRET);
         this.app.use(
             session({
                 name: "qid",
@@ -97,10 +101,10 @@ class App {
                 }),
                 cookie: {
                     httpOnly: true,
-                    secure: true,
+                    secure: false,
                     domain: ".stayjanda.cloud",
-                    sameSite: "none",
-                    maxAge: ONE_DAY * 99
+                    sameSite: "lax",
+                    maxAge: ONE_DAY * 14
                 }
             })
         );

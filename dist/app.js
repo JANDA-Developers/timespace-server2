@@ -22,6 +22,7 @@ class App {
         this.corsOrigin = [
             "http://localhost:3000",
             "http://localhost:3001",
+            "http://localhost:4001",
             "http://localhost:80",
             "https://dev-ticket-yeulbep6p.stayjanda.cloud",
             "https://space.stayjanda.cloud",
@@ -37,6 +38,9 @@ class App {
             this.app.set("trust procy", true);
             this.app.use(helmet_1.default());
             // MongoDB for Session Storage
+            console.log(process.env.JD_TIMESPACE_SECRET);
+            console.log(process.env.JD_TIMESPACE_SECRET);
+            console.log(process.env.JD_TIMESPACE_SECRET);
             this.app.use(express_session_1.default({
                 name: "qid",
                 secret: process.env.JD_TIMESPACE_SECRET || "",
@@ -47,10 +51,10 @@ class App {
                 }),
                 cookie: {
                     httpOnly: true,
-                    secure: true,
+                    secure: false,
                     domain: ".stayjanda.cloud",
-                    sameSite: "none",
-                    maxAge: dateFuncs_1.ONE_DAY * 99
+                    sameSite: "lax",
+                    maxAge: dateFuncs_1.ONE_DAY * 14
                 }
             }));
             this.useLogger();

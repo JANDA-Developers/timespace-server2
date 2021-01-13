@@ -67,6 +67,10 @@ const resolvers = {
                         user.refreshTokenLastUpdate = new Date();
                         await user.save({ session });
                     }
+                    console.log("?????!?!??!?!?!?!");
+                    console.log(signInInfo);
+                    console.log(signInInfo);
+                    console.log(signInInfo);
                     req.session.seller = signInInfo;
                 }
                 else {
