@@ -71,7 +71,7 @@ const resolvers: Resolvers = {
                             sub: cognitoUser.data.sub
                         });
                         if (!user) {
-                            new UserModel({
+                            await new UserModel({
                                 _id: new ObjectId(),
                                 sub: cognitoUser.data.sub,
                                 refreshToken: authResult.RefreshToken || "",
@@ -91,7 +91,7 @@ const resolvers: Resolvers = {
                             sub: cognitoUser.data.sub
                         });
                         if (!user) {
-                            new BuyerModel({
+                            await new BuyerModel({
                                 _id: new ObjectId(),
                                 sub: cognitoUser.data.sub,
                                 refreshToken: authResult.RefreshToken || "",
@@ -115,6 +115,7 @@ const resolvers: Resolvers = {
                         error: null
                     };
                 } catch (error) {
+                    console.log("FFFFF!!");
                     return await errorReturn(error, session);
                 }
             }

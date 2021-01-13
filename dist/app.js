@@ -37,7 +37,6 @@ class App {
             this.app.set("trust procy", true);
             this.app.use(helmet_1.default());
             // MongoDB for Session Storage
-            console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!qid");
             this.app.use(express_session_1.default({
                 name: "qid",
                 secret: process.env.JD_TIMESPACE_SECRET || "",
@@ -73,11 +72,9 @@ class App {
         };
         this.jwt = async (req, res, next) => {
             var _a, _b, _c, _d;
-            // @ts-ignore
             const seller = (_a = req.session) === null || _a === void 0 ? void 0 : _a.seller;
             const token = seller === null || seller === void 0 ? void 0 : seller.idToken;
             if (token) {
-                // @ts-ignore
                 const expiresAt = parseInt((_c = (_b = req.session) === null || _b === void 0 ? void 0 : _b.seller) === null || _c === void 0 ? void 0 : _c.expiresIn);
                 const now = Date.now();
                 // TODO: Refresh Token...
@@ -106,7 +103,6 @@ class App {
                                 result
                             });
                             if (req.session) {
-                                // @ts-ignore
                                 req.session.seller = {
                                     idToken: result.idToken,
                                     expiresIn: (_d = result.expDate) === null || _d === void 0 ? void 0 : _d.getTime(),
@@ -127,11 +123,9 @@ class App {
         };
         this.jwtForBuyer = async (req, res, next) => {
             var _a, _b, _c, _d;
-            // @ts-ignore
             const buyer = (_a = req.session) === null || _a === void 0 ? void 0 : _a.buyer;
             const token = buyer === null || buyer === void 0 ? void 0 : buyer.idToken;
             if (token) {
-                // @ts-ignore
                 const expiresAt = parseInt((_c = (_b = req.session) === null || _b === void 0 ? void 0 : _b.buyer) === null || _c === void 0 ? void 0 : _c.expiresIn);
                 const now = Date.now();
                 // TODO: Refresh Token...
@@ -153,7 +147,6 @@ class App {
                         const { ok, data: result } = await refreshToken_1.refreshToken(rToken, "BUYER");
                         if (ok && result) {
                             if (req.session) {
-                                // @ts-ignore
                                 req.session.buyer = {
                                     idToken: result.idToken,
                                     expiresIn: (_d = result.expDate) === null || _d === void 0 ? void 0 : _d.getTime(),
