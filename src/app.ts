@@ -87,9 +87,6 @@ class App {
         this.app.set("trust procy", true);
         this.app.use(helmet());
         // MongoDB for Session Storage
-        console.log(process.env.JD_TIMESPACE_SECRET);
-        console.log(process.env.JD_TIMESPACE_SECRET);
-        console.log(process.env.JD_TIMESPACE_SECRET);
         this.app.use(
             session({
                 name: "qid",

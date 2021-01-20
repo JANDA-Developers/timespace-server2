@@ -38,9 +38,6 @@ class App {
             this.app.set("trust procy", true);
             this.app.use(helmet_1.default());
             // MongoDB for Session Storage
-            console.log(process.env.JD_TIMESPACE_SECRET);
-            console.log(process.env.JD_TIMESPACE_SECRET);
-            console.log(process.env.JD_TIMESPACE_SECRET);
             this.app.use(express_session_1.default({
                 name: "qid",
                 secret: process.env.JD_TIMESPACE_SECRET || "",
@@ -53,7 +50,7 @@ class App {
                     httpOnly: true,
                     secure: false,
                     domain: ".stayjanda.cloud",
-                    sameSite: "lax",
+                    sameSite: "none",
                     maxAge: dateFuncs_1.ONE_DAY * 14
                 }
             }));
