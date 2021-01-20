@@ -87,10 +87,6 @@ const resolvers: Resolvers = {
 
                             await user.save({ session });
                         }
-                        console.log("?????!?!??!?!?!?!");
-                        console.log(signInInfo);
-                        console.log(signInInfo);
-                        console.log(signInInfo);
                         req.session.seller = signInInfo;
                     } else {
                         const user = await BuyerModel.findOne({

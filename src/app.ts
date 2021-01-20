@@ -103,7 +103,7 @@ class App {
                     httpOnly: true,
                     secure: false,
                     domain: ".stayjanda.cloud",
-                    sameSite: "lax",
+                    sameSite: "none",
                     maxAge: ONE_DAY * 14
                 }
             })
