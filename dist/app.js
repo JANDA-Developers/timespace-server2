@@ -49,14 +49,14 @@ class App {
                 }),
                 cookie: {
                     httpOnly: true,
-                    secure: true,
+                    secure: "auto",
                     domain: ".stayjanda.cloud",
                     sameSite: "none",
                     maxAge: dateFuncs_1.ONE_DAY * 14
                 }
             }));
             this.app.use((req, res, next) => {
-                res.set("version", "1.0.2");
+                res.set("version", "1.0.3");
                 next();
             });
             this.useLogger();
