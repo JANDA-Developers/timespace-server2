@@ -99,7 +99,7 @@ class App {
                 }),
                 cookie: {
                     httpOnly: true,
-                    secure: "auto",
+                    secure: true,
                     domain: ".stayjanda.cloud",
                     sameSite: "lax",
                     maxAge: ONE_DAY * 14
@@ -107,7 +107,7 @@ class App {
             })
         );
         this.app.use((req: Request, res: Response, next: NextFunction) => {
-            res.set("version", "1.0.0");
+            res.set("version", "1.0.1");
             next();
         });
         this.useLogger();
