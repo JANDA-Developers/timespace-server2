@@ -105,6 +105,10 @@ class App {
                 }
             })
         );
+        this.app.use((req: Request, res: Response, next: NextFunction) => {
+            res.set("version", "1.0.0");
+            next();
+        });
         this.useLogger();
         this.app.use(this.jwt);
         this.app.use(this.jwtForBuyer);

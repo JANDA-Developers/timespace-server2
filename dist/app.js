@@ -54,6 +54,10 @@ class App {
                     maxAge: dateFuncs_1.ONE_DAY * 14
                 }
             }));
+            this.app.use((req, res, next) => {
+                res.set("version", "1.0.0");
+                next();
+            });
             this.useLogger();
             this.app.use(this.jwt);
             this.app.use(this.jwtForBuyer);
