@@ -78,6 +78,7 @@ class App {
     }
 
     private middlewares = (): void => {
+        console.count("call occur");
         this.app.use(
             cors({
                 credentials: true,
