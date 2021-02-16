@@ -51,12 +51,12 @@ class App {
                     httpOnly: true,
                     secure: true,
                     domain: ".stayjanda.cloud",
-                    sameSite: "lax",
+                    sameSite: "none",
                     maxAge: dateFuncs_1.ONE_DAY * 14
                 }
             }));
             this.app.use((req, res, next) => {
-                res.set("version", "1.0.1");
+                res.set("version", "1.0.2");
                 next();
             });
             this.useLogger();
