@@ -31,6 +31,7 @@ class App {
             "https://dev.timespace.stayjanda.cloud"
         ];
         this.middlewares = () => {
+            console.count("call occur");
             this.app.use(cors_1.default({
                 credentials: true,
                 origin: this.corsOrigin
@@ -55,7 +56,7 @@ class App {
                 }
             }));
             this.app.use((req, res, next) => {
-                res.set("version", "1.0.0");
+                res.set("version", "1.0.1");
                 next();
             });
             this.useLogger();

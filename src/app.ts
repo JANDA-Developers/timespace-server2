@@ -99,7 +99,7 @@ class App {
                 }),
                 cookie: {
                     httpOnly: true,
-                    secure: true,
+                    secure: "auto",
                     domain: ".stayjanda.cloud",
                     sameSite: "lax",
                     maxAge: ONE_DAY * 14
