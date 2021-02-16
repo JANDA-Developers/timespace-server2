@@ -45,6 +45,7 @@ exports.startVerification = async (target, payload, storeGroupCode, session) => 
             throw new Error("VerificationTarget 값 에러");
         }
     }
+    console.log({ code });
     const verification = new Verification_1.VerificationModel({
         target,
         payload,

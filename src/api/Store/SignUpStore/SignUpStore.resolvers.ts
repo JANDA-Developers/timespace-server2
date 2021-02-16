@@ -26,6 +26,8 @@ export const SignUpStoreFunc = async ({
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
+        console.log("SginUpStore....");
+        console.log("SginUpStore....");
         // store 또는 storeGroup
         const {
             store,
@@ -39,6 +41,8 @@ export const SignUpStoreFunc = async ({
 
         const storeUser = await createStoreUser(param, storeGroup, store);
         await storeUser.save({ session });
+
+        console.log({ storeUser });
 
         setStoreUserSessionData(req, storeUser, storeGroup.code);
 
@@ -67,6 +71,8 @@ const createStoreUser = async (
     store?: DocumentType<StoreCls>
 ): Promise<DocumentType<StoreUserCls>> => {
     const storeUser = new StoreUserModel(param);
+    console.log("createStoreUser");
+    console.log({ storeUser });
     storeUser.setPhoneNumber(phoneNumber);
     storeUser.setEmail(email);
     await storeUser.setZoneinfo(timezone);

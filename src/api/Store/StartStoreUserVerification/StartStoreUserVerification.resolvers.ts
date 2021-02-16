@@ -16,6 +16,7 @@ export const StartStoreUserVerificationFunc = async ({
     args,
     context: { req }
 }): Promise<StartStoreUserVerificationResponse> => {
+    console.log("!!!!!!!!!");
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
@@ -30,11 +31,13 @@ export const StartStoreUserVerificationFunc = async ({
             target,
             session
         );
+
         console.log({
             type: "전화번호 인증",
             code: verificationCode,
             user: storeUser._id
         });
+
         await session.commitTransaction();
         session.endSession();
         return {

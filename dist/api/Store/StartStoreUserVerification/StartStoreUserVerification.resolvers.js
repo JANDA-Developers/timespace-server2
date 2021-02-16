@@ -7,6 +7,7 @@ const resolverFuncWrapper_1 = require("../../../utils/resolverFuncWrapper");
 const storeUserFunc_1 = require("../../../models/StoreUser/storeUserFunc");
 const StoreUser_1 = require("../../../models/StoreUser/StoreUser");
 exports.StartStoreUserVerificationFunc = async ({ args, context: { req } }) => {
+    console.log("!!!!!!!!!");
     const session = await typegoose_1.mongoose.startSession();
     session.startTransaction();
     try {

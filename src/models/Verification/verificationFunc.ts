@@ -54,6 +54,8 @@ export const startVerification = async (
             throw new Error("VerificationTarget 값 에러");
         }
     }
+
+    console.log({code});
     const verification = new VerificationModel({
         target,
         payload,

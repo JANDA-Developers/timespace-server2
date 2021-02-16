@@ -11,12 +11,15 @@ exports.SignUpStoreFunc = async ({ args, context: { req } }) => {
     const session = await typegoose_1.mongoose.startSession();
     session.startTransaction();
     try {
+        console.log("SginUpStore....");
+        console.log("SginUpStore....");
         // store 또는 storeGroup
         const { store, storeGroup } = req;
         const { param } = args;
         await validateParams(args, storeGroup);
         const storeUser = await createStoreUser(param, storeGroup, store);
         await storeUser.save({ session });
+        console.log({ storeUser });
         SignInStore_resolvers_1.setStoreUserSessionData(req, storeUser, storeGroup.code);
         await session.commitTransaction();
         session.endSession();
@@ -35,6 +38,8 @@ const validateParams = async (args, storeGroup) => {
 };
 const createStoreUser = async ({ email, timezone, phoneNumber, ...param }, storeGroup, store) => {
     const storeUser = new StoreUser_1.StoreUserModel(param);
+    console.log("createStoreUser");
+    console.log({ storeUser });
     storeUser.setPhoneNumber(phoneNumber);
     storeUser.setEmail(email);
     await storeUser.setZoneinfo(timezone);

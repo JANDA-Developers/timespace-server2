@@ -226,9 +226,7 @@ export const privateResolverForStoreUser = (
         // scode를 이용하는 경우... session.storeUsers[scode] 로 접근한다
         // 만약 sgcode, scode 둘다 있는 경우에는 scode를 우선으로 접근한다.
         const storeUser = context.req.session?.storeGroupUsers?.[sgcode];
-        console.log({
-            testestest: context.req.session?.storeGroupUsers
-        });
+
         if (
             !storeUser &&
             (data as DocumentType<StoreGroupCls>).signUpOption
@@ -239,17 +237,16 @@ export const privateResolverForStoreUser = (
                 ERROR_CODES.UNAUTHORIZED_USER
             );
         }
+
         // update여부 체크 ㄱㄱ
         const updatedStoreUser = await StoreUserModel.findOne({
-            _id: new ObjectId(storeUser._id),
+            _id: new ObjectId(storeUser?._id),
             updatedAt: {
                 $gt: new Date(storeUser.updatedAt)
             }
         }).exec();
+
         if (updatedStoreUser) {
-            console.log({ updatedStoreUser });
-            console.log({ sgcode });
-            console.log({ session: context.req.session });
             context.req.session.storeGroupUsers[
                 sgcode
             ] = updatedStoreUser.toObject();

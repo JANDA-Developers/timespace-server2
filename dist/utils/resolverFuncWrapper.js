@@ -153,7 +153,7 @@ exports.privateResolverForStoreGroup = (resolverFunction) => async ({ parent, ar
     }
 };
 exports.privateResolverForStoreUser = (resolverFunction) => async ({ parent, args, context, info }, stack) => {
-    var _a, _b, _c;
+    var _a, _b;
     try {
         const sgcode = context.req.sgcode;
         if (!sgcode) {
@@ -166,9 +166,6 @@ exports.privateResolverForStoreUser = (resolverFunction) => async ({ parent, arg
         // scode를 이용하는 경우... session.storeUsers[scode] 로 접근한다
         // 만약 sgcode, scode 둘다 있는 경우에는 scode를 우선으로 접근한다.
         const storeUser = (_b = (_a = context.req.session) === null || _a === void 0 ? void 0 : _a.storeGroupUsers) === null || _b === void 0 ? void 0 : _b[sgcode];
-        console.log({
-            testestest: (_c = context.req.session) === null || _c === void 0 ? void 0 : _c.storeGroupUsers
-        });
         if (!storeUser &&
             data.signUpOption
                 .acceptAnonymousUser !== true) {
@@ -176,15 +173,12 @@ exports.privateResolverForStoreUser = (resolverFunction) => async ({ parent, arg
         }
         // update여부 체크 ㄱㄱ
         const updatedStoreUser = await StoreUser_1.StoreUserModel.findOne({
-            _id: new mongodb_1.ObjectId(storeUser._id),
+            _id: new mongodb_1.ObjectId(storeUser === null || storeUser === void 0 ? void 0 : storeUser._id),
             updatedAt: {
                 $gt: new Date(storeUser.updatedAt)
             }
         }).exec();
         if (updatedStoreUser) {
-            console.log({ updatedStoreUser });
-            console.log({ sgcode });
-            console.log({ session: context.req.session });
             context.req.session.storeGroupUsers[sgcode] = updatedStoreUser.toObject();
             context.req.session.save((err) => {
                 if (err) {

@@ -43,11 +43,13 @@
         "prettier": "^1.18.2",
         "sinon": "^7.5.0",
         "ts-jest": "^24.2.0",
-        "ts-node": "^8.6.2"
+        "ts-node": "^8.6.2",
+        "ts-node-dev": "^1.1.1"
     },
     "scripts": {
         "test": "jest --detectOpenHandles --watch",
         "predev": "yarn run types",
+        "watch": "cd src && ts-node-dev index.ts -e ts,graphql",
         "dev": "cd src && ts-node index.ts -e ts,graphql",
         "dev:local": "cp .env.localhost .env && yarn run dev",
         "dev:cloud": "cp .env.development .env && yarn run dev",
