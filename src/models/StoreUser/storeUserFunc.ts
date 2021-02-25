@@ -1,9 +1,9 @@
 import { StoreUserCls } from "./StoreUser";
 import { DocumentType } from "@typegoose/typegoose";
 import { VerificationTarget } from "GraphType";
- import { sendSMS } from "../../utils/smsFunction";
+//  import { sendSMS } from "../../utils/smsFunction";
 import { ClientSession } from "mongoose";
-
+import axios from "axios";
 export const startStoreUserVerification = async (
     storeUser: DocumentType<StoreUserCls>,
     target: VerificationTarget,
@@ -17,10 +17,40 @@ export const startStoreUserVerification = async (
                 .padStart(6, "0");
             storeUser.phoneVerificationCode = code;
             await storeUser.save({ session });
-            await sendSMS({
-                receivers: storeUser.phoneNumber,
-                msg: `회원가입 인증코드는 [${code}] 입니다.`
-            });
+            
+            const query = (receivers : string, msg : string) => {
+                return `mutation {
+                    SendSMS(
+                        receivers : "${receivers}"
+                        msg : "${msg}"
+                    )
+                    {
+                        ok
+                    }
+                }
+                `
+              }
+            
+            // const options = {
+            //     url : "http://timespace-alb-1323994784.ap-northeast-2.elb.amazonaws.com",///process.env.URL,
+            //     method : "post",
+            //     data : {
+            //         query : query(storeUser.phoneNumber, `회원가입 인증코드는 [${code}] 입니다.`)  
+            //     }
+            // }
+            // const {data} = await axios(options);
+            await axios.post(
+                "http://timespace-alb-1323994784.ap-northeast-2.elb.amazonaws.com",///process.env.URL,
+                {
+                    query : query(storeUser.phoneNumber, `회원가입 인증코드는 [${code}] 입니다.`)  
+                }
+            )
+      
+            
+            // await sendSMS({
+            //     receivers: storeUser.phoneNumber,
+            //     msg: `회원가입 인증코드는 [${code}] 입니다.`
+            // });
             return code;
         }
         case "EMAIL": {
