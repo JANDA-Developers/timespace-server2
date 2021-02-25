@@ -38,7 +38,7 @@ export const StartStoreUserVerificationFunc = async ({
             code: verificationCode,
             user: storeUser._id
         });
-        console.log("회원가입 이메일 전송!");
+        console.log("이메일 전송!");
         const result = await sendEmail({html : "<div>인증번호 : " + verificationCode+"</div>", summary : "인증번호 : " + verificationCode, targets: [storeUser.email]});
         console.log(result);
         await session.commitTransaction();
