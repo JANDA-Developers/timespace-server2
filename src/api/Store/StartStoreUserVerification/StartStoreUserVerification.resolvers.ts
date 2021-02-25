@@ -17,7 +17,7 @@ export const StartStoreUserVerificationFunc = async ({
     args,
     context: { req }
 }): Promise<StartStoreUserVerificationResponse> => {
-    console.log("!!!!!!!!!");
+    console.log("!!!!---------StartStoreUserVerificationFunc-------------!!!!!");
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
@@ -26,20 +26,28 @@ export const StartStoreUserVerificationFunc = async ({
         if (!storeUser) {
             throw new Error("존재하지 않는 StoreUserId");
         }
+
+        console.log("----------storeUser---------");
+        console.log(storeUser);
         const { target } = args as StartStoreUserVerificationMutationArgs;
+
+        console.log("----------target---------");
+        console.log(target);
         const verificationCode = await startStoreUserVerification(
             storeUser,
             target,
             session
         );
-
+        console.log("----------verificationCode---------");
+        console.log(verificationCode);
+        
         console.log({
             type: "전화번호 인증",
             code: verificationCode,
             user: storeUser._id
         });
         console.log("이메일 전송!");
-        const result = await sendEmail({html : "<div>인증번호 : " + verificationCode+"</div>", summary : "인증번호 : " + verificationCode, targets: [storeUser.email]});
+        const result = await sendEmail({html : "<div>인증번호 : " + verificationCode+"</div>", summary : "인증번호", targets: [storeUser.email]});
         console.log(result);
         await session.commitTransaction();
         await session.commitTransaction();
