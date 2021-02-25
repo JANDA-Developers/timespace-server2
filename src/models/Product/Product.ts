@@ -300,9 +300,9 @@ export class ProductCls extends BaseSchema
                 i => i._id * 1000 === o.segment.from.getTime()
             );
             const item = filtered[0];
-            console.log({
-                filteredItem: item
-            });
+            // console.log({
+            //     filteredItem: item
+            // });
             if (item) {
                 o.itemCount = item.count;
                 o.items.push(...item.items.map(i => i._id));

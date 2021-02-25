@@ -51,9 +51,9 @@ let ProductCls = class ProductCls extends BaseSchema_1.BaseSchema {
         real.forEach(o => {
             const filtered = productSegmentList.filter(i => i._id * 1000 === o.segment.from.getTime());
             const item = filtered[0];
-            console.log({
-                filteredItem: item
-            });
+            // console.log({
+            //     filteredItem: item
+            // });
             if (item) {
                 o.itemCount = item.count;
                 o.items.push(...item.items.map(i => i._id));
