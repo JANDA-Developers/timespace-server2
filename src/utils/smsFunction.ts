@@ -4,7 +4,7 @@ import axios from "axios";
 export const sendSMS = async ({
     receivers,
     msg,
-    sender = process.env.SMS_SENDER
+    sender = process.env.SMS_SENDER || "18334157"
 }: {
     receivers: string;
     msg: string;

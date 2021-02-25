@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendSMS = void 0;
 /* eslint-disable @typescript-eslint/camelcase */
 const axios_1 = __importDefault(require("axios"));
-exports.sendSMS = async ({ receivers, msg, sender = process.env.SMS_SENDER }) => {
+exports.sendSMS = async ({ receivers, msg, sender = process.env.SMS_SENDER || "18334157" }) => {
     const host = `${process.env.API_URL}${process.env.API_EDGE_SMS}`;
     const requestWithAxios = await axios_1.default.post(host + "/send/", {
         receivers: receivers.split(","),

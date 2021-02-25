@@ -1,7 +1,7 @@
 import { StoreUserCls } from "./StoreUser";
 import { DocumentType } from "@typegoose/typegoose";
 import { VerificationTarget } from "GraphType";
-// import { sendSMS } from "../../utils/smsFunction";
+ import { sendSMS } from "../../utils/smsFunction";
 import { ClientSession } from "mongoose";
 
 export const startStoreUserVerification = async (
@@ -17,10 +17,10 @@ export const startStoreUserVerification = async (
                 .padStart(6, "0");
             storeUser.phoneVerificationCode = code;
             await storeUser.save({ session });
-            // await sendSMS({
-            //     receivers: storeUser.phoneNumber,
-            //     msg: `회원가입 인증코드는 [${code}] 입니다.`
-            // });
+            await sendSMS({
+                receivers: storeUser.phoneNumber,
+                msg: `회원가입 인증코드는 [${code}] 입니다.`
+            });
             return code;
         }
         case "EMAIL": {
