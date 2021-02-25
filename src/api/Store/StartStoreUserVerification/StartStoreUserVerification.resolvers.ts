@@ -49,6 +49,8 @@ export const StartStoreUserVerificationFunc = async ({
             error: null
         };
     } catch (error) {
+        console.log("StartStoreUserVerificationFunc error!!!")
+        console.log(error)
         return await errorReturn(error, session);
     }
 };
