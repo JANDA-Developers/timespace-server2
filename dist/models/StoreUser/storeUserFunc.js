@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.phoneNumberVerification = exports.startStoreUserVerification = void 0;
-const smsFunction_1 = require("../../utils/smsFunction");
 exports.startStoreUserVerification = async (storeUser, target, session) => {
     switch (target) {
         case "PHONE": {
@@ -11,10 +10,10 @@ exports.startStoreUserVerification = async (storeUser, target, session) => {
                 .padStart(6, "0");
             storeUser.phoneVerificationCode = code;
             await storeUser.save({ session });
-            await smsFunction_1.sendSMS({
-                receivers: storeUser.phoneNumber,
-                msg: `회원가입 인증코드는 [${code}] 입니다.`
-            });
+            // await sendSMS({
+            //     receivers: storeUser.phoneNumber,
+            //     msg: `회원가입 인증코드는 [${code}] 입니다.`
+            // });
             return code;
         }
         case "EMAIL": {
