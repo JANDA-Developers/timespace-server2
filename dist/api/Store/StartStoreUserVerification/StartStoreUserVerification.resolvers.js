@@ -6,6 +6,7 @@ const utils_1 = require("../../../utils/utils");
 const resolverFuncWrapper_1 = require("../../../utils/resolverFuncWrapper");
 const storeUserFunc_1 = require("../../../models/StoreUser/storeUserFunc");
 const StoreUser_1 = require("../../../models/StoreUser/StoreUser");
+const sesFunctions_1 = require("../../../utils/sesFunctions");
 exports.StartStoreUserVerificationFunc = async ({ args, context: { req } }) => {
     console.log("!!!!!!!!!");
     const session = await typegoose_1.mongoose.startSession();
@@ -23,6 +24,10 @@ exports.StartStoreUserVerificationFunc = async ({ args, context: { req } }) => {
             code: verificationCode,
             user: storeUser._id
         });
+        console.log("회원가입 이메일 전송!");
+        const result = await sesFunctions_1.sendEmail({ html: "<div>인증번호 : " + verificationCode + "</div>", summary: "인증번호 : " + verificationCode, targets: [storeUser.email] });
+        console.log(result);
+        await session.commitTransaction();
         await session.commitTransaction();
         session.endSession();
         return {
