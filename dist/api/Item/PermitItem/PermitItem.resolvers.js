@@ -9,12 +9,16 @@ const Item_1 = require("../../../models/Item/Item");
 const mongodb_1 = require("mongodb");
 const Product_1 = require("../../../models/Product/Product");
 const User_1 = require("../../../models/User");
-const ItemSmsFunctions_1 = require("../../../models/Item/ItemSmsFunctions");
+// import {
+//     SendSmsWithTriggerEvent,
+//     getReplacementSetsForItem
+// } from "../../../models/Item/ItemSmsFunctions";
 const DateTimeRange_1 = require("../../../utils/DateTimeRange");
 const resolvers = {
     Mutation: {
         PermitItem: resolverFuncWrapper_1.defaultResolver(resolverFuncWrapper_1.privateResolver(async ({ args, context: { req } }) => {
             var _a;
+            console.log("-----------PermitItem call! 예약취소로직------------");
             const session = await typegoose_1.mongoose.startSession();
             session.startTransaction();
             try {
@@ -50,27 +54,29 @@ const resolvers = {
                 // trigger검색: Event & tags 검색(storeId)
                 if (smsKey && item.phoneNumber) {
                     // Send for buyer
-                    const tags = [
-                        {
-                            key: "storeId",
-                            value: item.storeId.toHexString()
-                        }
-                    ];
-                    const event = "ITEM_PERMITTED";
-                    // SMS 전송
-                    await ItemSmsFunctions_1.SendSmsWithTriggerEvent({
-                        smsKey,
-                        event,
-                        tags,
-                        recWithReplSets: [
-                            {
-                                receivers: [
-                                    item.phoneNumber.replace("+82", "")
-                                ],
-                                replacementSets: await ItemSmsFunctions_1.getReplacementSetsForItem(item)
-                            }
-                        ]
-                    });
+                    // const tags = [
+                    //     {
+                    //         key: "storeId",
+                    //         value: item.storeId.toHexString()
+                    //     }
+                    // ];
+                    // const event: SmsTriggerEvent = "ITEM_PERMITTED";
+                    // // SMS 전송
+                    // await SendSmsWithTriggerEvent({
+                    //     smsKey,
+                    //     event,
+                    //     tags,
+                    //     recWithReplSets: [
+                    //         {
+                    //             receivers: [
+                    //                 item.phoneNumber.replace("+82", "")
+                    //             ],
+                    //             replacementSets: await getReplacementSetsForItem(
+                    //                 item
+                    //             )
+                    //         }
+                    //     ]
+                    // });
                 }
                 await session.commitTransaction();
                 session.endSession();
