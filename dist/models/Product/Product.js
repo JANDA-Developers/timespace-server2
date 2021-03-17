@@ -48,6 +48,8 @@ let ProductCls = class ProductCls extends BaseSchema_1.BaseSchema {
             };
         });
         console.log("Product.ts => getSegmentSchedules==============================================");
+        console.log("===========real==============");
+        console.log(real);
         real.forEach(o => {
             const filtered = productSegmentList.filter(i => i._id * 1000 === o.segment.from.getTime());
             const item = filtered[0];
