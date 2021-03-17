@@ -200,7 +200,9 @@ const createItem = async (
     // SMS 전송 ㄱㄱㄱ
     if (!product.usingPayment) {
         // 결제가 이루어지는 경우 ConfirmItem에서 문자를 전송한다.
-        await SendSmsForStoreUser(product, item);
+        //await SendSmsForStoreUser(product, item);
+        console.log(typeof SendSmsForStoreUser);
+        console.log("====403에러떄문에 문자는 잠시안보내기로 ===");
     }
     await item.save({ session });
     return item;
