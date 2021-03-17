@@ -40,6 +40,8 @@ export const CreateItemForStoreUserFunc = async ({
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
+        console.log("------------CreateItemForStoreUserFunc call!!=========")
+
         const { storeUser }: { storeUser: DocumentType<StoreUserCls> } = req;
         const {
             dateTimeRange,

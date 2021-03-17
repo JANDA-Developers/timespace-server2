@@ -20,6 +20,7 @@ exports.CreateItemForStoreUserFunc = async ({ args, context: { req } }) => {
     const session = await typegoose_1.mongoose.startSession();
     session.startTransaction();
     try {
+        console.log("------------CreateItemForStoreUserFunc call!!=========");
         const { storeUser } = req;
         const { dateTimeRange, productCode, usersInput } = args;
         // product = undefined 인 경우 에러나면서 종료됨.
