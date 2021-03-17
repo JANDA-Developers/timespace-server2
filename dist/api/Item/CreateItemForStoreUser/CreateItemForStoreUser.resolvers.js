@@ -30,16 +30,28 @@ exports.CreateItemForStoreUserFunc = async ({ args, context: { req } }) => {
             product
         });
         if (!product.needToPermit) {
+            console.log("------------validateDateTimeRange call!!=========");
             await validateDateTimeRange(product, dateTimeRange);
+            console.log("------------validateDateTimeRange endll!!=========");
         }
         const store = await Store_1.StoreModel.findById(product.storeId);
         if (!store) {
             throw new Error("존재하지 않는 Store");
         }
+        console.log("------------checkVerification call!!=========");
         exports.checkVerification(store, storeUser);
+        console.log("------------createItem call!!=========");
         const item = await createItem(storeUser, store, product, dateTimeRange, usersInput, session);
+        console.log("------------item=========");
+        console.log(item);
         await session.commitTransaction();
         session.endSession();
+        console.log("------------return=========");
+        console.log({
+            ok: true,
+            error: null,
+            data: item
+        });
         return {
             ok: true,
             error: null,
@@ -47,6 +59,8 @@ exports.CreateItemForStoreUserFunc = async ({ args, context: { req } }) => {
         };
     }
     catch (error) {
+        console.log("----------catch cal!!!!!!---------");
+        console.log(error);
         return await utils_1.errorReturn(error, session);
     }
 };
