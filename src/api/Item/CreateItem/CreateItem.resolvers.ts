@@ -126,6 +126,8 @@ const resolvers: Resolvers = {
                             const list = await product.getSegmentSchedules(
                                 new DateTimeRangeCls(dateTimeRange)
                             );
+                            console.log("============getSegmentSchedules 호출 완료!!=========");
+                            console.log(list);
                             if (list.length === 0) {
                                 throw new ApolloError(
                                     "이용 가능한 시간이 아닙니다.",
