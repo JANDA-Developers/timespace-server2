@@ -62,6 +62,8 @@ let ProductCls = class ProductCls extends BaseSchema_1.BaseSchema {
                 o.soldOut = this.capacity <= item.count;
             }
         });
+        console.log("===========soldOut==============");
+        console.log(soldOut);
         if (soldOut !== undefined || soldOut === null) {
             // soldOut false, true 둘중 하나 출력
             return real.filter(r => r.soldOut === soldOut);
@@ -122,6 +124,7 @@ let ProductCls = class ProductCls extends BaseSchema_1.BaseSchema {
             };
         }
         const itemExistsList = await this.getSegmentSchedules(dateTimeRange, soldOut);
+        console.log(itemExistsList);
         const list = await Promise.all(itemExistsList.map(async (o) => {
             return {
                 ...o,
