@@ -60,6 +60,11 @@ export const startStoreUserVerification = async (
                 .substr(2)
                 .slice(0, 7)
                 .toUpperCase();
+            
+            // await sendSMS({
+            //     receivers: storeUser.phoneNumber,
+            //     msg: `회원가입 인증코드는 [${code}] 입니다.`
+            // });
             return code;
         }
         default: {
