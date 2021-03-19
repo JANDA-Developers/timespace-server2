@@ -67,7 +67,7 @@ export const CancelItemForStoreUserFunc = async ({
             );
         }
         
-        //await sendSms(item, user.smsKey);
+        await sendSms(item, user.smsKey);
         console.log(typeof sendSms);
         console.log("sendSms 전송 안되서 당분간 사용 x");
         // TODO: Item.refundStatus = PENDING 으로 만들어야함.

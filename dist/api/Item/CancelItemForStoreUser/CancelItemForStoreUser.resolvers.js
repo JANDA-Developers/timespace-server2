@@ -36,7 +36,7 @@ exports.CancelItemForStoreUserFunc = async ({ args, context: { req } }) => {
         if (!user) {
             throw new apollo_server_1.ApolloError("존재하지 않는 UserId", values_1.ERROR_CODES.UNEXIST_USER);
         }
-        //await sendSms(item, user.smsKey);
+        await sendSms(item, user.smsKey);
         console.log(typeof sendSms);
         console.log("sendSms 전송 안되서 당분간 사용 x");
         // TODO: Item.refundStatus = PENDING 으로 만들어야함.
