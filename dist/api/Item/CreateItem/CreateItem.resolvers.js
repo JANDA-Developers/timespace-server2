@@ -88,6 +88,8 @@ const resolvers = {
                 const dateTimeRange = param.dateTimeRange;
                 if (dateTimeRange) {
                     const list = await product.getSegmentSchedules(new DateTimeRange_1.DateTimeRangeCls(dateTimeRange));
+                    console.log("============getSegmentSchedules 호출 완료!!=========");
+                    console.log(list);
                     if (list.length === 0) {
                         throw new apollo_server_1.ApolloError("이용 가능한 시간이 아닙니다.", values_1.ERROR_CODES.UNAVAILABLE_BUSINESSHOURS);
                     }

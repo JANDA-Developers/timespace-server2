@@ -31,6 +31,7 @@ export const CancelItemForStoreUserFunc = async ({
     args,
     context: { req }
 }): Promise<CancelItemForStoreUserResponse> => {
+    console.log("-=============CancelItemForStoreUserFunc call!==========")
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
@@ -65,9 +66,10 @@ export const CancelItemForStoreUserFunc = async ({
                 ERROR_CODES.UNEXIST_USER
             );
         }
-
+        
         await sendSms(item, user.smsKey);
-
+        // console.log(typeof sendSms);
+        // console.log("sendSms 전송 안되서 당분간 사용 x");
         // TODO: Item.refundStatus = PENDING 으로 만들어야함.
         if (item.transactionId) {
             const transaction = await findTransaction(item.transactionId);

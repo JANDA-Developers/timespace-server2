@@ -5,7 +5,7 @@ import {
 } from "../../../utils/resolverFuncWrapper";
 import { createStoreFunc } from "./CreateStoreFunc";
 
-const resolvers: Resolvers = {
+const resolvers : Resolvers = {
     Mutation: {
         CreateStore: defaultResolver(privateResolver(createStoreFunc))
     }

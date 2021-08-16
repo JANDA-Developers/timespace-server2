@@ -6,8 +6,9 @@ const utils_1 = require("../../../utils/utils");
 const resolverFuncWrapper_1 = require("../../../utils/resolverFuncWrapper");
 const storeUserFunc_1 = require("../../../models/StoreUser/storeUserFunc");
 const StoreUser_1 = require("../../../models/StoreUser/StoreUser");
+const sesFunctions_1 = require("../../../utils/sesFunctions");
 exports.StartStoreUserVerificationFunc = async ({ args, context: { req } }) => {
-    console.log("!!!!!!!!!");
+    console.log("!!!!---------StartStoreUserVerificationFunc-------------!!!!!");
     const session = await typegoose_1.mongoose.startSession();
     session.startTransaction();
     try {
@@ -16,13 +17,23 @@ exports.StartStoreUserVerificationFunc = async ({ args, context: { req } }) => {
         if (!storeUser) {
             throw new Error("존재하지 않는 StoreUserId");
         }
+        console.log("----------storeUser---------");
+        console.log(storeUser);
         const { target } = args;
+        console.log("----------target---------");
+        console.log(target);
         const verificationCode = await storeUserFunc_1.startStoreUserVerification(storeUser, target, session);
+        console.log("----------verificationCode---------");
+        console.log(verificationCode);
         console.log({
             type: "전화번호 인증",
             code: verificationCode,
             user: storeUser._id
         });
+        console.log("이메일 전송!");
+        const result = await sesFunctions_1.sendEmail({ html: "<div>인증번호 : " + verificationCode + "</div>", summary: "인증번호", targets: [storeUser.email] });
+        console.log(result);
+        await session.commitTransaction();
         await session.commitTransaction();
         session.endSession();
         return {
@@ -31,6 +42,8 @@ exports.StartStoreUserVerificationFunc = async ({ args, context: { req } }) => {
         };
     }
     catch (error) {
+        console.log("StartStoreUserVerificationFunc error!!!");
+        console.log(error);
         return await utils_1.errorReturn(error, session);
     }
 };

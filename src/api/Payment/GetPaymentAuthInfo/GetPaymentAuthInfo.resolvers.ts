@@ -15,7 +15,7 @@ export const GetPaymentAuthInfoFunc = async ({
 }): Promise<GetPaymentAuthInfoResponse> => {
     try {
         const { amount } = args as GetPaymentAuthInfoQueryArgs;
-
+        
         const time = moment(new Date(Date.now() + ONE_HOUR * 9)).format(
             "YYYYMMDDHHmmss"
         );

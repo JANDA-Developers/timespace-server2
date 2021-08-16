@@ -17,6 +17,7 @@ const User_1 = require("../../../models/User");
 const ItemSmsFunctions_1 = require("../../../models/Item/ItemSmsFunctions");
 const transactionFuncs_1 = require("../../../models/Transaction/transactionFuncs");
 exports.CreateItemForAnonymousFunc = async ({ args, context: { req } }) => {
+    console.log("------------CreateItemForAnonymousFunc call!!=========");
     const session = await typegoose_1.mongoose.startSession();
     session.startTransaction();
     try {

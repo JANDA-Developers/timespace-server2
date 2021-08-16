@@ -20,6 +20,7 @@ exports.CreateItemForStoreUserFunc = async ({ args, context: { req } }) => {
     const session = await typegoose_1.mongoose.startSession();
     session.startTransaction();
     try {
+        console.log("------------CreateItemForStoreUserFunc call!!=========");
         const { storeUser } = req;
         const { dateTimeRange, productCode, usersInput } = args;
         // product = undefined 인 경우 에러나면서 종료됨.
@@ -29,16 +30,28 @@ exports.CreateItemForStoreUserFunc = async ({ args, context: { req } }) => {
             product
         });
         if (!product.needToPermit) {
+            console.log("------------validateDateTimeRange call!!=========");
             await validateDateTimeRange(product, dateTimeRange);
+            console.log("------------validateDateTimeRange endll!!=========");
         }
         const store = await Store_1.StoreModel.findById(product.storeId);
         if (!store) {
             throw new Error("존재하지 않는 Store");
         }
+        console.log("------------checkVerification call!!=========");
         exports.checkVerification(store, storeUser);
+        console.log("------------createItem call!!=========");
         const item = await createItem(storeUser, store, product, dateTimeRange, usersInput, session);
+        console.log("------------item=========");
+        console.log(item);
         await session.commitTransaction();
         session.endSession();
+        console.log("------------return=========");
+        console.log({
+            ok: true,
+            error: null,
+            data: item
+        });
         return {
             ok: true,
             error: null,
@@ -46,6 +59,8 @@ exports.CreateItemForStoreUserFunc = async ({ args, context: { req } }) => {
         };
     }
     catch (error) {
+        console.log("----------catch cal!!!!!!---------");
+        console.log(error);
         return await utils_1.errorReturn(error, session);
     }
 };
@@ -112,6 +127,8 @@ const createItem = async (storeUser, store, product, dateTimeRange, usersInput, 
     if (!product.usingPayment) {
         // 결제가 이루어지는 경우 ConfirmItem에서 문자를 전송한다.
         await SendSmsForStoreUser(product, item);
+        // console.log(typeof SendSmsForStoreUser);
+        // console.log("====403에러떄문에 문자는 잠시안보내기로 ===");
     }
     await item.save({ session });
     return item;

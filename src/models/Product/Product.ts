@@ -295,20 +295,25 @@ export class ProductCls extends BaseSchema
         console.log(
             "Product.ts => getSegmentSchedules=============================================="
         );
+
+        console.log("===========real==============");
+        console.log(real);
         real.forEach(o => {
             const filtered = productSegmentList.filter(
                 i => i._id * 1000 === o.segment.from.getTime()
             );
             const item = filtered[0];
-            console.log({
-                filteredItem: item
-            });
+            // console.log({
+            //     filteredItem: item
+            // });
             if (item) {
                 o.itemCount = item.count;
                 o.items.push(...item.items.map(i => i._id));
                 o.soldOut = this.capacity <= item.count;
             }
         });
+        console.log("===========soldOut==============");
+        console.log(soldOut);
         if (soldOut !== undefined || soldOut === null) {
             // soldOut false, true 둘중 하나 출력
             return real.filter(r => r.soldOut === soldOut);
@@ -401,6 +406,7 @@ export class ProductCls extends BaseSchema
             dateTimeRange,
             soldOut
         );
+        console.log(itemExistsList);
         const list = await Promise.all(
             itemExistsList.map(async o => {
                 return {

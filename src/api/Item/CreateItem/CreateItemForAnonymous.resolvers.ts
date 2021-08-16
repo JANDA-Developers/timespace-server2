@@ -36,6 +36,8 @@ export const CreateItemForAnonymousFunc = async ({
     args,
     context: { req }
 }): Promise<CreateItemForAnonymousResponse> => {
+    console.log("------------CreateItemForAnonymousFunc call!!=========")
+
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
@@ -47,7 +49,6 @@ export const CreateItemForAnonymousFunc = async ({
 
         // product = undefined 인 경우 에러나면서 종료됨.
         const product = await ProductModel.findByCode(productCode);
-
         console.log({
             usingPayment: product.usingPayment,
             product
