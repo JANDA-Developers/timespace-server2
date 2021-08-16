@@ -23,5 +23,7 @@ input StoreUpdateParamInput {
     manager: ManagerInput
     infos: [InfoInput!]
     bookingPolicy: BookingPolicyInput
+    polices: [PolicyInput]
     usingPayment: Boolean
+    blockDates: [DateTime]
 }

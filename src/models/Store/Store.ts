@@ -260,10 +260,18 @@ export class StoreCls extends BaseSchema implements StoreProps, StoreFuncs {
     })
     bookingPolicy: BookingPolicy;
 
+    @prop()
+    polices: Policy[];
+
     @prop({
         default: []
     })
     infos: Info[];
+
+    @prop({
+        default: []
+    })
+    blockDates: Date[];
 
     @prop({
         default: {
@@ -278,3 +286,17 @@ export class StoreCls extends BaseSchema implements StoreProps, StoreFuncs {
 }
 
 export const StoreModel = getModelForClass(StoreCls);
+
+export class Policy {
+    @prop()
+    name: string;
+
+    @prop()
+    content: string;
+
+    @prop({ default: false })
+    require: boolean;
+
+    @prop()
+    version: number;
+}

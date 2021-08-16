@@ -34,7 +34,7 @@ export const getReplacementSetsForItem = async (
     );
     const store = await StoreModel.findById(product.storeId);
     const replacements: Replacements = {
-        ITEM_CODE: item.code,
+        ITEM_CODE: item.code || "",
         ITEM_END: end,
         ITEM_START: start,
         ITEM_DATETIME_RANGE: dateTimeRange,

@@ -100,7 +100,10 @@ class App {
                 cookie: {
                     httpOnly: true,
                     secure: false,
-                    domain: ".stayjanda.cloud",
+                    domain:
+                        process.env.NODE_ENV === "development"
+                            ? "localhost"
+                            : ".stayjanda.cloud",
                     sameSite: "lax",
                     maxAge: ONE_DAY * 14
                 }

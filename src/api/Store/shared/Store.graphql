@@ -23,6 +23,8 @@ type Store implements BaseModel {
     infos: [Info!]
     intro: String
     warning: String
+    blockDates: [DateTime]
+    polices: [Policy]
     customFields: [CustomField!]
     storeUsers: [StoreUser!]!
     signUpOption: StoreUserSignUpOption!
@@ -61,4 +63,23 @@ type TimelineItem {
     _id: ID
     from: Int!
     to: Int!
+}
+
+
+type Policy {
+    # 최대 선택 범위
+    name: String!
+    # 최소 손택 범위
+    content: String!
+    # 선택 단위
+    require: Boolean!
+}
+
+input PolicyInput {
+    # 최대 선택 범위
+    name: String!
+    # 최소 손택 범위
+    content: String!
+    # 선택 단위
+    require: Boolean!
 }
