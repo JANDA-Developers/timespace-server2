@@ -9,6 +9,5 @@ src/logs
 logs
 *.log
 *.uri.ts
-yarn.lock
 *.zip
 *.tar*
