@@ -98,7 +98,7 @@ export const SendSmsWithTriggerEvent = async ({
     }[];
 }) => {
     console.log("Send Start");
-    console.log({ recWithReplSets });
+    console.log(recWithReplSets?.[0]?.receivers);
     const sendResult =
         // const queryResult =
         await requestApi(

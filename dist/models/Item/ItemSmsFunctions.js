@@ -58,8 +58,9 @@ const dateStrFormat = (date) => {
         .replace("T", " ");
 };
 exports.SendSmsWithTriggerEvent = async ({ event, recWithReplSets, smsKey, tags }) => {
+    var _a;
     console.log("Send Start");
-    console.log({ recWithReplSets });
+    console.log((_a = recWithReplSets === null || recWithReplSets === void 0 ? void 0 : recWithReplSets[0]) === null || _a === void 0 ? void 0 : _a.receivers);
     const sendResult = 
     // const queryResult =
     await requestSmsApi_1.requestApi(process.env.SMS_API_EDGE || "", graphql_1.print(apollo_server_1.gql `
