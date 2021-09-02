@@ -1,0 +1,23 @@
+type CountryInfo {
+    _id: ID!
+    # 국가 코드
+    countryCode: String!
+    # 국가 명
+    countryName: String!
+    # 국가 전화 코드
+    callingCode: String!
+    # 얘가 유니크한 값임.
+    timezones: [Timezone!]
+}
+
+type Query {
+    # 국가 검색용 API => 결과값에 timezone 포함되어 있음.
+    countries(countryName: String): [Country!]
+    currentCountry: Zoneinfo!
+}
+
+type Country {
+    countryName: String!
+    countryCode: String!
+    timezones: [Timezone!]
+}

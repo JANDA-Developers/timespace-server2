@@ -1,0 +1,28 @@
+type Mutation {
+    CreateStore(param: CreateStoreInput!): CreateStoreResponse!
+}
+type CreateStoreResponse {
+    ok: Boolean!
+    error: Err
+    data: Store
+}
+
+input CreateStoreInput {
+    name: String!
+    type: StoreType!
+    description: String
+    # 미입력시 User의 이름, 전화번호로 들어감
+    manager: ManagerInput
+    timezone: String
+    warning: String
+    intro: String
+    groupId: ID
+    businessHours: [PeriodInput!]
+    periodOption: PeriodOptionInput!
+    customFieldInput: [CustomFieldDefineInput!]
+    infos: [InfoInput!]
+    bookingPolicy: BookingPolicyInput
+    usingPayment: Boolean
+    polices: [PolicyInput]
+    blockDates: [DateTime]
+}

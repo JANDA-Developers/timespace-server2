@@ -1,0 +1,16 @@
+type StoreUser implements BaseModel {
+    _id: ID!
+    name: String!
+    password: String
+    email: String!
+    zoneinfo: Zoneinfo!
+    phoneNumber: String!
+    isPhoneVerified: Boolean!
+    isEmailVerified: Boolean!
+    company: String
+    store: Store
+    storeGroup: StoreGroup!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    expiresAt: DateTime
+}

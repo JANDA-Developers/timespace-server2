@@ -1,0 +1,45 @@
+# 부산클라우드혁신센터에서 받은 노트 참조
+type Transaction implements BaseModel {
+    _id: ID!
+    seller: User!
+    store: Store!
+    storeUser: StoreUser
+    item: Item!
+    amount: Float!
+    amountInfo: AmountInfo!
+    paymethod: String!
+    currency: CurrencyCode!
+    history: [TransactionHistoryItem!]!
+    # 현재 결제 상태: default: PENDING
+    paymentStatus: PaymentStatus!
+    # 현재 환불 상태. default: NONE
+    refundStatus: RefundStatus!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    expiresAt: DateTime
+}
+
+type TransactionItem {
+    target: String!
+    payload: String!
+}
+
+enum PaymentStatus {
+    NONE
+    PENDING
+    DONE
+    CANCELED
+}
+
+enum RefundStatus {
+    NONE
+    PENDING
+    CANCELED
+    DONE
+}
+
+type AmountInfo {
+    origin: Float!
+    paid: Float!
+    refunded: Float!
+}

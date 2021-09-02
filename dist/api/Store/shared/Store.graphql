@@ -1,0 +1,85 @@
+type Store implements BaseModel {
+    _id: ID!
+    user: User
+    name: String!
+    code: String!
+    # deprecated
+    groups: [StoreGroup!]
+    group: StoreGroup!
+    type: StoreType!
+    zoneinfo: Zoneinfo!
+    description: String
+    location: Location
+    image: URL
+    manager: Manager
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    expiresAt: DateTime
+    products: [Product!]
+    productCount: Int!
+    businessHours: [Period!]
+    periodOption: PeriodOption
+    bookingPolicy: BookingPolicy
+    infos: [Info!]
+    intro: String
+    warning: String
+    blockDates: [DateTime]
+    polices: [Policy]
+    customFields: [CustomField!]
+    storeUsers: [StoreUser!]!
+    signUpOption: StoreUserSignUpOption!
+}
+
+enum StoreType {
+    # 임대업. ex) 스터디룸, 컨퍼런스룸, etc...
+    LEASE
+    # 티켓 판매. ex) 롤러장, etc... 티켓이라고 부를수 있는 것들.
+    TICKET
+}
+
+type BookingPolicy {
+    # 최대 x일 뒤의 날짜까지 예약 가능 - ex) lastBooking: 60 => 60일 뒤의 날짜까지 예약 가능
+    limitLastBooking: Int!
+    # 최소 x일 뒤의 날짜부터 예약 가능 - ex) firstBooking: 0 => 당일예약 가능, 1 => 당일예약 불가, 내일날자 이후 예약 가능
+    limitFirstBooking: Int!
+}
+
+input BookingPolicyInput {
+    # 최대 x일 뒤의 날짜까지 예약 가능 - ex) lastBooking: 60 => 60일 뒤의 날짜까지 예약 가능
+    limitLastBooking: Int!
+    # 최소 x일 뒤의 날짜부터 예약 가능 - ex) firstBooking: 0 => 당일예약 가능, 1 => 당일예약 불가, 내일날자 이후 예약 가능
+    limitFirstBooking: Int!
+}
+
+type Schedules {
+    # 최대 선택 가능 시간
+    max: Int!
+    # 필수 최소 선택 시간
+    min: Int!
+    timeline: [TimelineItem!]!
+}
+
+type TimelineItem {
+    _id: ID
+    from: Int!
+    to: Int!
+}
+
+
+type Policy {
+    # 최대 선택 범위
+    name: String!
+    # 최소 손택 범위
+    content: String!
+    # 선택 단위
+    require: Boolean!
+}
+
+input PolicyInput {
+    # 최대 선택 범위
+    name: String!
+    # 최소 손택 범위
+    content: String!
+    # 선택 단위
+    require: Boolean!
+}

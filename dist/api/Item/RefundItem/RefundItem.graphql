@@ -1,0 +1,13 @@
+type Mutation {
+    RefundItem(itemId: ID!, refundInput: RefundInput!): RefundItemResponse!
+}
+
+type RefundItemResponse {
+    ok: Boolean!
+    error: Err
+}
+
+input RefundInput {
+    amount: Float!
+    message: String
+}

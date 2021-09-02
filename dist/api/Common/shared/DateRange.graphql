@@ -1,0 +1,11 @@
+type DateTimeRange {
+    from: DateTime!
+    to: DateTime!
+    interval: Int!
+}
+
+# 비교 시 from은 포함관계, end는 "비"포함관계
+input DateTimeRangeInput {
+    from: DateTime!
+    to: DateTime!
+}

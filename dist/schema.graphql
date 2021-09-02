@@ -1,0 +1,2064 @@
+type GeoLocationWithIp {
+  ip: String
+  continent_code: String
+  continent_name: String
+  country_code2: String
+  country_code3: String
+  country_name: String
+  country_capital: String
+  state_prov: String
+  district: String
+  city: String
+  zipcode: String
+  latitude: String
+  longitude: String
+  is_eu: Boolean
+  calling_code: String
+  country_tld: String
+  languages: String
+  country_flag: String
+  geoname_id: String
+  isp: String
+  connection_type: String
+  organization: String
+  currency: Currency
+  time_zone: Timezone
+}
+
+type Timezone {
+  name: String!
+  offset: Float!
+  current_time: String
+  current_time_unix: Int
+  is_dst: Boolean
+  dst_savings: Int
+}
+
+type Currency {
+  code: String
+  name: String
+  symbol: String
+}
+
+enum CurrencyCode {
+  KRW
+  USD
+  JPY
+}
+
+scalar DateTime
+
+scalar EmailAddress
+
+scalar Name
+
+scalar Password
+
+scalar PhoneNumber
+
+scalar URL
+
+scalar Object
+
+scalar Upload
+
+enum MimeType {
+  TEXT_PLAIN
+  TEXT_CSS
+  TEXT_JAVASCRIPT
+  IMAGE_GIF
+  IMAGE_PNG
+  IMAGE_JPEG
+  IMAGE_BMP
+  IMAGE_WEBP
+  AUDIO_MIDI
+  AUDIO_MPEG
+  AUDIO_WEBM
+  AUDIO_OGG
+  AUDIO_WAV
+  VIDEO_WEBM
+  VIDEO_OGG
+  APPLICATION_OCTET_STREAM
+  APPLICATION_PKCS12
+  APPLICATION_VND_MSPOWERPOINT
+  APPLICATION_XHTML_XML
+  APPLICATION_XML
+  APPLICATION_PDF
+}
+
+interface BaseModel {
+  _id: ID!
+  expiresAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime
+}
+
+# 기본 리턴값... 에러처리 골때릴듯한데...
+interface BaseResponse {
+  ok: Boolean!
+  error: Err
+}
+
+type Err {
+  code: String
+  msg: String
+  origin: Object
+}
+
+type Query {
+  includeDays(days: Int!): [Day!]
+  periodTest(param: PeriodTestInput!): [Period!]
+  GenCodeTest(param: GenCodeTestInput!): GenCodeTestResult!
+  dateTimeTest(date: DateTime!): DateTime!
+  # 국가 검색용 API => 결과값에 timezone 포함되어 있음.
+  countries(countryName: String): [Country!]
+  currentCountry: Zoneinfo!
+  GetStoreGroupByCode(param: GetStoreGroupByCodeInput!): GetStoreGroupByCodeResponse!
+  GetItemById(param: GetItemByIdInput!): GetItemByIdResponse!
+  GetItemForBuyer(param: GetItemForBuyerInput!): GetItemForBuyerResponse!
+  GetItemByCode(itemCode: String!): GetItemByCodeResponse!
+  GetItemForStoreUser(itemCode: String!): GetItemForStoreUserResponse!
+  GetItems(param: GetItemsInput!): GetItemsResponse!
+  GetItemsForBuyer(param: GetItemsForBuyerInput!): GetItemsForBuyerResponse!
+  GetItemsForStoreUser(filter: GetItemsFilterInput!): GetItemsForStoreUserResponse!
+  GetPaymentAuthInfo(amount: Float!): GetPaymentAuthInfoResponse!
+  GetPrivacyPolicy(storeCode: String!): GetPrivacyPolicyResponse!
+  GetProductById(param: GetProductByIdInput!): GetProductByIdResponse!
+  # Store Owner가 쿼리할떄 사용하는 함수임.
+  GetProductsByStoreId(param: GetProductsByStoreIdInput!): GetProductsByStoreIdResponse!
+  GetProductsForBuyer(param: GetProductsForBuyerInput!): GetProductsForBuyerResponse!
+  GetProductsForPublic(filter: GetProductsForPublicFilter): GetProductsForPublicResponse!
+  # 현재 등록된 SmsKey 가져오는 함수
+  GetSmsKey: GetSmsKeyResponse!
+  GetSmsTemplateAttributes(itemId: ID!): GetSmsTemplateAttributesResponse!
+  GetMyProfileStoreUser: GetMyProfileStoreUserResponse!
+  GetMyStores: GetMyStoresResponse!
+  GetStoreById(param: GetStoreByIdInput!): GetStoreByIdResponse!
+  # 외부에서 Store를 조회할떄 사용함 => ex) Buyer가 예약을 위해 조회할떄 사용
+  GetStoreForBuyer(param: GetStoreForBuyerInput!): GetStoreForBuyerResponse!
+  GetStoreForPublic: GetStoreForPublicResponse!
+  GetUsableRate(param: GetUsableRateInput!): GetUsableRateResponse!
+  GetTransactions(filter: GetTransactionsFilterInput!, pagingInput: PagingInput!): GetTransactionsResponse!
+  AuthorizeCodeSignIn(param: AuthorizeCodeSignInInput!): AuthorizeCodeSignInResponse!
+  AuthorizeCodeSignInForBuyer(param: AuthorizeCodeSignInForBuyerInput!): AuthorizeCodeSignInForBuyerResponse!
+  FindMyEmail(param: FindMyEmailInput!): FindMyEmailResponse!
+  GetMyProfile: GetMyProfileResponse!
+  GetMyProfileForBuyer: GetMyProfileForBuyerResponse!
+  ValidateGoogleUser: ValidateGoogleUserResponse!
+}
+
+input PeriodTestInput {
+  periods: [PeriodInput!]
+}
+
+type Mutation {
+  singleUpload(upload: Upload!): File!
+  CreateStoreGroup(param: CreateStoreGroupInput!): CreateStoreGroupResponse!
+  DeleteStoreGroup(param: DeleteStoreGroupInput!): DeleteStoreGroupResponse!
+  UpdateStoreGroup(groupCode: String!, param: UpdateStoreGroupInput!): UpdateStoreGroupResponse!
+  AddTransactionHistoryToItem(itemId: ID!, input: AddTransactionHistoryInput!): AddTransactionHistoryToItemResponse!
+  CancelItem(param: CancelItemInput!): CancelItemResponse!
+  # deprecated
+  CancelItemForBuyer(param: CancelItemForBuyerInput!): CancelItemForBuyerResponse!
+  CancelItemForStoreUser(itemCode: String!, comment: String): CancelItemForStoreUserResponse!
+  CreateItem(param: CreateItemInput!): CreateItemResponse!
+  CreateItemForAnonymous(productCode: String!, dateTimeRange: DateTimeRangeInput!, usersInput: CreateItemForAnonymousInput!): CreateItemForAnonymousResponse!
+  CreateItemForBuyer(param: CreateItemForBuyerInput!): CreateItemForBuyerResponse!
+  CreateItemForStoreUser(productCode: String!, dateTimeRange: DateTimeRangeInput!, usersInput: CreateItemForStoreUserInput!): CreateItemForStoreUserResponse!
+  DeleteItem(param: DeleteItemInput!): DeleteItemResponse!
+  PermitItem(param: PermitItemInput!): PermitItemResponse!
+  PermitItemAndCancelOthers(itemId: ID!, comment: String): PermitItemResponse!
+  RefundItem(itemId: ID!, refundInput: RefundInput!): RefundItemResponse!
+  UpdateItem(itemId: ID!, input: UpdateItemInput!): UpdateItemResponse!
+  ConfirmItemPayment(itemId: ID!, input: ConfirmItemPaymentInput!): ConfirmItemPaymentResponse!
+  SetTransactionStatus(transactionId: ID!, input: SetTransactionStatusInput!): SetTransactionStatusResponse!
+  CreateProduct(param: CreateProductInput!): CreateProductResponse!
+  DeleteProduct(param: DeleteProductInput!): DeleteProductResponse!
+  SetProductPrice(productId: ID!, input: SetProductPriceInput!): SetProductPriceResponse!
+  UpdateProduct(param: UpdateProductInput!): UpdateProductResponse!
+  ChargeSms(amount: Float!): ChargeSmsResponse!
+  InitSms: InitSmsResponse!
+  Send(param: SendInput!): SendResponse!
+  CompleteStoreUserVerification(target: VerificationTarget!, code: String!): CompleteStoreUserVerificationResponse!
+  CreateStore(param: CreateStoreInput!): CreateStoreResponse!
+  DeleteStore(param: DeleteStoreInput!): DeleteStoreResponse!
+  CompleteFindStoreUserEmail(phoneNumber: String!, code: String!): CompleteFindStoreUserEmailResponse!
+  StartFindStoreUserEmail(phoneNumber: String!): StartFindStoreUserEmailResponse!
+  CompleteResetPasswordStoreUser(target: VerificationTarget!, payload: String!, code: String!, newPassword: String!): CompleteResetPasswordStoreUserResponse!
+  StartResetPasswordStoreUser(email: String!, target: VerificationTarget!, payload: String!): StartResetPasswordStoreUserResponse!
+  SignInStore(email: String!, password: String!): SignInStoreResponse!
+  SignOutStore: SignOutStoreResponse!
+  SignUpStore(param: SignUpStoreInput!): SignUpStoreResponse!
+  StartStoreUserVerification(target: VerificationTarget!): StartStoreUserVerificationResponse!
+  UpdateStore(param: UpdateStoreInput!): UpdateStoreResponse!
+  ChangePasswordStoreUser(oldPassword: String!, newPassword: String!): ChangePasswordStoreUserResponse!
+  UpdateStoreUsersProfile(password: String!, param: UpdateStoreUsersProfileInput!): UpdateStoreUsersProfileResponse!
+  AddTransactionHistory(transactionId: ID!, input: AddTransactionHistoryInput!): AddTransactionHistoryResponse!
+  AdminUpdateUser(param: AdminUpdateUserInput!): AdminUpdateUserResponse!
+  ChangePassword(param: ChangePasswordInput!): ChangePasswordResponse!
+  ChangePasswordForBuyer(param: ChangePasswordForBuyerInput!): ChangePasswordForBuyerResponse!
+  ConfirmCustomVerificationCode(email: String!, code: String!, role: UserRole!): ConfirmCustomVerificationCodeResponse!
+  ConfirmVerificationCode(param: ConfirmVerificationCodeInput!): ConfirmVerificationCodeResponse!
+  DeleteUser(param: DeleteUserInput!): DeleteUserResponse!
+  # Email 로그인
+  EmailSignIn(param: EmailSignInInput!): EmailSignInResponse!
+  # Email 로그인
+  EmailSignInBuyer(param: EmailSignInBuyerInput!): EmailSignInBuyerResponse!
+  EmailSignUp(param: EmailSignUpInput!): EmailSignUpResponse!
+  EmailSignUpForBuyer(param: EmailSignUpForBuyerInput!): EmailSignUpForBuyerResponse!
+  RefreshToken(param: RefreshTokenInput!): RefreshTokenResponse!
+  ResendConfirmationCode(username: String!, clientId: String!): ResendConfirmationCodeResponse!
+  SignOut(role: UserRole!): SignOutResponse!
+  UpdateMyProfile(param: UpdateMyProfileInput!): UpdateMyProfileResponse!
+  UpdateMyProfileForBuyer(param: UpdateMyProfileForBuyerInput!): UpdateMyProfileForBuyerResponse!
+}
+
+type Location {
+  address: String!
+  addressDetail: String
+  lat: Float!
+  lng: Float!
+}
+
+input LocationInput {
+  address: String!
+  addressDetail: String
+  lat: Float!
+  lng: Float!
+}
+
+type File {
+  filename: String!
+  mimetype: String!
+  encoding: String!
+}
+
+type JdFile {
+  url: URL!
+  filename: String!
+  mimeType: String!
+  tags: [JdTag!]
+}
+
+type JdTag {
+  Key: String!
+  Value: String!
+}
+
+input GenCodeTestInput {
+  id: ID!
+  units: [Int!]
+  digits: Int!
+}
+
+type GenCodeTestResult {
+  code: String!
+  id: String!
+}
+
+type CountryInfo {
+  _id: ID!
+  # 국가 코드
+  countryCode: String!
+  # 국가 명
+  countryName: String!
+  # 국가 전화 코드
+  callingCode: String!
+  # 얘가 유니크한 값임.
+  timezones: [Timezone!]
+}
+
+type Country {
+  countryName: String!
+  countryCode: String!
+  timezones: [Timezone!]
+}
+
+type DateTimeRange {
+  from: DateTime!
+  to: DateTime!
+  interval: Int!
+}
+
+# 비교 시 from은 포함관계, end는 "비"포함관계
+input DateTimeRangeInput {
+  from: DateTime!
+  to: DateTime!
+}
+
+enum GenderOption {
+  MALE
+  FEMALE
+  ANY
+  SEPARATELY
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+type PageInfo {
+  totalPageCount: Int!
+  totalRowCount: Int!
+  currentPageIndex: Int!
+  currentRowCount: Int!
+}
+
+interface OffsetPagingData {
+  pageInfo: PageInfo!
+  data: [BaseModel!]!
+}
+
+input PagingInput {
+  rowCount: Int!
+  index: Int!
+}
+
+type Period {
+  # 00:00 을 기준으로 분(Minute) 단위로 설정됨
+  start: Int!
+  # 00:00 을 기준으로 분(Minute) 단위로 설정됨
+  end: Int!
+  # start, end 사이의 시간
+  time: Int!
+  # 포함하는 요일"들"
+  days: [Day!]
+  # 해당 날짜가 포함되는지 확인
+  isIn(date: DateTime!): Boolean!
+  # 겹치는 기간 나옴
+  intersactions(period: PeriodInput!): Period
+  # [개발중] 서로 겹치지 않는 기간 출력
+  differences(perid: PeriodInput!): [Period!]
+  # [개발중] 여러개의 Period로 쪼개기
+  split: [Period!]
+}
+
+# 선택 가능 범위
+type PeriodOption {
+  # 최대 선택 범위
+  max: Int!
+  # 최소 손택 범위
+  min: Int!
+  # 선택 단위
+  unit: Int!
+  # timezone으로 인한 시간 보정값 => Hour 단위임 (ex - Asia/Seoul => +9)
+  offset: Float!
+}
+
+input PeriodInput {
+  start: Int!
+  # 분 단위 계산
+  end: Int!
+  days: [Day!]
+}
+
+input PeriodOptionInput {
+  max: Int!
+  min: Int!
+  unit: Int!
+  offset: Float
+}
+
+type Segment {
+  from: DateTime!
+  to: DateTime!
+}
+
+enum Day {
+  SUN
+  MON
+  TUE
+  WED
+  THU
+  FRI
+  SAT
+}
+
+type CreateStoreGroupResponse {
+  ok: Boolean!
+  error: Err
+  data: BaseGroup
+}
+
+input CreateStoreGroupInput {
+  name: String!
+  type: GroupType!
+  description: String
+  tags: [String!]
+  list: [ID!]
+}
+
+type DeleteStoreGroupResponse {
+  ok: Boolean!
+  error: Err
+  data: BaseGroup
+}
+
+input DeleteStoreGroupInput {
+  groupId: ID!
+}
+
+type GetStoreGroupByCodeResponse {
+  ok: Boolean!
+  error: Err
+  data: StoreGroup
+}
+
+input GetStoreGroupByCodeInput {
+  groupCode: String!
+}
+
+interface BaseGroup {
+  _id: ID!
+  user: User
+  name: String!
+  type: GroupType!
+  code: String!
+  description: String
+  tags: [String!]
+  list: [BaseModel!]
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  expiresAt: DateTime
+}
+
+enum GroupType {
+  STORE_GROUP
+  PRODUCT_GROUP
+}
+
+type StoreGroupConfig {
+  design: StoreDesignConfig!
+  guestSignUpOption: StoreUserSignUpOption!
+}
+
+type StoreDesignConfig {
+  # 메뉴바 상단 로고
+  logo: String
+  # 앱 아이콘 로고
+  iconLogo: String
+  # 메인 테마 컬러
+  color: String
+  # 상단 로고 클릭시 이동하는 링크
+  link: String
+}
+
+type StoreUserSignUpOption {
+  # default: false
+  acceptAnonymousUser: Boolean!
+  # default: STORE_GROUP
+  userAccessRange: UserAccessRange!
+  useEmailVerification: Boolean!
+  usePhoneVerification: Boolean!
+  useSignUpAutoPermit: Boolean!
+  signUpPolicyContent: String
+}
+
+input StoreUserSignUpOptionInput {
+  # default: false
+  acceptAnonymousUser: Boolean
+  # default: STORE_GROUP
+  userAccessRange: UserAccessRange
+  useEmailVerification: Boolean
+  usePhoneVerification: Boolean
+  useSignUpAutoPermit: Boolean
+  signUpPolicyContent: String
+}
+
+enum UserAccessRange {
+  STORE_GROUP
+  STORE
+  NONE
+}
+
+type ProductGroup implements BaseGroup {
+  _id: ID!
+  user: User
+  name: String!
+  type: GroupType!
+  code: String!
+  description: String
+  tags: [String!]
+  list: [Product!]
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  expiresAt: DateTime
+}
+
+type StoreGroup implements BaseGroup {
+  _id: ID!
+  isDefault: Boolean!
+  user: User
+  name: String!
+  type: GroupType!
+  code: String!
+  description: String
+  tags: [String!]
+  list: [Store!]
+  config: StoreGroupConfig!
+  designOption: StoreDesignConfig!
+  signUpOption: StoreUserSignUpOption!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  expiresAt: DateTime
+}
+
+type UpdateStoreGroupResponse {
+  ok: Boolean!
+  error: Err
+  data: StoreGroup
+}
+
+input UpdateStoreGroupInput {
+  name: String
+  description: String
+  designConfig: StoreDesignConfigInput
+  guestUserConfig: StoreUserSignUpOptionInput
+}
+
+input StoreDesignConfigInput {
+  logo: Upload
+  iconLogo: Upload
+  color: String
+  link: String
+}
+
+type AddTransactionHistoryToItemResponse {
+  ok: Boolean!
+  error: Err
+  data: Transaction
+}
+
+type CancelItemResponse {
+  ok: Boolean!
+  error: Err
+  data: Item
+}
+
+input CancelItemInput {
+  itemId: ID!
+  refundParams: RefundInput
+}
+
+type CancelItemForBuyerResponse {
+  ok: Boolean!
+  error: Err
+  data: Item
+}
+
+input CancelItemForBuyerInput {
+  itemCode: String!
+  comment: String
+}
+
+type CancelItemForStoreUserResponse {
+  ok: Boolean!
+  error: Err
+}
+
+type CreateItemResponse {
+  ok: Boolean!
+  error: Err
+  data: Item
+}
+
+input CreateItemInput {
+  storeId: ID!
+  productId: ID!
+  description: String
+  customFieldValues: [CustomFieldInput!]
+  phoneNumber: String
+  name: String
+  dateTimeRange: DateTimeRangeInput
+  gender: Gender
+}
+
+type CreateItemForAnonymousResponse {
+  ok: Boolean!
+  error: Err
+  data: Item
+}
+
+input CreateItemForAnonymousInput {
+  name: String
+  phoneNumber: String
+  description: String
+  customFieldValues: [CustomFieldInput!]
+  privacyPolicyAgreement: Boolean
+}
+
+type CreateItemForBuyerResponse {
+  ok: Boolean!
+  error: Err
+  data: Item
+}
+
+input CreateItemForBuyerInput {
+  name: String
+  phoneNumber: String
+  productCode: String!
+  description: String
+  dateTimeRange: DateTimeRangeInput
+  gender: Gender
+  customFieldValues: [CustomFieldInput!]
+}
+
+type CreateItemForStoreUserResponse {
+  ok: Boolean!
+  error: Err
+  data: Item
+}
+
+input CreateItemForStoreUserInput {
+  name: String
+  phoneNumber: String
+  description: String
+  gender: Gender
+  customFieldValues: [CustomFieldInput!]
+  privacyPolicyAgreement: Boolean
+  isExtended: Boolean
+}
+
+type DeleteItemResponse {
+  ok: Boolean!
+  error: Err
+  data: Item
+}
+
+input DeleteItemInput {
+  itemId: ID!
+}
+
+type GetItemByIdResponse {
+  ok: Boolean!
+  error: Err
+  data: Item
+}
+
+input GetItemByIdInput {
+  itemId: ID!
+}
+
+type GetItemForBuyerResponse {
+  ok: Boolean!
+  error: Err
+  data: Item
+}
+
+input GetItemForBuyerInput {
+  itemCode: String!
+}
+
+type GetItemByCodeResponse {
+  ok: Boolean!
+  error: Err
+  data: Item
+}
+
+type GetItemForStoreUserResponse {
+  ok: Boolean!
+  error: Err
+  data: Item
+}
+
+type GetItemsResponse {
+  ok: Boolean!
+  error: Err
+  data: [Item!]
+}
+
+input GetItemsInput {
+  storeId: ID
+  filter: GetItemsFilterInput!
+  sort: [GetItemsSortInput]
+}
+
+input GetItemsFilterInput {
+  productCode: String
+  productId: String
+  date: DateTime
+  dateTimeRange: DateTimeRangeInput
+  name: String
+  status: ItemStatus
+  createdAtRange: DateTimeRangeInput
+}
+
+input GetItemsSortInput {
+  sortKey: String!
+  sort: Int!
+}
+
+type GetItemsForBuyerResponse {
+  ok: Boolean!
+  error: Err
+  data: [Item!]
+}
+
+input GetItemsForBuyerInput {
+  filter: GetItemsFilterInput!
+}
+
+type GetItemsForStoreUserResponse {
+  ok: Boolean!
+  error: Err
+  data: [Item!]
+}
+
+# 아이템 승인
+type PermitItemResponse {
+  ok: Boolean!
+  error: Err
+  data: Item
+}
+
+input PermitItemInput {
+  itemId: ID!
+  comment: String
+}
+
+type PermitItemAndCancelOthersResponse {
+  ok: Boolean!
+  error: Err
+  data: PermitItemAndCancelOthersResultData
+}
+
+type PermitItemAndCancelOthersResultData {
+  permittedItem: Item!
+  canceledItem: [Item!]!
+}
+
+type RefundItemResponse {
+  ok: Boolean!
+  error: Err
+}
+
+input RefundInput {
+  amount: Float!
+  message: String
+}
+
+type Item implements BaseModel {
+  _id: ID!
+  store: Store
+  # 관리자 ID임..
+  user: User!
+  # store에 종속된 User
+  storeUser: StoreUser
+  product: Product
+  code: String!
+  name: String!
+  memo: String
+  status: ItemStatus!
+  statusChangedHistory: [ItemStatusChanged!]
+  phoneNumber: String
+  dateTimeRange: DateTimeRange
+  permissionInfo: ItemPermissionInfo
+  customFieldValues: [CustomFieldValue!]
+  # seller쪽에서 결제 사용여부가 NONE인 경우 해당 필드값 null 될수있음.
+  transaction: Transaction
+  isExtended: Boolean!
+  # deprecated
+  buyer: Buyer
+  # agreeWithPrivacyPolicy: AgreeWithPrivacyPolicy!
+  orderCount: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  expiresAt: DateTime
+}
+
+# TODO 나중에 작업해야됨 => Store에 어떤식으로 Content 전문을 저장할지 고민해보기... 버전도 있어야할듯 ㅜ
+type AgreeWithPrivacyPolicy {
+  agree: Boolean!
+  updatedAt: DateTime!
+  createdAt: DateTime!
+}
+
+input AgreeWithPrivacyPolicyInput {
+  agree: Boolean!
+  date: DateTime
+}
+
+enum ItemStatus {
+  # 취소됨
+  CANCELED
+  # 대기중
+  PENDING
+  # 허가완료
+  PERMITTED
+}
+
+type ItemPermissionInfo {
+  date: DateTime!
+  user: User!
+  comment: String
+}
+
+type ItemStatusChanged {
+  type: String!
+  status: ItemStatus!
+  worker: User!
+  comment: String
+  item: Item!
+  date: DateTime!
+}
+
+type UpdateItemResponse {
+  ok: Boolean!
+  error: Err
+}
+
+input UpdateItemInput {
+  name: String
+  phoneNumber: String
+  start: DateTime
+  end: DateTime
+}
+
+type ConfirmItemPaymentResponse {
+  ok: Boolean!
+  error: Err
+}
+
+input ConfirmItemPaymentInput {
+  amount: Float!
+  paymethod: Paymethod!
+  currency: CurrencyCode
+  payResult: NicepayPayResultInput
+}
+
+type GetPaymentAuthInfoResponse {
+  ok: Boolean!
+  error: Err
+  data: PaymentAuthObject
+}
+
+type PaymentAuthObject {
+  mid: String!
+  hash: String!
+  date: String
+}
+
+type SetTransactionStatusResponse {
+  ok: Boolean!
+  error: Err
+}
+
+input SetTransactionStatusInput {
+  amount: Float!
+  paymethod: Paymethod!
+  currency: CurrencyCode
+  payResult: NicepayPayResultInput
+}
+
+type GetPrivacyPolicyResponse {
+  ok: Boolean!
+  error: Err
+  data: PrivacyPolicy
+}
+
+type PrivacyPolicy implements BaseModel {
+  _id: ID!
+  name: String!
+  content: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  expiresAt: DateTime
+}
+
+type CreateProductResponse implements BaseResponse {
+  ok: Boolean!
+  error: Err
+  data: Product
+}
+
+input CreateProductInput {
+  storeId: ID!
+  subTitle: String
+  name: String
+  images: [Upload!]
+  description: String
+  intro: String
+  warning: String
+  optionalParams: ProductOptionalFieldInput
+  infos: [InfoInput!]
+  needToConfirm: Boolean
+}
+
+input ProductOptionalFieldInput {
+  # deprecated
+  peopleCapacity: Int
+  capacity: Int
+  genderOption: GenderOption
+  businessHours: [PeriodInput!]
+  disabledPeriod: [PeriodInput!]
+  periodOption: PeriodOptionInput
+  bookingPolicy: BookingPolicyInput
+}
+
+type DeleteProductResponse {
+  ok: Boolean!
+  error: Err
+  data: Product
+}
+
+input DeleteProductInput {
+  productId: ID!
+}
+
+type GetProductByIdResponse {
+  ok: Boolean!
+  error: Err
+  data: Product
+}
+
+input GetProductByIdInput {
+  productId: ID!
+}
+
+type GetProductsByStoreIdResponse {
+  ok: Boolean!
+  error: Err
+  data: [Product!]
+}
+
+input GetProductsByStoreIdInput {
+  storeId: ID!
+}
+
+type GetProductsForBuyerResponse {
+  ok: Boolean!
+  error: Err
+  data: [Product!]
+}
+
+input GetProductsForBuyerInput {
+  storeCode: String!
+}
+
+type GetProductsForPublicResponse {
+  ok: Boolean!
+  error: Err
+  data: [Product!]
+}
+
+input GetProductsForPublicFilter {
+  storeCodes: [String!]
+}
+
+type SetProductPriceResponse {
+  ok: Boolean!
+  error: Err
+}
+
+input SetProductPriceInput {
+  defaultPrice: Float
+  segmentPrice: Float
+}
+
+# 판매되는 상품 스키마
+type Product implements BaseModel {
+  _id: ID!
+  user: User!
+  store: Store!
+  name: String!
+  subTitle: String
+  code: String!
+  images: [URL!]
+  description: String
+  needToConfirm: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  expiresAt: DateTime
+  warning: String
+  intro: String
+  infos: [Info!]
+  items(date: DateTime!, status: ItemStatus): [Item!]
+  # null이 출력되는 경우 해당 date값이 영업시간이 포함되지 않기 때문임.
+  schedules(date: DateTime!, soldOut: Boolean): ProductSchedules
+  bookingPolicy: BookingPolicy!
+  # 기본 예약 가격
+  defaultPrice: Float!
+  # 예약 Segment당 가격
+  segmentPrice: Float!
+  # 결제 사용 여부
+  usingPayment: Boolean!
+  # 수용 가능 예약 수. 인원수가 될수도 있고 인원수가 아닌 예약한 팀의 수가 될수도 있고...
+  capacity: Int
+  # 수용 가능 성별 옵션
+  genderOption: GenderOption
+  # 영업시간
+  businessHours: [Period!]
+  # Min, Max는 변경 가능하지만 Unit은 변경 불가
+  periodOption: PeriodOption
+  # 전체 예약 아이템 수
+  totalItemCount: Int!
+}
+
+type ProductSegment {
+  segment: Segment!
+  itemCount: Int!
+  maxCount: Int!
+  # 해당 Segment 품절여부
+  soldOut: Boolean!
+  # 권한에 따라서 item이 null 또는 [] 값으로 나올 수 있음
+  items: [Item!]
+}
+
+type ProductScheduleInfo {
+  # 검색하고자 하는 일자가 영업하는날인지 true, false
+  isOpenDate: Boolean!
+  # 검색 범위
+  dateTimeRange: DateTimeRange!
+  # 단위. (Segment의 최소 interval을 말함.)
+  unit: Int!
+}
+
+type ProductSchedules {
+  # 검색 정보
+  info: ProductScheduleInfo!
+  # 검색 결과
+  list: [ProductSegment!]
+}
+
+type Info {
+  key: String!
+  label: String!
+  content: String!
+}
+
+input InfoInput {
+  key: String!
+  content: String!
+  label: String!
+}
+
+type UpdateProductResponse {
+  ok: Boolean!
+  error: Err
+  data: Product
+}
+
+input UpdateProductInput {
+  productCode: String!
+  updateProductParamInput: UpdateProductParamInput!
+}
+
+input UpdateProductParamInput {
+  name: String
+  description: String
+  subTitle: String
+  needToConfirm: Boolean
+  addImages: [Upload!]
+  deleteImages: [String!]
+  # deprecated
+  peopleCapacity: Int
+  capacity: Int
+  genderOption: GenderOption
+  businessHours: [PeriodInput!]
+  periodOption: PeriodOptionInput
+  bookingPolicy: BookingPolicyInput
+  infos: [InfoInput!]
+  usingPayment: Boolean
+}
+
+type ChargeSmsResponse {
+  ok: Boolean!
+  error: Err
+}
+
+type GetSmsKeyResponse {
+  ok: Boolean!
+  error: Err
+  # SmsKey 바로나옴
+  data: String
+}
+
+type GetSmsTemplateAttributesResponse {
+  ok: Boolean!
+  error: Err
+  data: [SmsTemplateAttributeSets!]
+}
+
+type InitSmsResponse {
+  ok: Boolean!
+  error: Err
+  # smsKey를 리턴함
+  data: String
+}
+
+type SendResponse {
+  ok: Boolean!
+  error: Err
+  data: [SendResultData!]
+}
+
+input SendInput {
+  senderId: ID
+  # 치환 문자열 포함 가능
+  message: String!
+  receivers: [String!]
+  itemIds: [ID!]
+}
+
+type SendResultData {
+  successCount: Int!
+  errorCount: Int!
+  aligoMid: Int!
+  amount: Float!
+  type: SmsType!
+}
+
+enum SmsType {
+  SMS
+  LMS
+  MMS
+}
+
+enum SmsTemplateKeyForItemUpsert {
+  # 예약한 상품 명
+  PRODUCT_NAME
+  # 이용 시작 시간(YYYY-MM-DD H:i:s)
+  ITEM_START
+  # 이용 종료 시간(YYYY-MM-DD H:i:s)
+  ITEM_END
+  # 이용 시간 범위(YYYY-MM-DD H:i:s ~ H:i:s)
+  ITEM_DATETIME_RANGE
+  # 총 이용 시간
+  ITEM_INTERVAL
+  # 아마도 예약자?
+  ITEM_NAME
+  # 예약 상태
+  ITEM_STATUS
+  # 예약 코드
+  ITEM_CODE
+  # 예약 수
+  ITEM_ORDERCOUNT
+  # 담당자 명
+  MANAGER_NAME
+  # 담당자 전화번호
+  MANAGER_PHONENUMBER
+}
+
+enum SmsTriggerEvent {
+  # [고객 - 예약] 고객에게 전송
+  ITEM_CREATED
+  # [고객 - 예약] 관리자에게 전송
+  ITEM_CREATED_FOR_SELLER
+  # [관리자 - 예약 승인] 고객에게 전송
+  ITEM_PERMITTED
+  # [관리자 - 예약 거절] 고객에게 전송
+  ITEM_CANCELED
+}
+
+type SmsTemplateAttributeSets {
+  key: SmsTemplateKeyForItemUpsert!
+  value: String!
+}
+
+type CompleteStoreUserVerificationResponse {
+  ok: Boolean!
+  error: Err
+}
+
+type CreateStoreResponse {
+  ok: Boolean!
+  error: Err
+  data: Store
+}
+
+input CreateStoreInput {
+  name: String!
+  type: StoreType!
+  description: String
+  # 미입력시 User의 이름, 전화번호로 들어감
+  manager: ManagerInput
+  timezone: String
+  warning: String
+  intro: String
+  groupId: ID
+  businessHours: [PeriodInput!]
+  periodOption: PeriodOptionInput!
+  customFieldInput: [CustomFieldDefineInput!]
+  infos: [InfoInput!]
+  bookingPolicy: BookingPolicyInput
+  usingPayment: Boolean
+  polices: [PolicyInput]
+  blockDates: [DateTime]
+}
+
+type DeleteStoreResponse {
+  ok: Boolean!
+  error: Err
+  data: Store
+}
+
+input DeleteStoreInput {
+  storeId: ID!
+}
+
+type CompleteFindStoreUserEmailResponse {
+  ok: Boolean!
+  error: Err
+  email: String
+}
+
+type StartFindStoreUserEmailResponse {
+  ok: Boolean!
+  error: Err
+}
+
+type GetMyProfileStoreUserResponse {
+  ok: Boolean!
+  error: Err
+  data: StoreUser
+}
+
+type GetMyStoresResponse {
+  ok: Boolean!
+  error: Err
+  data: [Store!]
+}
+
+type GetStoreByIdResponse {
+  ok: Boolean!
+  error: Err
+  data: Store
+}
+
+input GetStoreByIdInput {
+  storeId: ID!
+}
+
+type GetStoreForBuyerResponse {
+  ok: Boolean!
+  error: Err
+  data: Store
+}
+
+input GetStoreForBuyerInput {
+  storeCode: String!
+}
+
+type GetStoreForPublicResponse {
+  ok: Boolean!
+  error: Err
+  data: Store
+}
+
+type GetUsableRateResponse {
+  ok: Boolean!
+  error: Err
+  data: [UsableRateObject!]
+}
+
+input GetUsableRateInput {
+  storeCode: String!
+  dateRange: DateTimeRangeInput!
+  # 아직 개발중임
+  filter: GetUsableRateFilterInput
+}
+
+type UsableRateObject {
+  date: DateTime!
+  # 이용 가능여부
+  isUsable: Boolean!
+  # 이용률
+  usableRate: Float!
+  # 전체 segment 수
+  segmentCount: Int!
+  # 사용 가능한 segment 수
+  segmentUsableCount: Int!
+}
+
+input GetUsableRateFilterInput {
+  timeRange: DateTimeRangeInput
+  productCode: String
+}
+
+type CompleteResetPasswordStoreUserResponse {
+  ok: Boolean!
+  error: Err
+  storeUser: StoreUser
+}
+
+type StartResetPasswordStoreUserResponse {
+  ok: Boolean!
+  error: Err
+}
+
+type CustomField {
+  key: ID!
+  label: String!
+  type: CustomFieldType!
+  # type===LIST 인 경우 표시할 선택목록
+  list: [String!]
+  placeHolder: String
+  default: String
+  # 게시할 파일 URL
+  fileUrl: String
+  isMandatory: Boolean!
+}
+
+enum CustomFieldType {
+  STRING
+  LIST
+  FILE
+}
+
+input CustomFieldDefineInput {
+  key: ID
+  label: String!
+  type: CustomFieldType!
+  list: [String!]
+  placeHolder: String
+  default: String
+  file: Upload
+  # 필수값? => default: false
+  isMandatory: Boolean
+}
+
+# 사용자들에게 보여주기 위한 출력시 사용하는 필드
+type CustomFieldValue {
+  key: ID!
+  label: String!
+  # type === file인 경우에 value는 s3의 파일 URl로 저장되었음을 의미함
+  type: CustomFieldType
+  value: String!
+}
+
+# 커스텀 필드 입력
+input CustomFieldInput {
+  key: ID!
+  value: String!
+  file: Upload
+}
+
+type Store implements BaseModel {
+  _id: ID!
+  user: User
+  name: String!
+  code: String!
+  # deprecated
+  groups: [StoreGroup!]
+  group: StoreGroup!
+  type: StoreType!
+  zoneinfo: Zoneinfo!
+  description: String
+  location: Location
+  image: URL
+  manager: Manager
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  expiresAt: DateTime
+  products: [Product!]
+  productCount: Int!
+  businessHours: [Period!]
+  periodOption: PeriodOption
+  bookingPolicy: BookingPolicy
+  infos: [Info!]
+  intro: String
+  warning: String
+  blockDates: [DateTime]
+  polices: [Policy]
+  customFields: [CustomField!]
+  storeUsers: [StoreUser!]!
+  signUpOption: StoreUserSignUpOption!
+}
+
+enum StoreType {
+  # 임대업. ex) 스터디룸, 컨퍼런스룸, etc...
+  LEASE
+  # 티켓 판매. ex) 롤러장, etc... 티켓이라고 부를수 있는 것들.
+  TICKET
+}
+
+type BookingPolicy {
+  # 최대 x일 뒤의 날짜까지 예약 가능 - ex) lastBooking: 60 => 60일 뒤의 날짜까지 예약 가능
+  limitLastBooking: Int!
+  # 최소 x일 뒤의 날짜부터 예약 가능 - ex) firstBooking: 0 => 당일예약 가능, 1 => 당일예약 불가, 내일날자 이후 예약 가능
+  limitFirstBooking: Int!
+}
+
+input BookingPolicyInput {
+  # 최대 x일 뒤의 날짜까지 예약 가능 - ex) lastBooking: 60 => 60일 뒤의 날짜까지 예약 가능
+  limitLastBooking: Int!
+  # 최소 x일 뒤의 날짜부터 예약 가능 - ex) firstBooking: 0 => 당일예약 가능, 1 => 당일예약 불가, 내일날자 이후 예약 가능
+  limitFirstBooking: Int!
+}
+
+type Schedules {
+  # 최대 선택 가능 시간
+  max: Int!
+  # 필수 최소 선택 시간
+  min: Int!
+  timeline: [TimelineItem!]!
+}
+
+type TimelineItem {
+  _id: ID
+  from: Int!
+  to: Int!
+}
+
+type Policy {
+  # 최대 선택 범위
+  name: String!
+  # 최소 손택 범위
+  content: String!
+  # 선택 단위
+  require: Boolean!
+}
+
+input PolicyInput {
+  # 최대 선택 범위
+  name: String!
+  # 최소 손택 범위
+  content: String!
+  # 선택 단위
+  require: Boolean!
+}
+
+type StoreUser implements BaseModel {
+  _id: ID!
+  name: String!
+  password: String
+  email: String!
+  zoneinfo: Zoneinfo!
+  phoneNumber: String!
+  isPhoneVerified: Boolean!
+  isEmailVerified: Boolean!
+  company: String
+  store: Store
+  storeGroup: StoreGroup!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  expiresAt: DateTime
+}
+
+type SignInStoreResponse {
+  ok: Boolean!
+  error: Err
+}
+
+type SignOutStoreResponse {
+  ok: Boolean!
+  error: Err
+}
+
+type SignUpStoreResponse {
+  ok: Boolean!
+  error: Err
+  data: StoreUser
+}
+
+input SignUpStoreInput {
+  name: String!
+  password: String!
+  email: String!
+  phoneNumber: String!
+  # default: KR
+  timezone: String!
+  company: String
+}
+
+type StartStoreUserVerificationResponse {
+  ok: Boolean!
+  error: Err
+}
+
+enum VerificationTarget {
+  EMAIL
+  PHONE
+  PHONE
+  EMAIL
+}
+
+type UpdateStoreResponse {
+  ok: Boolean!
+  error: Err
+  data: Store
+}
+
+input UpdateStoreInput {
+  storeId: ID!
+  updateParam: StoreUpdateParamInput!
+  # 하위의 Product들도 같이 Update 돌릴것인지 선택
+  withProduct: Boolean
+}
+
+input StoreUpdateParamInput {
+  name: String
+  description: String
+  businessHours: [PeriodInput!]
+  customFields: [CustomFieldDefineInput!]
+  warning: String
+  intro: String
+  manager: ManagerInput
+  infos: [InfoInput!]
+  bookingPolicy: BookingPolicyInput
+  polices: [PolicyInput]
+  usingPayment: Boolean
+  blockDates: [DateTime]
+}
+
+type ChangePasswordStoreUserResponse {
+  ok: Boolean!
+  error: Err
+}
+
+type UpdateStoreUsersProfileResponse {
+  ok: Boolean!
+  error: Err
+}
+
+input UpdateStoreUsersProfileInput {
+  name: String
+  timezone: String
+}
+
+type AddTransactionHistoryResponse {
+  ok: Boolean!
+  error: Err
+}
+
+input AddTransactionHistoryInput {
+  type: TrxHistoryItemType!
+  status: TrxHistoryItemStatus!
+  amount: Float!
+  paymethod: Paymethod!
+  currency: CurrencyCode
+  message: String
+  nicepayPayResultInput: NicepayPayResultInput
+  nicepayRefundResultInput: NicepayRefundResultInput
+}
+
+type GetTransactionsResponse {
+  ok: Boolean!
+  error: Err
+  data: PagedTransactions
+}
+
+type PagedTransactions implements OffsetPagingData {
+  pageInfo: PageInfo!
+  data: [Transaction!]!
+}
+
+input GetTransactionsFilterInput {
+  createdAtRange: DateTimeRangeInput!
+  # 아직 미지원
+  usageDateTimeRange: DateTimeRangeInput
+  storeIds: [ID!]
+  productIds: [ID!]
+}
+
+type NicepayPayResult {
+  ResultCode: String!
+  ResultMsg: String!
+  Amt: String!
+  MID: String!
+  Moid: String!
+  BuyerEmail: String!
+  BuyerTel: String!
+  BuyerName: String!
+  GoodsName: String!
+  TID: String!
+  AuthCode: String!
+  AuthDate: String!
+  PayMethod: String!
+  CartData: String!
+  Signature: String!
+  CardCode: String!
+  CardName: String!
+  CardNo: String!
+  CardQuota: String!
+  CardInterest: String!
+  AcquCardCode: String!
+  AcquCardName: String!
+  CardCl: String!
+  CcPartCl: String!
+  CouponAmt: String!
+  CouponMinAmt: String!
+  PointAppAmt: String!
+  ClickpayCl: String!
+}
+
+input NicepayPayResultInput {
+  ResultCode: String!
+  ResultMsg: String!
+  Amt: String!
+  MID: String!
+  Moid: String!
+  BuyerEmail: String!
+  BuyerTel: String!
+  BuyerName: String!
+  GoodsName: String!
+  TID: String!
+  AuthCode: String!
+  AuthDate: String!
+  PayMethod: String!
+  CartData: String!
+  Signature: String!
+  CardCode: String!
+  CardName: String!
+  CardNo: String!
+  CardQuota: String!
+  CardInterest: String!
+  AcquCardCode: String!
+  AcquCardName: String!
+  CardCl: String!
+  CcPartCl: String!
+  CouponAmt: String!
+  CouponMinAmt: String!
+  PointAppAmt: String!
+  ClickpayCl: String!
+}
+
+type NicepayRefundResult {
+  ResultCode: String!
+  ResultMsg: String!
+  CancelAmt: String!
+  MID: String!
+  Moid: String!
+  PayMethod: String
+  TID: String
+  CancelDate: String
+  CancelTime: String
+  RemainAmt: String
+}
+
+input NicepayRefundResultInput {
+  ResultCode: String!
+  ResultMsg: String!
+  CancelAmt: String!
+  MID: String!
+  Moid: String!
+  PayMethod: String
+  TID: String
+  CancelDate: String
+  CancelTime: String
+  RemainAmt: String
+}
+
+# 부산클라우드혁신센터에서 받은 노트 참조
+type Transaction implements BaseModel {
+  _id: ID!
+  seller: User!
+  store: Store!
+  storeUser: StoreUser
+  item: Item!
+  amount: Float!
+  amountInfo: AmountInfo!
+  paymethod: String!
+  currency: CurrencyCode!
+  history: [TransactionHistoryItem!]!
+  # 현재 결제 상태: default: PENDING
+  paymentStatus: PaymentStatus!
+  # 현재 환불 상태. default: NONE
+  refundStatus: RefundStatus!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  expiresAt: DateTime
+}
+
+type TransactionItem {
+  target: String!
+  payload: String!
+}
+
+enum PaymentStatus {
+  NONE
+  PENDING
+  DONE
+  CANCELED
+}
+
+enum RefundStatus {
+  NONE
+  PENDING
+  CANCELED
+  DONE
+}
+
+type AmountInfo {
+  origin: Float!
+  paid: Float!
+  refunded: Float!
+}
+
+type TransactionHistoryItem {
+  type: TrxHistoryItemType!
+  status: TrxHistoryItemStatus!
+  amount: Float!
+  currency: CurrencyCode!
+  # 환불의 경우에도 마찬가지임. 카드로 결제하면 카드로 환불!
+  paymethod: Paymethod!
+  date: DateTime!
+  # type = PAY, status: DONE 인 경우에 출력
+  payResult: NicepayPayResult
+  # type = REFUND, status: DONE 인 경우에 출력
+  refundResult: NicepayRefundResult
+  message: String
+}
+
+enum TrxHistoryItemType {
+  PAY
+  REFUND
+}
+
+enum TrxHistoryItemStatus {
+  PENDING
+  DONE
+  CANCELED
+}
+
+enum Paymethod {
+  CARD
+  # 현장결제같은 경우... ㅎㅎ
+  CASH
+  BANK_TRANSFER
+  VBANK
+  BILLING
+}
+
+type AdminUpdateUserResponse {
+  ok: Boolean!
+  error: Err
+  # IdToken => 헤더에 저장할것!
+  data: String
+}
+
+input AdminUpdateUserInput {
+  userSub: String!
+  role: UserRole!
+  updateParam: UpdateUserParamInput!
+}
+
+input UpdateUserParamInput {
+  name: String
+  smsKey: String
+  # callingCode 앞에 자동으로 붙임. 그냥 010부터 적으면됨
+  phoneNumber: String
+  timezone: String
+}
+
+type AuthorizeCodeSignInResponse {
+  ok: Boolean!
+  error: Err
+  data: AuthorizeCodeSignInResultData
+}
+
+input AuthorizeCodeSignInInput {
+  authorizeCode: String!
+  redirectUri: String!
+}
+
+type AuthorizeCodeSignInResultData {
+  token: String!
+  expiresIn: DateTime!
+  accessToken: String!
+  isInitiated: Boolean!
+}
+
+type AuthorizeCodeSignInForBuyerResponse {
+  ok: Boolean!
+  error: Err
+  data: AuthorizeCodeSignInForBuyerResultData
+}
+
+input AuthorizeCodeSignInForBuyerInput {
+  authorizeCode: String!
+  redirectUri: String!
+}
+
+type AuthorizeCodeSignInForBuyerResultData {
+  token: String!
+  expiresIn: DateTime!
+  accessToken: String!
+  isInitiated: Boolean!
+}
+
+type ChangePasswordResponse {
+  ok: Boolean!
+  error: Err
+  data: String
+}
+
+input ChangePasswordInput {
+  oldPw: String!
+  newPw: String!
+  newPwRe: String!
+}
+
+type ChangePasswordForBuyerResponse {
+  ok: Boolean!
+  error: Err
+  data: String
+}
+
+input ChangePasswordForBuyerInput {
+  oldPw: String!
+  newPw: String!
+  newPwRe: String!
+}
+
+type ConfirmCustomVerificationCodeResponse {
+  ok: Boolean!
+  error: Err
+}
+
+type ConfirmVerificationCodeResponse {
+  ok: Boolean!
+  error: Err
+}
+
+input ConfirmVerificationCodeInput {
+  email: String!
+  code: String!
+  role: UserRole!
+}
+
+type DeleteUserResponse {
+  ok: Boolean!
+  error: Err
+}
+
+input DeleteUserInput {
+  userSub: String!
+  expiresAt: DateTime
+}
+
+type EmailSignInResponse implements BaseResponse {
+  ok: Boolean!
+  error: Err
+}
+
+input EmailSignInInput {
+  email: EmailAddress!
+  password: String!
+  role: UserRole!
+}
+
+type EmailSignInBuyerResponse implements BaseResponse {
+  ok: Boolean!
+  error: Err
+}
+
+input EmailSignInBuyerInput {
+  email: EmailAddress!
+  password: String!
+}
+
+type EmailSignUpResponse implements BaseResponse {
+  ok: Boolean!
+  error: Err
+  data: EmailSignUpResult
+}
+
+input EmailSignUpInput {
+  email: EmailAddress!
+  # 국가번호까지 다 쳐야됨. countries 메서드로 국가 검색 => zoneinfo필드에서 해당하는 Timezone 선택 후 "callingCode" 받으면됨. => ex) +8201000000000
+  phoneNumber: PhoneNumber!
+  password: Password!
+  username: String!
+  timezone: String!
+  # SELLER, BUYER
+  role: UserRole!
+  company: String
+}
+
+type EmailSignUpResult {
+  CodeDeliveryDetails: CodeDeliveryDetails
+  UserConfirmed: Boolean!
+  UserSub: String
+}
+
+type CodeDeliveryDetails {
+  AttributeName: String
+  DeliveryMedium: String
+  Destination: String
+}
+
+type EmailSignUpForBuyerResponse {
+  ok: Boolean!
+  error: Err
+  data: EmailSignUpResult
+}
+
+input EmailSignUpForBuyerInput {
+  email: EmailAddress!
+  # 국가번호까지 다 쳐야됨. countries 메서드로 국가 검색 => zoneinfo필드에서 해당하는 Timezone 선택 후 "callingCode" 받으면됨. => ex) +8201000000000
+  phoneNumber: PhoneNumber!
+  password: Password!
+  username: String!
+  timezone: String!
+}
+
+type FindMyEmailResponse {
+  ok: Boolean!
+  error: Err
+  data: String
+}
+
+input FindMyEmailInput {
+  phoneNumber: String!
+}
+
+type GetMyProfileResponse implements BaseResponse {
+  ok: Boolean!
+  error: Err
+  data: GetMyProfileResult
+}
+
+type GetMyProfileResult {
+  user: User!
+}
+
+type GetMyProfileForBuyerResponse implements BaseResponse {
+  ok: Boolean!
+  error: Err
+  data: GetMyProfileForBuyerResult
+}
+
+type GetMyProfileForBuyerResult {
+  buyer: Buyer!
+}
+
+# 만료된 토큰은 갱신할수 없음. 토큰 만료되면 다시 로그인하게 하긔
+type RefreshTokenResponse implements BaseResponse {
+  ok: Boolean!
+  error: Err
+  data: RefreshTokenResultData
+}
+
+input RefreshTokenInput {
+  role: UserRole!
+}
+
+type RefreshTokenResultData {
+  idToken: String!
+  accessToken: String!
+  expDate: DateTime!
+}
+
+type ResendConfirmationCodeResponse {
+  ok: Boolean!
+  error: Err
+}
+
+type Buyer {
+  _id: ID!
+  sub: String!
+  name: String!
+  email: String!
+  email_verified: Boolean!
+  phone_number_verified: Boolean!
+  phone_number: String!
+  zoneinfo: Zoneinfo!
+  tokenExpiry: Int!
+  items: [Item!]
+}
+
+type User {
+  # user.sub
+  _id: ID!
+  roles: [UserRole!]
+  role: UserRole!
+  sub: String!
+  name: String!
+  email: String!
+  email_verified: Boolean!
+  phone_number_verified: Boolean!
+  phone_number: String!
+  zoneinfo: Zoneinfo!
+  tokenExpiry: Int!
+  stores: [Store!]
+  disabledStores: [Store!]
+  groups: [StoreGroup!]
+  groupCount: Int!
+  smsKey: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  expiresAt: DateTime
+}
+
+type Zoneinfo {
+  name: String!
+  code: String!
+  tz: String!
+  offset: Int!
+  callingCode: String!
+}
+
+enum UserRole {
+  BUYER
+  SELLER
+  ADMIN
+}
+
+type Manager {
+  name: String!
+  phoneNumber: String!
+  isVerifiedPhoneNumber: Boolean!
+}
+
+input ManagerInput {
+  name: String!
+  phoneNumber: String!
+}
+
+type SignOutResponse {
+  ok: Boolean!
+  error: Err
+}
+
+type UpdateMyProfileResponse {
+  ok: Boolean!
+  error: Err
+  data: String
+}
+
+input UpdateMyProfileInput {
+  roles: [UserRole!]
+  name: String
+  # callingCode 제거한채로 넣기...
+  phoneNumber: String
+  # timezone... ex) Asia/Seoul
+  timezone: String
+}
+
+type UpdateMyProfileForBuyerResponse {
+  ok: Boolean!
+  error: Err
+  data: String
+}
+
+input UpdateMyProfileForBuyerInput {
+  name: String
+  # callingCode 제거한채로 넣기...
+  phoneNumber: String
+  # timezone... ex) Asia/Seoul
+  timezone: String
+}
+
+type ValidateGoogleUserResponse {
+  ok: Boolean!
+  error: Err
+  data: ValidateGoogleUserResult
+}
+
+type ValidateGoogleUserResult {
+  # init 필요한 유저임(SELLER)
+  isInitiated: Boolean!
+}
+
+type Verification implements BaseModel {
+  _id: ID!
+  target: VerificationTarget!
+  payload: String!
+  isVerified: Boolean!
+  storeGroupCode: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  expiresAt: DateTime
+}

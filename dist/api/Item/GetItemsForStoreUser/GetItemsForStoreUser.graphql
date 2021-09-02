@@ -1,0 +1,10 @@
+type Query {
+    GetItemsForStoreUser(
+        filter: GetItemsFilterInput!
+    ): GetItemsForStoreUserResponse!
+}
+type GetItemsForStoreUserResponse {
+    ok: Boolean!
+    error: Err
+    data: [Item!]
+}

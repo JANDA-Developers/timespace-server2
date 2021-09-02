@@ -1,0 +1,16 @@
+type PageInfo {
+    totalPageCount: Int!
+    totalRowCount: Int!
+    currentPageIndex: Int!
+    currentRowCount: Int!
+}
+
+interface OffsetPagingData {
+    pageInfo: PageInfo!
+    data: [BaseModel!]!
+}
+
+input PagingInput {
+    rowCount: Int!
+    index: Int!
+}

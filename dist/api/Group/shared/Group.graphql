@@ -1,0 +1,62 @@
+interface BaseGroup {
+    _id: ID!
+    user: User
+    name: String!
+    type: GroupType!
+    code: String!
+    description: String
+    tags: [String!]
+    list: [BaseModel!]
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    expiresAt: DateTime
+}
+
+enum GroupType {
+    STORE_GROUP
+    PRODUCT_GROUP
+}
+
+type StoreGroupConfig {
+    design: StoreDesignConfig!
+    guestSignUpOption: StoreUserSignUpOption!
+}
+
+type StoreDesignConfig {
+    # 메뉴바 상단 로고
+    logo: String
+    # 앱 아이콘 로고
+    iconLogo: String
+    # 메인 테마 컬러
+    color: String
+    # 상단 로고 클릭시 이동하는 링크
+    link: String
+}
+
+type StoreUserSignUpOption {
+    # default: false
+    acceptAnonymousUser: Boolean!
+    # default: STORE_GROUP
+    userAccessRange: UserAccessRange!
+    useEmailVerification: Boolean!
+    usePhoneVerification: Boolean!
+    useSignUpAutoPermit: Boolean!
+    signUpPolicyContent: String
+}
+
+input StoreUserSignUpOptionInput {
+    # default: false
+    acceptAnonymousUser: Boolean
+    # default: STORE_GROUP
+    userAccessRange: UserAccessRange
+    useEmailVerification: Boolean
+    usePhoneVerification: Boolean
+    useSignUpAutoPermit: Boolean
+    signUpPolicyContent: String
+}
+
+enum UserAccessRange {
+    STORE_GROUP
+    STORE
+    NONE
+}

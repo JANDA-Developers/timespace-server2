@@ -1,0 +1,40 @@
+enum SmsTemplateKeyForItemUpsert {
+    # 예약한 상품 명
+    PRODUCT_NAME
+    # 이용 시작 시간(YYYY-MM-DD H:i:s)
+    ITEM_START
+    # 이용 종료 시간(YYYY-MM-DD H:i:s)
+    ITEM_END
+    # 이용 시간 범위(YYYY-MM-DD H:i:s ~ H:i:s)
+    ITEM_DATETIME_RANGE
+    # 총 이용 시간
+    ITEM_INTERVAL
+    # 아마도 예약자?
+    ITEM_NAME
+    # 예약 상태
+    ITEM_STATUS
+    # 예약 코드
+    ITEM_CODE
+    # 예약 수
+    ITEM_ORDERCOUNT
+    # 담당자 명
+    MANAGER_NAME
+    # 담당자 전화번호
+    MANAGER_PHONENUMBER
+}
+
+enum SmsTriggerEvent {
+    # [고객 - 예약] 고객에게 전송
+    ITEM_CREATED
+    # [고객 - 예약] 관리자에게 전송
+    ITEM_CREATED_FOR_SELLER
+    # [관리자 - 예약 승인] 고객에게 전송
+    ITEM_PERMITTED
+    # [관리자 - 예약 거절] 고객에게 전송
+    ITEM_CANCELED
+}
+
+type SmsTemplateAttributeSets {
+    key: SmsTemplateKeyForItemUpsert!
+    value: String!
+}

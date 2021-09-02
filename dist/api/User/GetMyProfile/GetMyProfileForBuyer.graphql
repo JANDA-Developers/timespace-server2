@@ -1,0 +1,13 @@
+type Query {
+    GetMyProfileForBuyer: GetMyProfileForBuyerResponse!
+}
+
+type GetMyProfileForBuyerResponse implements BaseResponse {
+    ok: Boolean!
+    error: Err
+    data: GetMyProfileForBuyerResult
+}
+
+type GetMyProfileForBuyerResult {
+    buyer: Buyer!
+}

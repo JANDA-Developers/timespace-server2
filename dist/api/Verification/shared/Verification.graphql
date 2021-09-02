@@ -1,0 +1,15 @@
+type Verification implements BaseModel {
+    _id: ID!
+    target: VerificationTarget!
+    payload: String!
+    isVerified: Boolean!
+    storeGroupCode: String
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    expiresAt: DateTime
+}
+
+enum VerificationTarget {
+    PHONE
+    EMAIL
+}

@@ -1,0 +1,15 @@
+type Query {
+    GetStoreGroupByCode(
+        param: GetStoreGroupByCodeInput!
+    ): GetStoreGroupByCodeResponse!
+}
+
+type GetStoreGroupByCodeResponse {
+    ok: Boolean!
+    error: Err
+    data: StoreGroup
+}
+
+input GetStoreGroupByCodeInput {
+    groupCode: String!
+}

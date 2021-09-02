@@ -1,0 +1,9 @@
+type Mutation {
+    InitSms: InitSmsResponse!
+}
+type InitSmsResponse {
+    ok: Boolean!
+    error: Err
+    # smsKey를 리턴함
+    data: String
+}

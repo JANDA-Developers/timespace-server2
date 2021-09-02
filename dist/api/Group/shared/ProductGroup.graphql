@@ -1,0 +1,13 @@
+type ProductGroup implements BaseGroup {
+    _id: ID!
+    user: User
+    name: String!
+    type: GroupType!
+    code: String!
+    description: String
+    tags: [String!]
+    list: [Product!]
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    expiresAt: DateTime
+}

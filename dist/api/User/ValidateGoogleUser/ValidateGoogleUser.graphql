@@ -1,0 +1,14 @@
+type Query {
+    ValidateGoogleUser: ValidateGoogleUserResponse!
+}
+
+type ValidateGoogleUserResponse {
+    ok: Boolean!
+    error: Err
+    data: ValidateGoogleUserResult
+}
+
+type ValidateGoogleUserResult {
+    # init 필요한 유저임(SELLER)
+    isInitiated: Boolean!
+}

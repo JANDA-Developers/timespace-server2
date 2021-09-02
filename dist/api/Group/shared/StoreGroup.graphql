@@ -1,0 +1,17 @@
+type StoreGroup implements BaseGroup {
+    _id: ID!
+    isDefault: Boolean!
+    user: User
+    name: String!
+    type: GroupType!
+    code: String!
+    description: String
+    tags: [String!]
+    list: [Store!]
+    config: StoreGroupConfig!
+    designOption: StoreDesignConfig!
+    signUpOption: StoreUserSignUpOption!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    expiresAt: DateTime
+}
