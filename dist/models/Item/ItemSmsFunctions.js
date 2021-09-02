@@ -57,9 +57,13 @@ const dateStrFormat = (date) => {
         .substr(0, 16)
         .replace("T", " ");
 };
+let sendChange = 1;
 exports.SendSmsWithTriggerEvent = async ({ event, recWithReplSets, smsKey, tags }) => {
     var _a;
+    console.count("HowManyTime" + event);
     console.log("Send Start");
+    console.log(sendChange);
+    sendChange -= 1;
     console.log((_a = recWithReplSets === null || recWithReplSets === void 0 ? void 0 : recWithReplSets[0]) === null || _a === void 0 ? void 0 : _a.receivers);
     const sendResult = 
     // const queryResult =

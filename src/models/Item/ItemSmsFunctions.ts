@@ -83,6 +83,7 @@ const dateStrFormat = (date: Date) => {
         .replace("T", " ");
 };
 
+let sendChange = 1;
 export const SendSmsWithTriggerEvent = async ({
     event,
     recWithReplSets,
@@ -97,7 +98,10 @@ export const SendSmsWithTriggerEvent = async ({
         replacementSets: SmsTemplateAttributeSets[];
     }[];
 }) => {
+    console.count("HowManyTime" + event);
     console.log("Send Start");
+    console.log(sendChange);
+    sendChange -= 1;
     console.log(recWithReplSets?.[0]?.receivers);
     const sendResult =
         // const queryResult =
