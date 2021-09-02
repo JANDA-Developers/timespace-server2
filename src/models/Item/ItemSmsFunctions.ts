@@ -34,7 +34,7 @@ export const getReplacementSetsForItem = async (
     );
     const store = await StoreModel.findById(product.storeId);
     const replacements: Replacements = {
-        ITEM_CODE: item.code || "",
+        ITEM_CODE: item.code,
         ITEM_END: end,
         ITEM_START: start,
         ITEM_DATETIME_RANGE: dateTimeRange,
@@ -97,8 +97,8 @@ export const SendSmsWithTriggerEvent = async ({
         replacementSets: SmsTemplateAttributeSets[];
     }[];
 }) => {
+    console.log("Send Start");
     console.log({ recWithReplSets });
-    console.log("sendStart");
     const sendResult =
         // const queryResult =
         await requestApi(
@@ -140,6 +140,6 @@ export const SendSmsWithTriggerEvent = async ({
                 smsKey
             }
         );
-    console.log("sendEnd");
+    console.log("Send End");
     return sendResult;
 };
