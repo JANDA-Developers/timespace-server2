@@ -1,7 +1,0 @@
-type Mutation {
-    SignInStore(email: String!, password: String!): SignInStoreResponse!
-}
-type SignInStoreResponse {
-    ok: Boolean!
-    error: Err
-}

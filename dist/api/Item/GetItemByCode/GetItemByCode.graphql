@@ -1,8 +1,0 @@
-type Query {
-    GetItemByCode(itemCode: String!): GetItemByCodeResponse!
-}
-type GetItemByCodeResponse {
-    ok: Boolean!
-    error: Err
-    data: Item
-}

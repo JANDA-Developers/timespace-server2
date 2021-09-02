@@ -1,8 +1,0 @@
-type Query {
-    GetStoreForPublic: GetStoreForPublicResponse!
-}
-type GetStoreForPublicResponse {
-    ok: Boolean!
-    error: Err
-    data: Store
-}

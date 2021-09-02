@@ -1,7 +1,0 @@
-type Mutation {
-    ChargeSms(amount: Float!): ChargeSmsResponse!
-}
-type ChargeSmsResponse {
-    ok: Boolean!
-    error: Err
-}

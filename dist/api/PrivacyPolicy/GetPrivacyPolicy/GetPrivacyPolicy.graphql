@@ -1,8 +1,0 @@
-type Query {
-    GetPrivacyPolicy(storeCode: String!): GetPrivacyPolicyResponse!
-}
-type GetPrivacyPolicyResponse {
-    ok: Boolean!
-    error: Err
-    data: PrivacyPolicy
-}

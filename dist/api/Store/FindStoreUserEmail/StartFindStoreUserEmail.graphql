@@ -1,9 +1,0 @@
-type Mutation {
-    StartFindStoreUserEmail(
-        phoneNumber: String!
-    ): StartFindStoreUserEmailResponse!
-}
-type StartFindStoreUserEmailResponse {
-    ok: Boolean!
-    error: Err
-}

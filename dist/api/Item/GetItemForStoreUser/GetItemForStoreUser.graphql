@@ -1,8 +1,0 @@
-type Query {
-    GetItemForStoreUser(itemCode: String!): GetItemForStoreUserResponse!
-}
-type GetItemForStoreUserResponse {
-    ok: Boolean!
-    error: Err
-    data: Item
-}

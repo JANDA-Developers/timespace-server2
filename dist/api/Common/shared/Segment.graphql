@@ -1,4 +1,0 @@
-type Segment {
-    from: DateTime!
-    to: DateTime!
-}

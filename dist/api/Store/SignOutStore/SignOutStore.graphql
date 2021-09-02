@@ -1,7 +1,0 @@
-type Mutation {
-    SignOutStore: SignOutStoreResponse!
-}
-type SignOutStoreResponse {
-    ok: Boolean!
-    error: Err
-}

@@ -1,5 +1,0 @@
-enum SmsType {
-    SMS
-    LMS
-    MMS
-}
