@@ -17,7 +17,7 @@ exports.getReplacementSetsForItem = async (item) => {
     const { start, end, dateTimeRange } = getStartEnd(item.dateTimeRange.from, item.dateTimeRange.to, offset);
     const store = await Store_1.StoreModel.findById(product.storeId);
     const replacements = {
-        ITEM_CODE: item.code || "",
+        ITEM_CODE: item.code,
         ITEM_END: end,
         ITEM_START: start,
         ITEM_DATETIME_RANGE: dateTimeRange,
@@ -58,8 +58,8 @@ const dateStrFormat = (date) => {
         .replace("T", " ");
 };
 exports.SendSmsWithTriggerEvent = async ({ event, recWithReplSets, smsKey, tags }) => {
+    console.log("Send Start");
     console.log({ recWithReplSets });
-    console.log("sendStart");
     const sendResult = 
     // const queryResult =
     await requestSmsApi_1.requestApi(process.env.SMS_API_EDGE || "", graphql_1.print(apollo_server_1.gql `
@@ -96,7 +96,7 @@ exports.SendSmsWithTriggerEvent = async ({ event, recWithReplSets, smsKey, tags 
     }, {
         smsKey
     });
-    console.log("sendEnd");
+    console.log("Send End");
     return sendResult;
 };
 //# sourceMappingURL=ItemSmsFunctions.js.map

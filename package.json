@@ -58,7 +58,7 @@
         "types": "graphql-to-typescript ./src/schema.graphql ./src/types/graph.d.ts",
         "prebuild": "rm -r dist",
         "build": "tsc",
-        "postbuild": "cpx 'src/**/*.graphql' dist",
+        "postbuild": "cpx \"src/**/*.graphql\" dist",
         "start": "cd dist && node index.js",
         "upload:dev": "aws s3 cp ./ticket-apis.zip s3://booking.storage.private/dev/ticket/apis.zip",
         "upload": "aws s3 cp ./ticket-apis.zip s3://booking.storage.private/ticket/apis.zip"
