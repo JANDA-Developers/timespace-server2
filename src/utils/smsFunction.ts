@@ -26,7 +26,6 @@ export const sendSMS = async ({
     //     }
     // );
 
-
     // const {
     //     result_code,
     //     message,
@@ -53,7 +52,7 @@ export const sendSMS = async ({
     //     result
     // };
 
-    const query = (receivers : string, msg : string) => {
+    const query = (receivers: string, msg: string) => {
         return `mutation {
             SendSMS(
                 receivers : "${receivers}"
@@ -63,20 +62,22 @@ export const sendSMS = async ({
                 ok
             }
         }
-        `
-    }
-    
-    const {data} = await axios.post(
-        process.env.SMS_API_EDGE? process.env.SMS_API_EDGE :  "http://timespace-alb-1323994784.ap-northeast-2.elb.amazonaws.com/",
+        `;
+    };
+
+    const { data } = await axios.post(
+        process.env.SMS_API_EDGE
+            ? process.env.SMS_API_EDGE
+            : "http://timespace-alb-1323994784.ap-northeast-2.elb.amazonaws.com/",
         {
-            query : query(receivers, msg)  
+            query: query(receivers, msg)
         }
-    )
+    );
 
     //   const {data} = await axios.post(
     //     process.env.SMS_API_EDGE? process.env.SMS_API_EDGE :  "http://timespace-alb-1323994784.ap-northeast-2.elb.amazonaws.com/",
     //     {
-    //         query : SendSMSQuery(receivers, msg)  
+    //         query : SendSMSQuery(receivers, msg)
     //     }
     //   )
     return data;

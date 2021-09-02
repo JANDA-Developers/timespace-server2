@@ -56,13 +56,15 @@ exports.sendSMS = async ({ receivers, msg, sender = process.env.SMS_SENDER || "1
         }
         `;
     };
-    const { data } = await axios_1.default.post(process.env.SMS_API_EDGE ? process.env.SMS_API_EDGE : "http://timespace-alb-1323994784.ap-northeast-2.elb.amazonaws.com/", {
+    const { data } = await axios_1.default.post(process.env.SMS_API_EDGE
+        ? process.env.SMS_API_EDGE
+        : "http://timespace-alb-1323994784.ap-northeast-2.elb.amazonaws.com/", {
         query: query(receivers, msg)
     });
     //   const {data} = await axios.post(
     //     process.env.SMS_API_EDGE? process.env.SMS_API_EDGE :  "http://timespace-alb-1323994784.ap-northeast-2.elb.amazonaws.com/",
     //     {
-    //         query : SendSMSQuery(receivers, msg)  
+    //         query : SendSMSQuery(receivers, msg)
     //     }
     //   )
     return data;

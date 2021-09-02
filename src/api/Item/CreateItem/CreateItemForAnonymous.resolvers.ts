@@ -36,7 +36,7 @@ export const CreateItemForAnonymousFunc = async ({
     args,
     context: { req }
 }): Promise<CreateItemForAnonymousResponse> => {
-    console.log("------------CreateItemForAnonymousFunc call!!=========")
+    console.log("------------CreateItemForAnonymousFunc call!!=========");
 
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -72,12 +72,16 @@ export const CreateItemForAnonymousFunc = async ({
 
         await session.commitTransaction();
         session.endSession();
+        console.log("------------CreateItemForAnonymousFunc end!!=========");
+
         return {
             ok: true,
             error: null,
             data: item as any
         };
     } catch (error) {
+        console.log({ error });
+        console.log({ error });
         return await errorReturn(error, session);
     }
 };

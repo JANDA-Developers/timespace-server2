@@ -38,6 +38,7 @@ exports.CreateItemForAnonymousFunc = async ({ args, context: { req } }) => {
         const item = await createItem(store, product, dateTimeRange, usersInput, session);
         await session.commitTransaction();
         session.endSession();
+        console.log("------------CreateItemForAnonymousFunc end!!=========");
         return {
             ok: true,
             error: null,
@@ -45,6 +46,8 @@ exports.CreateItemForAnonymousFunc = async ({ args, context: { req } }) => {
         };
     }
     catch (error) {
+        console.log({ error });
+        console.log({ error });
         return await utils_1.errorReturn(error, session);
     }
 };

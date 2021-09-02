@@ -97,6 +97,8 @@ export const SendSmsWithTriggerEvent = async ({
         replacementSets: SmsTemplateAttributeSets[];
     }[];
 }) => {
+    console.log({ recWithReplSets });
+    console.log("sendStart");
     const sendResult =
         // const queryResult =
         await requestApi(
@@ -138,5 +140,6 @@ export const SendSmsWithTriggerEvent = async ({
                 smsKey
             }
         );
+    console.log("sendEnd");
     return sendResult;
 };
