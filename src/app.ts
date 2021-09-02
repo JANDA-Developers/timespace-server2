@@ -16,7 +16,7 @@ const MongoStore = require("connect-mongo")(session);
 
 class App {
     public server: ApolloServer;
-    public app: Express;
+    public app: Express; //.
 
     private corsOrigin: string[] = [
         "http://localhost:3000",
