@@ -17,7 +17,7 @@ exports.getReplacementSetsForItem = async (item) => {
     const { start, end, dateTimeRange } = getStartEnd(item.dateTimeRange.from, item.dateTimeRange.to, offset);
     const store = await Store_1.StoreModel.findById(product.storeId);
     const replacements = {
-        ITEM_CODE: item.code,
+        ITEM_CODE: item.code || "",
         ITEM_END: end,
         ITEM_START: start,
         ITEM_DATETIME_RANGE: dateTimeRange,

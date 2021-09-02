@@ -50,7 +50,9 @@ class App {
                 cookie: {
                     httpOnly: true,
                     secure: false,
-                    domain: ".stayjanda.cloud",
+                    domain: process.env.NODE_ENV === "development"
+                        ? "localhost"
+                        : ".stayjanda.cloud",
                     sameSite: "lax",
                     maxAge: dateFuncs_1.ONE_DAY * 14
                 }
@@ -211,7 +213,7 @@ class App {
                     resolve("Clear");
                     // } else {
                     //     reject("boooooooooooo");
-                    // }
+                    // }123123
                 });
             }
         });

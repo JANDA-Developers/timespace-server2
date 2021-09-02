@@ -71,7 +71,7 @@ class App {
                     resolve("Clear");
                     // } else {
                     //     reject("boooooooooooo");
-                    // }
+                    // }123123
                 });
             }
         });

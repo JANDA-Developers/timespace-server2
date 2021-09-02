@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.StoreModel = exports.StoreCls = void 0;
+exports.Policy = exports.StoreModel = exports.StoreCls = void 0;
 const BaseSchema_1 = require("../../abs/BaseSchema");
 const typegoose_1 = require("@typegoose/typegoose");
 const __collectionNames_1 = require("../__collectionNames");
@@ -226,11 +226,21 @@ __decorate([
     __metadata("design:type", Object)
 ], StoreCls.prototype, "bookingPolicy", void 0);
 __decorate([
+    typegoose_1.prop(),
+    __metadata("design:type", Array)
+], StoreCls.prototype, "polices", void 0);
+__decorate([
     typegoose_1.prop({
         default: []
     }),
     __metadata("design:type", Array)
 ], StoreCls.prototype, "infos", void 0);
+__decorate([
+    typegoose_1.prop({
+        default: []
+    }),
+    __metadata("design:type", Array)
+], StoreCls.prototype, "blockDates", void 0);
 __decorate([
     typegoose_1.prop({
         default: {
@@ -248,4 +258,23 @@ StoreCls = __decorate([
 ], StoreCls);
 exports.StoreCls = StoreCls;
 exports.StoreModel = typegoose_1.getModelForClass(StoreCls);
+class Policy {
+}
+__decorate([
+    typegoose_1.prop(),
+    __metadata("design:type", String)
+], Policy.prototype, "name", void 0);
+__decorate([
+    typegoose_1.prop(),
+    __metadata("design:type", String)
+], Policy.prototype, "content", void 0);
+__decorate([
+    typegoose_1.prop({ default: false }),
+    __metadata("design:type", Boolean)
+], Policy.prototype, "require", void 0);
+__decorate([
+    typegoose_1.prop(),
+    __metadata("design:type", Number)
+], Policy.prototype, "version", void 0);
+exports.Policy = Policy;
 //# sourceMappingURL=Store.js.map
